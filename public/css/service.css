@@ -1,0 +1,119 @@
+.btn {
+    max-width: 178px;
+}
+.table {
+    grid-template-columns: 10% 60% 10% 10% 10%;
+}
+.row-6 {
+    grid-row: 6;
+}
+.row-7 {
+    grid-row: 7;
+}
+.row-8 {
+    grid-row: 8;
+}
+.row-9 {
+    grid-row: 9;
+}
+.group textarea {
+    border: 1px solid #6B6B6B;
+    border-radius: 5px;
+    resize: none;
+}
+.abbr-tt>span {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: right;
+}
+.group {
+    margin: 29px 0;
+}
+.grid.group.add-service.hide {
+    display: none;
+}
+.modal-body > .add-service {
+    text-align: left;
+}
+.add-service {
+    grid-template-columns: 20% 36% 1fr;
+    grid-template-rows: 30px 30px 1fr 134px 30px 30px 30px minmax(30px, 1fr) 30px;
+    grid-gap: 29px 20px;
+    width: 762px;
+    padding-left: 43px;
+}
+.group.add-service {
+    grid-template-rows: 30px 30px;
+}
+.intervals {
+    grid-gap: 10px 20px;
+    grid-template-columns: 1fr 1fr;
+}
+.add-service option {
+    border: none;
+    font-size: 12px;
+}
+.add-service label {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+}
+#type-block input, #address-block input {
+    max-width: 215px;
+    margin-right: 4%;
+}
+#add-type, #add-address, #include-address, .include-address {
+    background: none;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 15px;
+    display: flex;
+}
+#addresses>select:not(:last-child), .addresses>select:not(:last-child) {
+    margin-bottom: 5px;
+}
+#more-address,.more-address {
+    margin-top: 20px;
+}
+input[type=radio] + label {
+    width: 100%;
+}
+#address-block {
+    margin-top: 7px;
+}
+.view {
+    text-align: left;
+}
+.view>.grid {
+    grid-template-columns: 2fr 3fr;
+    grid-template-rows: minmax(10px, 1fr);
+    grid-gap: 30px;
+    align-items: center;
+    margin-left: 47px;
+}
+.margin {
+    margin-left: 47px;
+}
+.view>.data {
+    margin: 0 0 15px 47px;
+}
+.view>.line:not(:first-child) {
+    margin: 20px 0 20px 0;
+}
+.view .line {
+    margin: 5px 0 10px 0;
+}
+.data.flex.direction-column b {
+    margin: 5px 0;
+    overflow: hidden;
+}
+.modal-edit {
+    overflow:scroll;
+}
+.modal-edit .line {
+    margin: 20px 0 20px 0;
+}
+.margin {
+    margin: 10px 0 20px 0;
+}

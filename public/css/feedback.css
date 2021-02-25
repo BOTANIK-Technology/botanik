@@ -1,0 +1,117 @@
+.sort {
+    font-size: 10px;
+    line-height: 12px;
+    color: #5B5B5B;
+}
+.review {
+    grid-template-columns: 6.7% 1fr 8.3% 16.8%;
+}
+.feedback {
+    border: 1px solid #90B9FC;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    grid-template-columns: 6.7% repeat(5, 1fr) 8.3%;
+}
+.text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 0!important;
+}
+.text.preview {
+    padding-left: 24px!important;
+}
+.date {
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: 0.005em;
+    color: #5B5B5B;
+}
+header > span {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 15px;
+    color: #C2C2C2;
+    margin-left: 30px;
+}
+header span>a {
+    height: 18px;
+    margin-left: 10px;
+}
+.modal-body {
+    max-width: 500px;
+    text-align: left;
+}
+.modal-body>div:not(.line) {
+    padding: 0 51px;
+}
+.message {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    padding: 20px 0;
+}
+.info {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    padding-bottom: 10px;
+}
+.info.phone {
+    margin-bottom: 10px;
+}
+.line.feedbacks {
+    margin-top: 20px;
+}
+.line.feedbacks:not(:last-child) {
+    margin-bottom: 20px;
+}
+.modal-feedback span {
+    margin-bottom: 5px;
+}
+.modal-footer p {
+    text-align: left;
+    padding: 0 56px;
+}
+.feedback.phone {
+    grid-template-columns: 1fr 1fr!important;
+    grid-template-rows: repeat(6, 1fr);
+}
+.two-col {
+    grid-column: 1/span 2;
+}
+.two-col div {
+    margin-right: 10px;
+}
+.two-col a {
+    text-decoration: none;
+}
+.two-col span {
+    font-weight: 800;
+    font-size: 11px;
+    line-height: 13px;
+    text-align: center;
+    letter-spacing: 0.1em;
+    color: #71A3D6;
+}
+
+@media screen and (max-width: 600px) {
+    .main-content > header > a {
+        align-self: flex-start;
+        margin-top: 10px;
+    }
+    .main-content > header > .btn {
+        margin-bottom: 10px;
+    }
+    .sort {
+        align-self: flex-start;
+        margin: 18px 0 0 0;
+    }
+    .main-content > header > span:last-child {
+        position: relative;
+        align-self: flex-end;
+        margin-right: 16px;
+        bottom: 18px;
+    }
+}

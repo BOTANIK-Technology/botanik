@@ -1,0 +1,280 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Interval;
+use App\Models\ServiceTimetable;
+use App\Models\TypeService;
+use App\Models\Address;
+use App\Models\Service;
+use Illuminate\Http\Request;
+use Exception;
+
+
+class ServiceController extends Controller
+{
+    /**
+     * Default params for view
+     *
+     * @var array
+     */
+    public $params = [];
+
+    /**
+     * View name
+     *
+     * @var string
+     */
+    public $view = 'service.page';
+
+
+    /**
+     * Set default params for view
+     *
+     * @param Request $request
+     */
+    public function setParams(Request $request)
+    {
+        $this->params['countService'] = TypeService::count();
+        $this->params['load'] = $request->load ?? 5;
+        $this->params['types'] = TypeService::take($this->params['load'])->get();
+        if ( $this->params['types']->isEmpty() ) $this->params['types'] = 0;
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getView (Request $request)
+    {
+        $this->setParams($request);
+        return view($this->view, $this->params);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index(Request $request)
+    {
+        return $this->getView($request);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function window (Request $request)
+    {
+        $this->params['modal'] = $request->modal;
+
+        switch ($request->modal) {
+            case 'delete':
+            case 'view':
+            case 'edit':
+            case 'create':
+            case 'timetable':
+                break;
+            default:
+                return abort(404);
+        }
+
+        switch ($request->modal) {
+            case 'delete':
+                $this->params['service_type'] = TypeService::find($request->id);
+                break;
+            case 'timetable':
+                $this->params['times'] = ServiceTimetable::getHours();
+                $this->params['days'] = ServiceTimetable::getDays();
+                $this->params['service_id'] = $request->service_id ?? $this->params['service_id'] = null;
+                $this->params['type_id'] = $request->type_id ?? $this->params['type_id'] = null;
+                break;
+            case 'create':
+            case 'edit':
+                $this->params['intervals'] = Interval::all();
+                $this->params['types_select'] = TypeService::all();
+                $this->params['addresses'] = Address::all();
+                if ($this->params['addresses']->isEmpty()) $this->params['addresses'] = 0;
+                break;
+        }
+
+        if ($request->modal == 'edit' || $request->modal == 'view') {
+            $this->params['service_type'] = TypeService::find($request->id);
+            $this->params['services'] = isset($this->params['service_type']->services) ?  $this->params['service_type']->services : false;
+            if ($request->modal == 'edit') $this->setTimetableCookies($this->params['services'], $request->business);
+        }
+
+        return $this->getView($request);
+    }
+
+
+    private function setTimetableCookies($services, $slug)
+    {
+        if (!$services || $services->isEmpty())
+            return;
+        foreach ($services as $service) {
+
+            if ( isset($_COOKIE['timetable-'.$service->id]) )
+                continue;
+
+            if (!$service->timetable)
+                continue;
+
+            $days = ServiceTimetable::getDaysEn();
+            $timetable = [];
+            foreach ($days as $day)
+                if(!is_null($service->timetable->$day))
+                    $timetable[$day] = json_decode($service->timetable->$day);
+
+            setcookie('checked-'.$service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+            setcookie('timetable-'.$service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addType(Request $request)
+    {
+        try {
+            $type = TypeService::create(['type' => $request->service]);
+            return response()->json(['id' => $type->id, 'type' => $type->type], 201);
+        }
+        catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addAddress(Request $request)
+    {
+        try {
+            $address = Address::create(['address' => $request->address]);
+            return response()->json(['id' => $address->id, 'address' => $address->address], 201);
+        }
+        catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws Exception
+     */
+    public function deleteService(Request $request)
+    {
+        try {
+            TypeService::find($request->id)->delete();
+        }
+        catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+        }
+
+        return response()->json(['ok' => true], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create(Request $request)
+    {
+        $validator = $this->validateService($request);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 405);
+        }
+
+        try {
+            $service = new Service();
+            $type = TypeService::find( $request->input('type') );
+            $service->name = $request->input('name');
+            $service->interval_id = $request->input('interval');
+            $service->range = $request->input('range');
+            $service->price = $request->input('price');
+            $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
+            $type->services()->save($service);
+            $service->attachAddresses($request->input('addresses'));
+            if ($request->has('timetable'))
+                $service->attachTimetable($request->input('timetable'));
+            if (!empty($request->input('quantity')) &&  !empty($request->input('message')))
+                $service->group()->create(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
+            return response()->json(['ok' => true], 201);
+        }
+        catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function editService(Request $request)
+    {
+        $validator = $this->validateService($request);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 405);
+        }
+
+        try {
+            $service = Service::find($request->id);
+            $service->type_service_id = $request->input('type');
+            $service->name = $request->input('name');
+            $service->interval_id = $request->input('interval');
+            $service->range = $request->input('range');
+            $service->price = $request->input('price');
+            $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
+            $service->save();
+            $service->rewriteAddresses($request->input('addresses'));
+            if ($request->has('timetable'))
+                $service->updateTimetable($request->input('timetable'));
+            if (!empty($request->input('quantity')) &&  !empty($request->input('message')))
+                $service->updateGroup(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
+            return response()->json(['ok' => true], 200);
+        } catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage().' '.$e->getLine()]], 500);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function removeService(Request $request)
+    {
+        try {
+            Service::find($request->id)->delete();
+            return response()->json(['ok' => true], 200);
+        }
+        catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 200);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Validation\Validator
+     */
+    private function validateService(Request $request)
+    {
+        return \Validator::make($request->all(), [
+            'price'     => 'required|integer|min:1',
+            'bonus'     => 'nullable|integer|min:1',
+            'type'      => 'required|integer',
+            'addresses' => 'required|array',
+            'name'      => 'required|string',
+            'interval'  => 'required|integer|min:0|max:24',
+            'range'     => 'nullable|integer|min:0',
+            'message'   => 'nullable|required_with:quantity|string',
+            'quantity'  => 'nullable|required_with:message|integer|min:2',
+            'timetable' => 'nullable|array'
+        ]);
+    }
+}

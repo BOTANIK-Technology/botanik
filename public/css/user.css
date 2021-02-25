@@ -1,0 +1,68 @@
+.btn {
+    max-width: 231px;
+}
+.table {
+    grid-template-columns: 10% 30% 30% 10% 10% 10%;
+}
+.modal-dialog {
+    min-width: 354px;
+}
+.add-user>div:not(.line) {
+    padding: 0 47px;
+}
+.add-user>div {
+    margin-bottom: 30px;
+}
+input[type=radio] + label {
+    max-width: 145px;
+}
+.calendar {
+    font-size: 12px;
+    line-height: 15px;
+    color: #4F4F4F;
+}
+#add-type, .add-type {
+    background: none;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 15px;
+    margin-left: 7px;
+    cursor: pointer;
+}
+
+.view-user>div:not(.line),.view-user>span {
+    text-align: left;
+    padding-left: 13.2%;
+}
+.view-user>div {
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    color: #000000;
+}
+.view-user>span {
+    margin-bottom: 5px;
+    font-size: 12px;
+    line-height: 15px;
+    color: #4F4F4F;
+}
+.abbr-tt>span {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: right;
+}
+.margin-top {
+    margin-top: 10px;
+}
+
+@media screen and (max-width: 600px) {
+    .main-content > header > a:not(:first-child) {
+        align-self: flex-start;
+        margin-top: 10px;
+    }
+    .main-content > header > .btn {
+        margin-bottom: 10px;
+    }
+}

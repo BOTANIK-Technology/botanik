@@ -1,0 +1,22 @@
+.notice-content {
+    margin-top: 60px;
+}
+.notice-message {
+    grid-template-columns: 1fr 8.3% 16.8%;
+    max-width: 753px;
+    margin: 0 auto 10px auto;
+    border: 1px solid #E9EAEC;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+.notice-message>div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    color: #5B5B5B;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: -0.41px;
+}
