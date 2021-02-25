@@ -1,0 +1,45 @@
+.table {
+    grid-template-columns: 6.7% 1fr repeat(5, 8.3%);
+}
+.icon {
+    height: 20px;
+    width: 20px;
+    background-size: cover;
+}
+.chart-icon {
+    background-image: url("../../images/pie-chart-c.svg");
+}
+.pause-icon {
+    background-image: url("../../images/pause.svg");
+}
+.view>div:not(.line),.view>span {
+    text-align: left;
+    padding-left: 13.2%;
+}
+.view>div {
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    color: #000000;
+}
+.view>span {
+    margin-bottom: 5px;
+    font-size: 12px;
+    line-height: 15px;
+    color: #4F4F4F;
+}
+.view-grid {
+    grid-template-columns: 1fr 1fr;
+}
+.col-1-2 {
+    grid-column: 1/span 2;
+}
+.view-logo {
+    width: 100px;
+    height: 100px;
+}
+.view-title {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}

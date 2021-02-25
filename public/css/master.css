@@ -1,0 +1,85 @@
+.navbar {
+    background-color: #F5F5F5;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.12);
+}
+.nav-menu .active {
+    background-color: #F5F5F5;
+}
+.nav-menu .active > a {
+    color: #FF8038;
+}
+.notice:hover {
+    background-image: url("../images/notice-d-hover.svg");
+}
+.notice.active {
+    background-image: url("../images/notice-d.svg");
+}
+.notice.true:hover {
+    background-image: url("../images/notice-true-d.svg");
+}
+.exit:hover {
+    background-image: url("../images/exit-hover-d.svg");
+}
+.modal-header {
+    background-color: #F5F5F5;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.12);
+}
+
+/*
+ * Personal schedule
+ */
+.schedule-pers {
+    margin-top: 60px;
+}
+.schedule-pers h2 {
+    margin-left: 2%;
+}
+.schedule-pers .date-sort {
+    margin-left: 21px;
+}
+.timetable.pers .row-1 {
+    max-width: 43px;
+}
+.timetable.pers {
+    margin-left: 2%;
+    grid-template-columns:minmax(5%,43px) 1fr;
+    max-width: 288px;
+    width: 100%;
+}
+.timetable.pers .border-right-main {
+    border-right: 1px solid #EFCCB8;
+}
+.timetable.pers .border-bottom-main {
+    border-bottom: 1px solid #EFCCB8;
+}
+.schedule-pers .date-sort>select {
+    border: 1px solid #EFCCB8;
+}
+.border-top{
+    border-top: 1px solid #E9EAEC;
+}
+.border-right {
+    border-right: 1px solid #E9EAEC;
+}
+.timetable {
+    border: 1px solid #EFCCB8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.border-right-main {
+    border-right: 1px solid #EFCCB8;
+}
+.border-bottom-main {
+    border-bottom: 1px solid #EFCCB8;
+}
+.border-top-main {
+    border-top: 1px solid #EFCCB8;
+}
+.hashtag {
+    color: #FF8038;
+}
+select {
+    background-image: url("../images/arrow-select-d.svg");
+}
+.border {
+    border: 1px solid #EFCCB8;
+}

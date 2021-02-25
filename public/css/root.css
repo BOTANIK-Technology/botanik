@@ -1,0 +1,24 @@
+.navbar {
+    box-shadow: 0 2px 3px rgba(117, 7, 255, 0.2);
+}
+.nav-menu .active, .navbar {
+    background-color: #DCFDFF;
+}
+.nav-menu .active > a, .color {
+    color: #7507FF;
+}
+.brand-logo {
+    width: 133px;
+    height: 29px;
+    background-image: url("../images/botanik-head.png");
+    background-size: cover;
+}
+.image-logo.active {
+    background-image: url("../images/image-icon-active.svg");
+}
+.view-icon {
+    content: url("../images/view-a.svg");
+}
+.edit-icon {
+    content: url("../images/edit-a.svg");
+}

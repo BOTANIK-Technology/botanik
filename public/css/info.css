@@ -1,0 +1,34 @@
+.create .modal-dialog {
+    max-width: 762px;
+    width: 100%;
+}
+.main-content > header > .btn {
+    max-width: 191px;
+}
+.table {
+    grid-template-columns: 6.7% 1fr 8.3% 8.3% 8.3%;
+}
+#add-address {
+    font-size: 12px;
+    line-height: 15px;
+    background: none;
+    font-weight: bold;
+    color: #084887;
+}
+.input-bg.map-pin {
+    background-image: url("../images/map-pin.svg");
+    height: 26px
+}
+.best-design,#best-design {
+    max-width: 117px;
+}
+#add-address-block {
+    margin-left: auto;
+    grid-column: 2;
+}
+#design-btn {
+    align-self: start;
+}
+.input-bg.map-pin:not(:last-child) {
+    margin-bottom: 10px;
+}

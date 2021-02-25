@@ -1,0 +1,70 @@
+.create-block {
+    padding-top: 63px;
+}
+.create-form {
+    grid-template-columns: 141px 1fr;
+    grid-gap: 30px 16px;
+    align-items: center;
+    max-width: 70%;
+    margin: 0 auto;
+}
+.create-form > label {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: -0.0024em;
+    color: #4F4F4F;
+}
+#img {
+    display: none;
+}
+input[type="text"],input[type="email"] {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    color: #5B5B5B;
+}
+.name>input {
+    max-width: 30%;
+}
+.pass>input {
+    max-width: 45%;
+}
+.pack>label:not(:last-child) {
+    margin-right: 10px;
+}
+.pack>label {
+    width: 80px;
+    height: 30px;
+    padding-top: 8px;
+    font-weight: 800;
+    font-size: 11px;
+    line-height: 13px;
+    text-align: center;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid #7507FF;
+    border-radius: 5px;
+    color: #7507FF;
+}
+input[type="radio"]:checked + label {
+    background-color: #7507FF;
+}
+input.active {
+    border-bottom: 1px solid #7507FF;
+}
+.create-form>.btn-primary {
+    grid-column: 1/span 2;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+.file-name {
+    position: relative;
+    left: 45px;
+    margin-left: 10px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    color: #5B5B5B;
+    white-space: nowrap;
+}

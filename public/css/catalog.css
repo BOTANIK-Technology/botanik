@@ -1,0 +1,6 @@
+.table {
+    grid-template-columns: 6.7% 1fr 8.3% 8.3% 8.3%;
+}
+.main-content > header > .btn {
+    max-width: 191px;
+}
