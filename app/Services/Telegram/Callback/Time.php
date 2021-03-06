@@ -23,7 +23,7 @@ class Time extends CallbackQuery
             $this->back = 'DatesService_'.parent::getServiceID();
             $buttons = $this->serviceTime(parent::getServiceID(), $date);
         }
-        return parent::editMessage(__('Выберите время'), $buttons);
+        return parent::editMessage(__('Выберете время'), $buttons);
     }
 
     private function serviceTime (int $service_id, string $date)

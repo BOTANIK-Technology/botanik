@@ -147,11 +147,22 @@
     color: #FFFFFF;
 }
 
-/* Create */
+/* Modal */
 .create {
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: auto;
     grid-gap: 10px;
-    padding: 0 20px;
+    padding: 0 10%;
+}
+.line.margin {
+    margin: 25px 0;
+}
+
+.modal-body .create input[type="text"]::placeholder {
+    font-size: 14px;
+}
+.modal-body .create input[type="text"] {
+    padding-bottom: 5px;
+    max-width: 120px;
 }
 
 @media screen and (max-width: 1100px) {

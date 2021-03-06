@@ -1,3 +1,8 @@
+@section('modal-scripts')
+    <script src="{{asset('js/request.js')}}"></script>
+    <script src="{{asset('js/schedule/edit.js')}}"></script>
+@endsection
+
 <div class="edit">
     <select id="edit-months" class="border-color">
         @foreach($calendar as $m)

@@ -16,7 +16,7 @@ class Service extends CallbackQuery
         parent::__construct($request);
         $this->back = 'TypesServices_';
         $type_id = parent::setTypeID();
-        return $this->editMessage(__('Выберите услугу для записи'), $this->getServices($type_id));
+        return $this->editMessage(__('Выберете услугу для записи'), $this->getServices($type_id));
     }
 
     /**

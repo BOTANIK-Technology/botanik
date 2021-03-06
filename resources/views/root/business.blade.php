@@ -5,13 +5,15 @@
 @endsection
 
 @section('scripts')
+    <script src="{{asset('js/requests.js')}}"></script>
+    <script src="{{asset('js/img-label.js')}}"></script>
     <script src="{{asset('js/root/business.js')}}"></script>
 @endsection
 
 @section('content')
     @component('root.layouts.content')
         <div class="create-block">
-            <form class="grid create-form" method="post" enctype="multipart/form-data" action="{{route('root.business.create')}}">
+            <div class="grid create-form">
 
                 <label for="business-name">Название бизнеса</label>
                 <input type="text" placeholder="Введите текст" id="business-name" name="business_name" class="inp">
@@ -31,7 +33,7 @@
                 <div class="flex pack">
                     @if ($packages)
                         @foreach($packages as $package)
-                            <input type="radio" name="package" value="{{$package->id}}" id="{{mb_strtolower($package->name)}}">
+                            <input type="radio" name="package" value="{{$package->id}}" id="{{mb_strtolower($package->name)}}" @if ($loop->last) checked @endif>
                             <label for="{{mb_strtolower($package->name)}}">
                                 {{$package->name}}
                             </label>
@@ -43,7 +45,7 @@
 
                 <label for="name">ФИО основателя</label>
                 <div class="flex justify-content-between name">
-                    <input type="text" name="last_name" placeholder="Введите фамилию" id="second-name" class="inp">
+                    <label for="second-name"></label><input type="text" name="last_name" placeholder="Введите фамилию" id="second-name" class="inp">
                     <input type="text" name="first_name" placeholder="Введите имя" id="first-name" class="inp">
                     <input type="text" name="middle_name" placeholder="Введите отчество" id="middle-name" class="inp">
                 </div>
@@ -75,11 +77,9 @@
                     </label>
                 </div>
 
-                @csrf
+                <button class="btn-primary" data-storage="{{route('api.storage')}}" data-href="{{route('root.business.create')}}" id="create">{{__('Создать')}}</button>
 
-                <button class="btn-primary">{{__('Создать')}}</button>
-
-            </form>
+            </div>
         </div>
     @endcomponent
 @endsection

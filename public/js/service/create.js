@@ -39,7 +39,7 @@ if (addService) {
 
     let groupBlock = document.getElementById('group-service');
     function groupOff () {
-        addClass(groupBlock, 'hide');
+        addClass(document.getElementById('group-service'), 'hide');
         document.getElementById('quantity').value = '';
         document.getElementById('message').value = '';
     }
@@ -75,7 +75,7 @@ if (addService) {
         let addresses = document.getElementsByName('addresses[]');
         let array = [];
         Object.keys(addresses).forEach((el) => {
-            if (el !== 0) array.push(addresses[el].value);
+            if (el != 0) array.push(addresses[el].value);
         });
         return array;
     }
@@ -230,7 +230,7 @@ if (addService) {
      * Calendar
      */
     calendar.addEventListener('click', function () {
-        // setCookie('inputs', JSON.stringify(send()), {'path':COOKIE_URL});
+        setCookie('inputs', JSON.stringify(send()), {'path':COOKIE_URL});
         window.location.href = this.dataset.href;
     });
 
@@ -238,11 +238,11 @@ if (addService) {
      * Group
      */
     let groupBtns = document.getElementsByName('group');
-    if (groupVal() === 0) groupOff();
+    if (groupVal() == 0) groupOff();
     else removeClass(groupBlock, 'hide');
     Object.keys(groupBtns).forEach((el) => {
         groupBtns[el].addEventListener('change', function () {
-            if (this.value === 0) groupOff();
+            if (this.value == 0) groupOff();
             else removeClass(groupBlock, 'hide');
         })
     });

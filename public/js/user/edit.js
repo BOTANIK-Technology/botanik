@@ -1,6 +1,5 @@
 let editUserBtn = document.getElementById('edit-user');
 if (editUserBtn) {
-
     editUserBtn.addEventListener('click', function () {
         let send = {
             'name': fio.value,
@@ -16,6 +15,8 @@ if (editUserBtn) {
             send.services = addressServices(serviceSelects);
         } else
             send.role = admin.value;
+
+        unsetCookies(countService);
 
         let Request = postRequest(editRoute+'/edit-user', send);
         Request.onload = function() {

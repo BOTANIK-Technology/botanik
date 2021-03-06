@@ -43,8 +43,8 @@
                             <div id="menu-{{$item->id}}" class="more-menu hide">
                                 <ul>
                                     <li><a href="{{route('window.user', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div><span class="more-menu-text">Просмотр</span></a></li>
-                                    <li><form method="get" action="{{route('manage.confirm', ['business' => $slug, 'sort' => $sort])}}"><input type="hidden" name="id" value="{{$item->id}}"><button class="add-b-icon bg-color-fff" type="submit"/></form></li>
-                                    <li><form method="get" action="{{route('manage.reject', ['business' => $slug, 'sort' => $sort])}}"><input type="hidden" name="id" value="{{$item->id}}"><button class="reject-icon bg-color-fff" type="submit"/></form></li>
+                                    <li><form method="get" action="{{route('manage.confirm', ['business' => $slug, 'sort' => $sort])}}"><input type="hidden" name="id" value="{{$item->id}}"><button class="add-b-icon bg-color-fff" type="submit"></button></form></li>
+                                    <li><form method="get" action="{{route('manage.reject', ['business' => $slug, 'sort' => $sort])}}"><input type="hidden" name="id" value="{{$item->id}}"><button class="reject-icon bg-color-fff" type="submit"></button></form></li>
                                 </ul>
                                 <div data-id="{{$item->id}}" class="more-menu-close"></div>
                             </div>
@@ -54,9 +54,11 @@
                             <div class="more-icon" data-id="{{$item->id}}"></div>
                             <div id="menu-{{$item->id}}" class="more-menu hide">
                                 <ul>
-                                    <li><a href="{{route('window.user', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div><span class="more-menu-text">Просмотр</span></a></li>
-                                    <li><a href="{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="edit-icon"></div><span class="more-menu-text">Редактировать</span></a></li>
-                                    <li><a href="{{route('window.user', ['business' => $slug, 'modal' => 'delete', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="delete-icon"></div><span class="more-menu-text red">Удалить</span></a></li>
+                                    <li><a href="{{route('window.user', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div><span class="more-menu-text">{{__('Просмотр')}}</span></a></li>
+                                    @if(Auth::user()->hasRole('owner'))
+                                        <li><a href="{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="edit-icon"></div><span class="more-menu-text">{{__('Редактировать')}}</span></a></li>
+                                    @endif
+                                    <li><a href="{{route('window.user', ['business' => $slug, 'modal' => 'delete', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="delete-icon"></div><span class="more-menu-text red">{{__('Удалить')}}</span></a></li>
                                 </ul>
                                 <div data-id="{{$item->id}}" class="more-menu-close"></div>
                             </div>
@@ -87,22 +89,24 @@
                         <div class="flex align-items-center justify-content-center">
                             <form method="get" action="{{route('manage.confirm', ['business' => $slug, 'sort' => $sort])}}">
                                 <input type="hidden" name="id" value="{{$item->id}}">
-                                <button class="add-b-icon bg-color-fff" type="submit"/>
+                                <button class="add-b-icon bg-color-fff" type="submit"></button>
                             </form>
                         </div>
                         <div class="flex align-items-center justify-content-center">
                             <form method="get" action="{{route('manage.reject', ['business' => $slug, 'sort' => $sort])}}">
                                 <input type="hidden" name="id" value="{{$item->id}}">
-                                <button class="reject-icon bg-color-fff" type="submit"/>
+                                <button class="reject-icon bg-color-fff" type="submit"></button>
                             </form>
                         </div>
                     @else
                         <div class="flex align-items-center justify-content-center">
                             <a href="{{route('window.user', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div></a>
                         </div>
-                        <div class="flex align-items-center justify-content-center">
-                            <a href="{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="edit-icon"></div></a>
-                        </div>
+                        @if(Auth::user()->hasRole('owner'))
+                            <div class="flex align-items-center justify-content-center">
+                                <a href="{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="edit-icon"></div></a>
+                            </div>
+                        @endif
                         <div class="flex align-items-center justify-content-center">
                             <a href="{{route('window.user', ['business' => $slug, 'modal' => 'delete', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="delete-icon"></div></a>
                         </div>

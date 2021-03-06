@@ -23,6 +23,6 @@ class Has
             }
         }
 
-        return abort(404);
+        abort(404);
     }
 }

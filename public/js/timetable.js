@@ -15,3 +15,10 @@ Object.keys(checkboxes).forEach((el) => {
         if (mouseDown) checkboxes[el].classList.toggle('checked');
     });
 });
+
+let all = document.querySelector('#select-all');
+all.addEventListener('click', function () {
+    Object.keys(checkboxes).forEach((el) => {
+        addClass(checkboxes[el], 'checked')
+    });
+})

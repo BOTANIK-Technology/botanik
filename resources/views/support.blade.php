@@ -5,6 +5,7 @@
 @endsection
 
 @section('scripts')
+    <script src="{{asset('js/img-label.js')}}"></script>
     <script src="{{asset('js/support.js')}}"></script>
 @endsection
 

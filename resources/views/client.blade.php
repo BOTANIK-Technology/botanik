@@ -80,9 +80,9 @@
 @component('modal')
         @if ($modal === 'delete')
             <div class="delete text-align-center">
-                Вы действительно <br>
+                Вы действительно<br>
                 хотите удалить клиента<br>
-                <b>{{$current->last_name ?? ''}} {{$current->first_name}} {{$current->middle_name ?? ''}}</b>?
+                <b>{{$current->getFio()}}</b>?
             </div>
             @slot('buttons')
                 <button type="button" id="delete-client" data-id="{{$current->id}}" class="btn-primary">
@@ -92,13 +92,22 @@
             @endslot
         @elseif($modal === 'block')
             <div class="delete text-align-center">
-                Вы действительно <br>
-                хотите заблокировать клиента<br>
-                <b>{{$current->last_name ?? ''}} {{$current->first_name}} {{$current->middle_name ?? ''}}</b>?
+                {{__('Вы действительно')}}<br>
+                @if ($current->status)
+                {{__('хотите заблокировать клиента')}}<br>
+                @else
+                {{__('хотите разблокировать клиента')}}<br>
+            @endif
+            <b>{{$current->getFio()}}</b> ?
             </div>
             @slot('buttons')
                 <button type="button" id="block-client" data-id="{{$current->id}}" class="btn-primary">
-                    {{ __('Заблокировать') }}
+                    @if ($current->status)
+                        {{ __('Заблокировать') }}
+                    @else
+                        {{ __('Разблокировать') }}
+                    @endif
+
                 </button>
                 <a href="{{route('client', ['business' => $slug, 'sort' => $sort, 'load' => $load])}}" id="refresh-modal"></a>
             @endslot

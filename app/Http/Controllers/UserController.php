@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMail;
+use App\Models\Notice;
 use App\Models\Service;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserTimetable;
 use App\Models\Role;
 use App\Models\Address;
 use Exception;
+use Illuminate\Validation\Validator;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
@@ -50,7 +56,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index(Request $request)
     {
@@ -59,7 +65,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function window (Request $request)
     {
@@ -78,11 +84,11 @@ class UserController extends Controller
                 $this->params['user'] = User::find($request->id);
                 break;
             case 'edit':
-                $this->params['user'] = User::find($request->id);
+                $this->params['id'] = $request->id;
+                $this->params['user'] = User::find($this->params['id']);
                 $this->setTimetableCookies($this->params['user'], $request->business);
                 $this->params['services'] = Service::withoutTimetable();
                 $this->params['addresses'] = Address::all();
-                $this->params['id'] = $request->id;
                 $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
                 break;
             case 'timetable':
@@ -90,6 +96,8 @@ class UserController extends Controller
                 $this->params['times'] = $time->getHours();
                 $this->params['days'] = $time->getDays();
                 $this->params['id'] = $request->id ?? null;
+                if (!is_null($this->params['id']))
+                    $this->setTimetableCookies(User::find($this->params['id']), $request->business, true);
                 $this->params['moreService'] = intval($request->moreService);
                 $this->params['currentService'] = intval($request->currentService);
                 break;
@@ -106,8 +114,9 @@ class UserController extends Controller
     /**
      * @param $user
      * @param $slug
+     * @param bool $checked
      */
-    private function setTimetableCookies($user, $slug)
+    private function setTimetableCookies($user, $slug, $checked = false)
     {
         if (empty($user->timetables))
             return;
@@ -123,16 +132,20 @@ class UserController extends Controller
                 if(!is_null($timetable->$day))
                     $cookie[$day] = json_decode($timetable->$day);
 
-            setcookie('checked-'.$k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/users/']);
-            setcookie('timetable-'.$k, json_encode($cookie), ['path' => '/'.$slug.'/users/', 'samesite' => 'Lax']);
+            switch ($checked) {
+                case false:
+                    setcookie('timetable-'.$k, json_encode($cookie), ['path' => '/'.$slug.'/users/', 'samesite' => 'Lax']);
+                case true:
+                    setcookie('checked-'.$k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/users/']);
+            }
         }
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function addUser (Request $request)
+    public function addUser (Request $request): JsonResponse
     {
         $validator = $this->validateUser($request);
 
@@ -167,7 +180,7 @@ class UserController extends Controller
 
             if ($root->hasRole('admin')) {
                 $array['status'] = 0;
-                \App\Models\Notice::sendNotice(
+                Notice::sendNotice(
                     $request->input('business_db'),
                     [
                         [
@@ -187,15 +200,15 @@ class UserController extends Controller
             $user->attachTimetables($request->timetables, $request->addresses, $services);
             $user->attachCustom('addresses', $request->addresses);
 
-//            if(!isset($array['status']) && \ConnectService::prepareJob()) {
-//                \App\Jobs\SendMail::dispatch(
-//                    $request->business,
-//                    $request->email,
-//                    $request->password,
-//                    $request->name,
-//                    $request->business_name
-//                )->delay(now()->addMinutes(2));
-//            }
+            if(!isset($array['status']) && \ConnectService::prepareJob()) {
+                SendMail::dispatch(
+                    $request->business,
+                    $request->email,
+                    $request->password,
+                    $request->name,
+                    $request->business_name
+                )->delay(now()->addMinutes(2));
+            }
 
             return response()->json(['ok' => true], 200);
 
@@ -208,9 +221,9 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function editUser (Request $request)
+    public function editUser (Request $request): JsonResponse
     {
         $validator = $this->validateUser($request, false);
 
@@ -270,7 +283,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function addService (Request $request)
     {
@@ -293,9 +306,9 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function deleteUser(Request $request)
+    public function deleteUser(Request $request): JsonResponse
     {
 
         try {
@@ -308,7 +321,7 @@ class UserController extends Controller
                 $user->updated_by = $root->id;
                 $user->save();
 
-                \App\Models\Notice::sendNotice(
+                Notice::sendNotice(
                     $request->input('business_db'),
                     [
                         [
@@ -318,7 +331,7 @@ class UserController extends Controller
                     ]
                 );
             } else {
-                \App\Models\Notice::sendNotice(
+                Notice::sendNotice(
                     $request->input('business_db'),
                     [
                         [
@@ -341,7 +354,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function manageConfirm (Request $request)
     {
@@ -349,7 +362,7 @@ class UserController extends Controller
         $user->status = 1;
         $user->save();
 
-        \App\Models\Notice::sendNotice(
+        Notice::sendNotice(
             $request->input('business_db'),
             [
                 [
@@ -360,7 +373,7 @@ class UserController extends Controller
         );
 
         if (\ConnectService::prepareJob()) {
-            \App\Jobs\SendMail::dispatch(
+            SendMail::dispatch(
                 $request->business,
                 $user->email,
                 $user->password,
@@ -374,7 +387,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function manageReject (Request $request)
     {
@@ -384,7 +397,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getView(Request $request)
     {
@@ -395,9 +408,9 @@ class UserController extends Controller
     /**
      * @param Request $request
      * @param bool $create
-     * @return \Illuminate\Validation\Validator
+     * @return Validator
      */
-    private function validateUser (Request $request, $create = true)
+    private function validateUser (Request $request, $create = true): Validator
     {
         $rules = [
             'name'       => 'required|string|min:1',

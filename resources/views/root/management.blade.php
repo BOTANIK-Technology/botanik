@@ -114,6 +114,9 @@
                     <span>Почта основателя</span>
                     <div>{{$business->owner->email}}</div>
 
+                    <span>Пароль основателя</span>
+                    <div>{{$business->owner->password}}</div>
+
                     <span>Ссылка на вход</span>
                     <div>{{URL::to('/').'/'.$business->slug.'/login'}}</div>
 
@@ -220,7 +223,7 @@
                     <span>Количество услуг</span>
                     <div>{{$chart['services']}}</div>
 
-                    <span>Количество салонов</span>
+                    <span>{{__('Количество адресов')}}</span>
                     <div>{{$chart['addrs']}}</div>
                 </div>
 
@@ -248,7 +251,7 @@
         @elseif($modal === 'delete')
 
             <div class="delete text-align-center">
-                Вы действительно  хотите удалить<br>
+                Вы действительно хотите удалить<br>
                 <b>{{$business->name}}</b><br>
                 из системы?
             </div>

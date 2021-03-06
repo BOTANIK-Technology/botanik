@@ -21,7 +21,7 @@ class DatesMaster extends CallbackQuery
         parent::__construct($request);
         $master_id = parent::setMasterID();
         $this->back = 'Master_'.parent::getAddressID();
-        return parent::editMessage(__('Выберите дату'), $this->masterDate($master_id, $month));
+        return parent::editMessage(__('Выберете дату'), $this->masterDate($master_id, $month));
     }
 
     private function masterDate($master_id, $month) {

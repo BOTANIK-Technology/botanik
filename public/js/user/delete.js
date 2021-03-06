@@ -5,7 +5,7 @@ if (delUserBtn) {
         Request.onload = function() {
             if (Request.status >= 200 && Request.status < 400) {
                 if (note && note.length)
-                    closeModal('modal', note);
+                    closeModal(false, 'modal', note);
                 closeModal();
             } else {
                 showErrors(Request.response);

@@ -45,7 +45,7 @@
             </ul>
 
             @slot('buttons')
-                <button class="btn error" type="button" onclick="closeModal('modal')">{{__('ОК')}}</button>
+                <button class="btn error" type="button" onclick="closeModal()">{{__('ОК')}}</button>
             @endslot
         @endcomponent
     @endsection

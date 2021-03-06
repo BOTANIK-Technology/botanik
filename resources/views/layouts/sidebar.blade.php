@@ -45,6 +45,9 @@
                     <a href="{{ route('report', $slug) }}">{{__('Отчёты')}}</a>
                 </li>
             @endif
+        <li class="{{ Route::currentRouteNamed('api') ? 'active': '' }}">
+            <a href="{{ route('api', $slug) }}">{{__('API')}}</a>
+        </li>
         @endrole
         @role('master')
             <li class="{{ Route::currentRouteNamed('schedule') ? 'active': '' }}">

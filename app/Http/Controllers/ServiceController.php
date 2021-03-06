@@ -7,8 +7,12 @@ use App\Models\ServiceTimetable;
 use App\Models\TypeService;
 use App\Models\Address;
 use App\Models\Service;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Validation\Validator;
+use Illuminate\View\View;
 
 
 class ServiceController extends Controller
@@ -43,7 +47,7 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getView (Request $request)
     {
@@ -53,7 +57,7 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index(Request $request)
     {
@@ -62,7 +66,7 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View|void
      */
     public function window (Request $request)
     {
@@ -88,6 +92,8 @@ class ServiceController extends Controller
                 $this->params['days'] = ServiceTimetable::getDays();
                 $this->params['service_id'] = $request->service_id ?? $this->params['service_id'] = null;
                 $this->params['type_id'] = $request->type_id ?? $this->params['type_id'] = null;
+                if (!is_null($this->params['service_id']))
+                    $this->setTimetableCookies(Service::where('id', $request->service_id)->get(), $request->business, true);
                 break;
             case 'create':
             case 'edit':
@@ -101,14 +107,15 @@ class ServiceController extends Controller
         if ($request->modal == 'edit' || $request->modal == 'view') {
             $this->params['service_type'] = TypeService::find($request->id);
             $this->params['services'] = isset($this->params['service_type']->services) ?  $this->params['service_type']->services : false;
-            if ($request->modal == 'edit') $this->setTimetableCookies($this->params['services'], $request->business);
+            if ($request->modal == 'edit')
+                $this->setTimetableCookies($this->params['services'], $request->business);
         }
 
         return $this->getView($request);
     }
 
 
-    private function setTimetableCookies($services, $slug)
+    private function setTimetableCookies($services, $slug, $checked = false)
     {
         if (!$services || $services->isEmpty())
             return;
@@ -126,16 +133,21 @@ class ServiceController extends Controller
                 if(!is_null($service->timetable->$day))
                     $timetable[$day] = json_decode($service->timetable->$day);
 
-            setcookie('checked-'.$service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
-            setcookie('timetable-'.$service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+            switch ($checked) {
+                case false:
+                    setcookie('timetable-'.$service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+                case true:
+                    setcookie('checked-'.$service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+            }
+
         }
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function addType(Request $request)
+    public function addType(Request $request): JsonResponse
     {
         try {
             $type = TypeService::create(['type' => $request->service]);
@@ -148,9 +160,9 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function addAddress(Request $request)
+    public function addAddress(Request $request): JsonResponse
     {
         try {
             $address = Address::create(['address' => $request->address]);
@@ -163,10 +175,10 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws Exception
      */
-    public function deleteService(Request $request)
+    public function deleteService(Request $request): JsonResponse
     {
         try {
             TypeService::find($request->id)->delete();
@@ -175,14 +187,14 @@ class ServiceController extends Controller
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
 
-        return response()->json(['ok' => true], 200);
+        return response()->json(['ok' => true]);
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         $validator = $this->validateService($request);
 
@@ -213,9 +225,9 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function editService(Request $request)
+    public function editService(Request $request): JsonResponse
     {
         $validator = $this->validateService($request);
 
@@ -245,9 +257,9 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function removeService(Request $request)
+    public function removeService(Request $request): JsonResponse
     {
         try {
             Service::find($request->id)->delete();
@@ -260,9 +272,9 @@ class ServiceController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Validation\Validator
+     * @return Validator
      */
-    private function validateService(Request $request)
+    private function validateService(Request $request): Validator
     {
         return \Validator::make($request->all(), [
             'price'     => 'required|integer|min:1',

@@ -14,7 +14,7 @@ class Master extends CallbackQuery
         $service_id = parent::getServiceID();
         $address_id = parent::setAddressID();
         $this->back = 'Address_'.$service_id;
-        return $this->editMessage(__('Выберите специалиста'), $this->getMaster($service_id, $address_id));
+        return $this->editMessage(__('Выберете специалиста'), $this->getMaster($service_id, $address_id));
     }
 
     /**

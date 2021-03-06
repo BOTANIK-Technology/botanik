@@ -22,7 +22,7 @@
     @error('email')
         @component('modal')
             @slot('buttons')
-                <button type="button" class="btn-primary" onclick="closeModal('modal')">
+                <button type="button" class="btn-primary" onclick="closeModal()">
                     {{ __('Продолжить') }}
                 </button>
             @endslot

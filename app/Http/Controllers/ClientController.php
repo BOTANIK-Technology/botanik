@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\TelegramUser;
 use Illuminate\Support\Collection;
 use Exception;
+use Illuminate\View\View;
+use Validator;
 
 class ClientController extends Controller
 {
@@ -99,7 +103,7 @@ class ClientController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getView(Request $request)
     {
@@ -109,7 +113,7 @@ class ClientController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index(Request $request)
     {
@@ -118,7 +122,7 @@ class ClientController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function window(Request $request)
     {
@@ -137,12 +141,12 @@ class ClientController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function edit(Request $request)
+    public function edit(Request $request): JsonResponse
     {
 
-         $validator = \Validator::make($request->all(), [
+         $validator = Validator::make($request->all(), [
             'first_name'  => 'required|string|max:255',
             'last_name'   => 'nullable|string|max:255',
             'middle_name' => 'nullable|string|max:255',
@@ -197,31 +201,32 @@ class ClientController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function block (Request $request)
+    public function block (Request $request): JsonResponse
     {
         try {
-            TelegramUser::find($request->id)->update(['status' => 0]);
-            return response()->json(['ok' => true], 200);
+            $client = TelegramUser::findOrFail($request->id);
+            $client->update(['status' => !$client->status]);
+            return response()->json(['ok' => true]);
         }
         catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 501);
         }
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function delete (Request $request)
+    public function delete (Request $request): JsonResponse
     {
         try {
             TelegramUser::find($request->id)->delete();
             return response()->json(['ok' => true], 200);
         }
         catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 501);
         }
     }
 

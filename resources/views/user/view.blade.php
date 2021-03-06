@@ -12,7 +12,7 @@
             <div class="line"></div>
             @if ($user->timetables && !$user->timetables->isEmpty())
                 @foreach($user->timetables as $timetable)
-                    <span>{{__('Адрес салона')}}</span>
+                    <span>{{__('Адрес')}}</span>
                     <div>{{$timetable->address->address}}</div>
                     @if($user->hasRole('master'))
                         <span>{{__('Услуга')}}</span>

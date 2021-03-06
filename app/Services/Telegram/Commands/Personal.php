@@ -3,6 +3,7 @@
 namespace App\Services\Telegram\Commands;
 
 use Illuminate\Http\Request;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class Personal extends Command
 {
@@ -20,9 +21,9 @@ class Personal extends Command
     }
 
     /**
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return InlineKeyboardMarkup
      */
-    private function getShares()
+    private function getShares(): InlineKeyboardMarkup
     {
         $array[] = [['text' => 'Мои записи', 'callback_data' => 'PersonalRecords_']];
 

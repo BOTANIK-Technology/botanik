@@ -1,16 +1,26 @@
 let modal = document.getElementsByClassName('modal');
+let close_modal = document.getElementsByClassName('close');
 let app = document.getElementById('app');
-let refresh;
 
-function closeModal(id = 'modal', href = false) {
+function closeError(id = 'error-modal') {
+    document.getElementById(id).remove();
+}
+function closeModal(event, id = 'modal', href = false) {
     removeClass(app, 'bg-blur');
-    if (refresh = document.getElementById('refresh-'+id)) {
+    let refresh = document.getElementById('refresh-'+id);
+    console.log(refresh, 'refresh-'+id)
+    if (refresh) {
         if (href !== false)
             refresh.href = href;
         refresh.click();
     }
     else
         document.getElementById(id).remove();
+}
+if (close_modal.length > 0) {
+    Object.keys(close_modal).forEach((k) => {
+        close_modal[k].addEventListener('click', closeModal)
+    });
 }
 function addClass (obj, add) {
     if (obj.classList) {
@@ -54,8 +64,8 @@ function inputActive(input) {
     }
     else {
         input.addEventListener('change', function () {
-            if (this.value.length > 0) addClass(input, 'active');
-            else removeClass(input, 'active');
+            if (this.value.length > 0) addClass(this, 'active');
+            else removeClass(this, 'active');
         });
     }
 }

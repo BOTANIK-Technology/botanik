@@ -182,5 +182,17 @@ class Service extends Model
        return $collection;
     }
 
+    /**
+     * @param $address_id
+     * @return bool|string
+     */
+    public function canRecord ($address_id)
+    {
+        $addr = $this->addresses->where('id', $address_id);
+        if (empty($addr))
+            return __('Услуга').' "'.$this->name.'" '.__('не привязана к выбранному адресу.');
+        return true;
+    }
+
 
 }
