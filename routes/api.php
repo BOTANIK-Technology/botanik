@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Root\AnalyticController;
+use App\Http\Controllers\API\v1\StorageController;
 use App\Http\Controllers\TelegramController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,13 +31,11 @@ Route::group(
     }
 );
 
-/**
- * A-level API
- */
 Route::group(
-    ['prefix' => '/a-level', 'middleware' => 'root.auth'],
+    [
+        'prefix' => '/v1'
+    ],
     function () {
-        // Collect analytic
-        Route::post('/analytic/collect', [AnalyticController::class, 'collect'])->name('analytic.collect');
+        Route::post('/storage', [StorageController::class, 'store'])->name('api.storage');
     }
 );

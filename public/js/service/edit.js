@@ -7,6 +7,16 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
     let saveBtns = document.getElementsByName('save-service');
     let delBtns = document.getElementsByName('delete-service');
 
+    function unsetCookies (without_id = false) {
+        ids.forEach((id) => {
+            if (without_id && id !== without_id) {
+                deleteCookie('inputs-'+id, COOKIE_URL);
+                deleteCookie('timetable-'+id, COOKIE_URL);
+                deleteCookie('checked-'+id, COOKIE_URL);
+            }
+        });
+    }
+
     function addressesVal (id) {
         let addresses = document.getElementsByName('addresses-'+id+'[]');
         let array = [];
@@ -24,9 +34,7 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
 
     function issetTimetable(id) {
         let timetable = getCookie('timetable-'+id);
-        if (timetable && timetable !== undefined && timetable !== 'undefined' && timetable.length)
-            return true;
-        return false;
+        return !!(timetable && timetable !== 'undefined' && timetable.length);
     }
 
     function getTimetable(id) {
@@ -161,7 +169,8 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
          * Calendar
          */
         calendar.addEventListener('click', function () {
-            // setCookie('inputs-'+id, JSON.stringify(send(id)), {'path': COOKIE_URL});
+            unsetCookies(id);
+            setCookie('inputs-'+id, JSON.stringify(send(id)), {'path': COOKIE_URL});
             window.location.href = this.dataset.href;
         });
 
@@ -192,10 +201,15 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
             data.id = id;
             if (issetTimetable(id))
                 data.timetable = getTimetable(id);
+            ids.forEach((id) => {
+                deleteCookie('inputs-'+id, COOKIE_URL);
+                deleteCookie('timetable-'+id, COOKIE_URL);
+                deleteCookie('checked-'+id, COOKIE_URL);
+            });
             let Request = postRequest(CURRENT_URL+'/confirm', data);
             Request.onload = function() {
                 if (Request.status >= 200 && Request.status < 400) {
-                    alert('Изменения сохранены!');
+                    location.reload()
                 } else {
                     showErrors(Request.response)
                 }
@@ -229,13 +243,9 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
     let close = document.getElementsByClassName('close');
     if (close.length > 0) {
         Object.keys(close).forEach((k) => {
-            close[k].addEventListener('click', function () {
-                ids.forEach((id) => {
-                    deleteCookie('inputs-'+id, COOKIE_URL);
-                    deleteCookie('timetable-'+id, COOKIE_URL);
-                    deleteCookie('checked-'+id, COOKIE_URL);
-                });
-            })
+            close[k].removeEventListener('click', closeModal);
+            close[k].addEventListener('click', unsetCookies);
+            close[k].addEventListener('click', closeModal);
         });
     }
 }

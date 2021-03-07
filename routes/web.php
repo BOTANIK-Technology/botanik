@@ -133,12 +133,7 @@ Route::group(
                 Route::get('/schedule', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedule');
                 Route::get('/schedule/{modal}/{id?}', [App\Http\Controllers\ScheduleController::class, 'window'])->name('window.schedule');
                 Route::post('/schedule/{modal}/{id}/confirm', [App\Http\Controllers\ScheduleController::class, 'deleteSchedule']);
-                Route::post('/schedule/{modal}/{id}/edit-schedule', [App\Http\Controllers\ScheduleController::class, 'editSchedule']);
-                Route::post('/schedule/services', [App\Http\Controllers\ScheduleController::class, 'createService']);
-                Route::post('/schedule/addresses', [App\Http\Controllers\ScheduleController::class, 'createAddress']);
-                Route::post('/schedule/masters', [App\Http\Controllers\ScheduleController::class, 'createMaster']);
-                Route::post('/schedule/dates', [App\Http\Controllers\ScheduleController::class, 'createDates']);
-                Route::post('/schedule/times', [App\Http\Controllers\ScheduleController::class, 'createTimes']);
+                Route::post('/schedule/update', [App\Http\Controllers\ScheduleController::class, 'editSchedule'])->name('schedule.update');
                 Route::post('/schedule/create', [App\Http\Controllers\ScheduleController::class, 'createRecord'])->name('schedule.create');
 
                 /**
@@ -185,7 +180,6 @@ Route::group(
                     Route::get('/users/window/{modal}/{id?}/{moreService?}', [App\Http\Controllers\UserController::class, 'addService'])->name('addService');
                     Route::post('/users/window/create/add-user', [App\Http\Controllers\UserController::class, 'addUser']);
                     Route::post('/users/window/delete/{id}/confirm', [App\Http\Controllers\UserController::class, 'deleteUser']);
-                    Route::post('/users/window/edit/{id}/edit-user', [App\Http\Controllers\UserController::class, 'editUser']);
 
                     /**
                      * Clients routes
@@ -250,8 +244,16 @@ Route::group(
                 Route::group(['middleware' => ['role:owner', 'package:pro']], function () {
 
                     /**
+                     * Api routes
+                     */
+                    Route::get( '/partner-api', [App\Http\Controllers\PartnerApiController::class, 'index'])->name('api');
+                    Route::post('/partner-api/{slug}/update', [App\Http\Controllers\PartnerApiController::class, 'update'])->name('api.update');
+                    Route::post('/partner-api/{slug}/{method}', [App\Http\Controllers\PartnerApiController::class, 'call'])->name('api.call');
+
+                    /**
                      * Users routes
                      */
+                    Route::post('/users/window/edit/{id}/edit-user', [App\Http\Controllers\UserController::class, 'editUser']);
                     Route::get('/users/manage/confirm', [App\Http\Controllers\UserController::class, 'manageConfirm'])->name('manage.confirm');
                     Route::get('/users/manage/reject', [App\Http\Controllers\UserController::class, 'manageReject'])->name('manage.reject');
 

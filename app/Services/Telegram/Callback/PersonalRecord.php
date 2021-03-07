@@ -2,16 +2,17 @@
 
 namespace App\Services\Telegram\Callback;
 
-
+use App\Models\Record;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class PersonalRecord extends CallbackQuery
 {
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $record = \App\Models\Record::find(parent::getCallbackValue());
+        $record = Record::find(parent::getCallbackValue());
         if (!$record)
             return;
 
@@ -19,7 +20,8 @@ class PersonalRecord extends CallbackQuery
         parent::editMessage($this->getText($record), $this->getButtons($record));
     }
 
-    private function getText($record) {
+    private function getText($record): string
+    {
         if (!is_null($record->user_id))
             return
                 'Запись #'.$record->id."\n".
@@ -38,7 +40,8 @@ class PersonalRecord extends CallbackQuery
             '5. Стоимость: '.$record->service->price.' грн';
     }
 
-    private function getButtons ($record) {
+    private function getButtons ($record): InlineKeyboardMarkup
+    {
 
         if (Carbon::parse($record->date) < Carbon::now()->format('Y-m-d') || !Carbon::parse($record->date.' '.$record->time)->greaterThan(Carbon::now()))
             return parent::buildInlineKeyboard();

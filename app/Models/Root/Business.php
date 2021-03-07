@@ -2,10 +2,32 @@
 
 namespace App\Models\Root;
 
+use App\Models\Address;
+use App\Models\FeedBack;
+use App\Models\Information;
+use App\Models\Record;
+use App\Models\Report;
+use App\Models\Review;
+use App\Models\Role;
+use App\Models\Service;
+use App\Models\User;
+use Artisan;
+use ConnectService;
+use DB;
+use Eloquent;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 use Log;
 use Exception;
+use Mail;
+use Storage;
+use URL;
 
 /**
  * App\Models\Root\Business
@@ -22,28 +44,28 @@ use Exception;
  * @property string $pay_token
  * @property int $catalog
  * @property int $owner_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Root\Owner|null $owner
- * @property-read \App\Models\Root\Package $package
- * @method static \Illuminate\Database\Eloquent\Builder|Business newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Business newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Business query()
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereBotName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereCatalog($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereDbName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereImg($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereOwnerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business wherePackageId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business wherePayToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Business whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Owner|null $owner
+ * @property-read Package $package
+ * @method static Builder|Business newModelQuery()
+ * @method static Builder|Business newQuery()
+ * @method static Builder|Business query()
+ * @method static Builder|Business whereBotName($value)
+ * @method static Builder|Business whereCatalog($value)
+ * @method static Builder|Business whereCreatedAt($value)
+ * @method static Builder|Business whereDbName($value)
+ * @method static Builder|Business whereId($value)
+ * @method static Builder|Business whereImg($value)
+ * @method static Builder|Business whereName($value)
+ * @method static Builder|Business whereOwnerId($value)
+ * @method static Builder|Business wherePackageId($value)
+ * @method static Builder|Business wherePayToken($value)
+ * @method static Builder|Business whereSlug($value)
+ * @method static Builder|Business whereStatus($value)
+ * @method static Builder|Business whereToken($value)
+ * @method static Builder|Business whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class Business extends Model
 {
@@ -52,17 +74,17 @@ class Business extends Model
     protected $guarded = ['id'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function package ()
+    public function package (): BelongsTo
     {
         return $this->belongsTo(Package::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
-    public function owner ()
+    public function owner (): HasOne
     {
         return $this->hasOne(Owner::class, 'id', 'owner_id');
     }
@@ -94,25 +116,25 @@ class Business extends Model
      */
     public function getChart ()
     {
-        if (!\ConnectService::dbConnect($this->db_name))
+        if (!ConnectService::dbConnect($this->db_name))
             return false;
 
         $array = [
-            'records'   => \App\Models\Record::count() ?? 0,
-            'total'     => \App\Models\Report::allTimeTotal(),
-            'info'      => \App\Models\Information::count() ?? 0,
-            'feedback'  => \App\Models\FeedBack::count() ?? 0,
-            'complaint' => \App\Models\FeedBack::where('stars', '<', 4)->count() ?? 0,
-            'reviews'   => \App\Models\Review::count() ?? 0,
-            'users'     => \App\Models\User::count() - 1,
-            'admins'    => \App\Models\Role::where('slug', 'admin')->first()->users->count() ?? 0,
-            'services'  => \App\Models\Service::count() ?? 0,
-            'addrs'     => \App\Models\Address::count() ?? 0,
+            'records'   => Record::count() ?? 0,
+            'total'     => Report::allTimeTotal(),
+            'info'      => Information::count() ?? 0,
+            'feedback'  => FeedBack::count() ?? 0,
+            'complaint' => FeedBack::where('stars', '<', 4)->count() ?? 0,
+            'reviews'   => Review::count() ?? 0,
+            'users'     => User::count() - 1,
+            'admins'    => Role::where('slug', 'admin')->first()->users->count() ?? 0,
+            'services'  => Service::count() ?? 0,
+            'addrs'     => Address::count() ?? 0,
         ];
 
-        $array['complaint'] += \App\Models\Review::where('stars', '<', 4)->count() ?? 0;
+        $array['complaint'] += Review::where('stars', '<', 4)->count() ?? 0;
 
-        \ConnectService::setDefaultConnect();
+        ConnectService::setDefaultConnect();
         return $array;
     }
 
@@ -126,12 +148,13 @@ class Business extends Model
      * @return bool
      *
      * @throws Exception
+     * @throws GuzzleException
      */
-    public function delete()
+    public function delete(): bool
     {
-        if ( \ConnectService::isExist($this->db_name) ) {
+        if ( ConnectService::isExist($this->db_name) ) {
             try {
-                \DB::statement("DROP DATABASE `{$this->db_name}`");
+                DB::statement("DROP DATABASE `{$this->db_name}`");
             }
             catch (Exception $e) {
                 Log::error($e->getMessage().' ** A level - delete database '.$this->db_name);
@@ -139,7 +162,7 @@ class Business extends Model
             }
         }
 
-        $fs = \Storage::disk('public');
+        $fs = Storage::disk('public');
         $fs->delete('/'.$this->img);
 
         $this->owner()->delete();
@@ -172,7 +195,7 @@ class Business extends Model
      */
     public function changeLogo (string $path)
     {
-        $fs = \Storage::disk('public');
+        $fs = Storage::disk('public');
         $fs->delete('/'.$this->img);
         $this->img = $path;
         $this->save();
@@ -182,13 +205,13 @@ class Business extends Model
      * Deploy the business system
      *
      * @return bool
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
-    public function deploy ()
+    public function deploy (): bool
     {
         // Create a new database
         try {
-            \Artisan::call('make:database', ['dbname' => $this->db_name]);
+            Artisan::call('make:database', ['dbname' => $this->db_name]);
         }
         catch (Exception $e) {
             Log::error($e->getMessage().' *** Cannot create "'.$this->db_name.'" database');
@@ -203,12 +226,12 @@ class Business extends Model
         $business_name = $this->name;
 
         // Connect to created database
-        if ( ! \ConnectService::dbConnect($db_name) )
+        if ( ! ConnectService::dbConnect($db_name) )
             return false;
 
         // Do migrate
         try {
-            \Artisan::call('migrate', ['--force' => true]);
+            Artisan::call('migrate', ['--force' => true]);
         }
         catch (Exception $e) {
             Log::error($e->getMessage().' *** Cannot migrate "'.$db_name.'" database');
@@ -217,15 +240,15 @@ class Business extends Model
 
         // Do seed
         try {
-            \Artisan::call('db:seed');
+            Artisan::call('db:seed');
         } catch (Exception $e) {
             Log::error($e->getMessage().' *** Cannot seed "'.$db_name.'" database');
             return false;
         }
 
         // Create owner account
-        $role = \App\Models\Role::where('slug', 'owner')->first();
-        $owner = \App\Models\User::create([
+        $role = Role::where('slug', 'owner')->first();
+        $owner = User::create([
             'name'     => $name,
             'email'    => $email,
             'password' => bcrypt($password),
@@ -239,26 +262,26 @@ class Business extends Model
         $owner->roles()->attach($role);
 
         try {
-            \Mail::send('emails.user-create', ['login' => $email, 'password' => $password, 'slug' => $slug], function ($message) use ($name, $email, $business_name) {
+            Mail::send('emails.user-create', ['login' => $email, 'password' => $password, 'slug' => $slug], function ($message) use ($name, $email, $business_name) {
                 $message->to($email, $name)->subject(__('Доступ к BOTANIK - '.$business_name));
             });
         } catch (Exception $e) {
             Log::warning($e->getMessage().' *** Cannot send auth data to owner. "'.$db_name.'" database');
         }
 
-        \ConnectService::setDefaultConnect();
+        ConnectService::setDefaultConnect();
         return $this->setWebhook();
     }
 
     /**
      * @return bool
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
-    public function setWebhook ()
+    public function setWebhook (): bool
     {
-        $base_url = \URL::to('/');
+        $base_url = URL::to('/');
         try {
-            $client = new \GuzzleHttp\Client();
+            $client = new Client();
             $response = $client->request(
                 'POST',
                 $base_url.'/api/telegram/'.$this->slug.'/admin',
@@ -282,11 +305,15 @@ class Business extends Model
         }
     }
 
-    public function deleteWebhook ()
+    /**
+     * @return string
+     * @throws GuzzleException
+     */
+    public function deleteWebhook (): string
     {
-        $base_url = \URL::to('/');
+        $base_url = URL::to('/');
         try {
-            $client = new \GuzzleHttp\Client();
+            $client = new Client();
             $response = $client->request(
                 'POST',
                 $base_url.'/api/telegram/'.$this->slug.'/admin',
@@ -309,13 +336,13 @@ class Business extends Model
 
     /**
      * @return bool|string
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function getWebhookInfo ()
     {
-        $base_url = \URL::to('/');
+        $base_url = URL::to('/');
         try {
-            $client = new \GuzzleHttp\Client();
+            $client = new Client();
             $response = $client->request(
                 'POST',
                 $base_url.'/api/telegram/'.$this->slug.'/admin',

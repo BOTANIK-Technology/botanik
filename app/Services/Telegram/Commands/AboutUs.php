@@ -18,7 +18,7 @@ class AboutUs extends Command
     public function __construct(Request $request, bool $back = false)
     {
         parent::__construct($request, $back);
-        parent::sendMessage('Выберите раздел, который Вас интересует', $this->getInfo());
+        parent::sendMessage('Выберете раздел, который Вас интересует', $this->getInfo());
     }
 
     /**

@@ -45,7 +45,7 @@
                     @foreach($service->users as $user)
 
                         @php $row++ @endphp
-                        @include('schedule.record', ['record' => $service->records->where('date', $date)->where('time', $time), 'main' => false, 'i' => $time_i, 'row' => $row])
+                        @include('schedule.record', ['record' => $user->records->where('date', $date)->where('time', $time), 'main' => false, 'i' => $time_i, 'row' => $row])
 
                     @endforeach
 

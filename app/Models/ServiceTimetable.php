@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Timetable;
 use Carbon\Carbon;
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,9 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * App\Models\ServiceTimetable
  *
  * @property-read Service $service
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceTimetable newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceTimetable newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceTimetable query()
+ * @method static Builder|ServiceTimetable newModelQuery()
+ * @method static Builder|ServiceTimetable newQuery()
+ * @method static Builder|ServiceTimetable query()
  * @mixin Eloquent
  */
 class ServiceTimetable extends Model

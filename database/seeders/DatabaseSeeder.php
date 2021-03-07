@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(IntervalSeeder::class);
         $this->call(InformationSeeder::class);
+        $this->call(ApiSeeder::class);
     }
 }

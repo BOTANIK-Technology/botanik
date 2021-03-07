@@ -18,7 +18,7 @@ class PersonalRecordEditTime extends CallbackQuery
         } else {
             $buttons = $this->serviceTime($record->service_id, $record->date);
         }
-        return parent::editMessage(__('Выберите время'), $buttons);
+        return parent::editMessage(__('Выберете время'), $buttons);
     }
 
     private function serviceTime (int $service_id, string $date)

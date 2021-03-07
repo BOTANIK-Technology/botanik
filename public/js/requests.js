@@ -10,10 +10,10 @@ function getMeta(metaName) {
     return false;
 }
 
-function postRequest(url, object = null, async = true) {
+function postRequest(url, object = null, async = true, contentType = 'application/json;charset=UTF-8') {
     let Request = new XMLHttpRequest();
     Request.open("POST", url, async);
-    Request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    Request.setRequestHeader("Content-Type", contentType);
     Request.setRequestHeader("X-CSRF-TOKEN", getMeta('csrf-token'));
     if (object)
         Request.send(JSON.stringify(object));
@@ -59,7 +59,7 @@ function showErrors(response) {
             '<div class="back align-self-center">' +
             '<span class="error fw500">Ошибка</span>' +
             '</div>' +
-            '<button type="button" class="close" onclick="closeModal(\'error-modal\')">×</button>' +
+            '<button type="button" class="close" onclick="closeError()">×</button>' +
             '</div>' +
             '<div class="modal-body">' +
             '<ul class="error-list">' +
@@ -67,7 +67,7 @@ function showErrors(response) {
             '</ul>' +
             '</div>' +
             '<div class="modal-footer text-align-center">' +
-            '<button class="btn error" type="button" onclick="closeModal(\'error-modal\')">ОК</button>' +
+            '<button class="btn error" type="button" onclick="closeError()">ОК</button>' +
             '</div>' +
             '</div>' +
             '</div>'
@@ -80,7 +80,6 @@ function showErrors(response) {
     }
 
     alert('Произошла ошибка, повторите операцию');
-    console.log('response.errors is FALSE');
     return false;
 
 }

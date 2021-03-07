@@ -17,7 +17,7 @@ class TypesOfServices extends Command
     public function __construct(Request $request, bool $back = false)
     {
         parent::__construct($request, $back);
-        return $this->sendMessage(__('Выберите тип услуги для записи'), $this->getServices());
+        return $this->sendMessage(__('Выберете тип услуги для записи'), $this->getServices());
     }
 
     /**

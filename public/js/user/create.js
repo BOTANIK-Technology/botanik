@@ -17,6 +17,12 @@ if (addUserBtn) {
         } else
             send.role = admin.value;
 
+        deleteCookie('input', COOKIE_URL);
+        for (let i = 0; i < countService; i++) {
+            deleteCookie('timetable-'+i, COOKIE_URL);
+            deleteCookie('checked-'+i, COOKIE_URL);
+        }
+
         let Request = postRequest(createRoute+'/add-user', send);
         Request.onload = function() {
             if (Request.status >= 200 && Request.status < 400) {
@@ -26,7 +32,7 @@ if (addUserBtn) {
                     deleteCookie('checked-'+i, COOKIE_URL);
                 }
                 if (note && note.length)
-                    closeModal('modal', note);
+                    closeModal(false, 'modal', note);
                 closeModal();
             } else {
                 showErrors(Request.response);

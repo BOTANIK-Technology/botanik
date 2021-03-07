@@ -19,7 +19,9 @@
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.0",
         "phpoffice/phpspreadsheet": "^1.15",
-        "telegram-bot/api": "^2.3"
+        "telegram-bot/api": "^2.3",
+        "ext-mysql_xdevapi": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",

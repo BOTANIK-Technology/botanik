@@ -1,7 +1,7 @@
 @section('critical-scripts')
     <link href="{{ asset('css/timetable.css') }}" rel="stylesheet">
 @endsection
-
+<button id="select-all" class="btn">{{__('Выбрать всё')}}</button>
 <div class="timetable grid">
     <div class="row-1 border-right-main border-bottom-main day"></div>
     @foreach($days as $key => $day)

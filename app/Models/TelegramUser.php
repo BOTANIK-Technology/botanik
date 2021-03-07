@@ -3,25 +3,28 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\TelegramUser
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FeedBack[] $feedBacks
+ * @property-read Collection|FeedBack[] $feedBacks
  * @property-read int|null $feed_backs_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Record[] $records
+ * @property-read Collection|Record[] $records
  * @property-read int|null $records_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Review[] $reviews
+ * @property-read Collection|Review[] $reviews
  * @property-read int|null $reviews_count
- * @property-read \App\Models\TelegramSession|null $telegramSession
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VisitHistory[] $visitHistories
+ * @property-read TelegramSession|null $telegramSession
+ * @property-read Collection|VisitHistory[] $visitHistories
  * @property-read int|null $visit_histories_count
- * @method static \Illuminate\Database\Eloquent\Builder|TelegramUser newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|TelegramUser newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|TelegramUser query()
- * @mixin \Eloquent
+ * @method static Builder|TelegramUser newModelQuery()
+ * @method static Builder|TelegramUser newQuery()
+ * @method static Builder|TelegramUser query()
+ * @mixin Eloquent
  */
 class TelegramUser extends Model
 {
@@ -185,9 +188,9 @@ class TelegramUser extends Model
     public function getFio () : string
     {
         $fio = '';
-        !is_null($this->last_name) ?: $fio .= $this->last_name;
-        $fio .= ' '.$this->first_name;
-        !is_null($this->middle_name) ?: $fio .= ' '.$this->middle_name;
+        is_null($this->last_name) ?: $fio .= $this->last_name.' ';
+        $fio .= $this->first_name;
+        is_null($this->middle_name) ?: $fio .= ' '.$this->middle_name;
         return $fio;
     }
 }

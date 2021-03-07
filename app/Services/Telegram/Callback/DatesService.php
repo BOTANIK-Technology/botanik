@@ -21,7 +21,7 @@ class DatesService extends CallbackQuery
         $this->back = 'Address_'.parent::getServiceID();
         parent::setMasterID(null);
         parent::setAddressID();
-        return parent::editMessage(__('Выберите дату'), $this->serviceDates(parent::getServiceID(), $month));
+        return parent::editMessage(__('Выберете дату'), $this->serviceDates(parent::getServiceID(), $month));
     }
 
     public function serviceDates($service_id, $month)

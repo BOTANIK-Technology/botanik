@@ -5,6 +5,14 @@ function getTimetables() {
     return array;
 }
 
+function unsetCookies (count) {
+    if (!count) return;
+    for (let i = 0; i < count; i++) {
+        deleteCookie('timetable-'+i, COOKIE_URL);
+        deleteCookie('checked-'+i, COOKIE_URL);
+    }
+}
+
 function addressServices (array) {
     let returned = [];
     array.forEach((select) => {
@@ -102,10 +110,7 @@ if (calendar.length) {
         });
     });
 } else {
-    for (let i = 0; i < countService; i++) {
-        deleteCookie('timetable-'+i, COOKIE_URL);
-        deleteCookie('checked-'+i, COOKIE_URL);
-    }
+    unsetCookies(countService);
 }
 
 let input = getCookie('input');

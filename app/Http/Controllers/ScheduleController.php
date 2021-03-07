@@ -115,7 +115,7 @@ class ScheduleController extends Controller
             case 'edit':
             case 'delete':
                 $this->params['id'] = $request->id;
-                $this->params['client_rec'] = Record::find($request->id);
+                $this->params['record'] = Record::find($request->id);
                 break;
         }
         return $this->getView($request);
@@ -140,13 +140,25 @@ class ScheduleController extends Controller
             return response()->json(['errors' => $validator->errors()], 405);
         }
 
+        if ($request->has('user_id')) {
+            $user = User::findOrFail($request->user_id);
+            $res = $user->canRecord($request->service_id, $request->address_id);
+        } else {
+            $service = Service::findOrFail($request->service_id);
+            $res = $service->canRecord($request->address_id);
+        }
+
+        if ($res !== true)
+            return response()->json(['errors' => ['text' => $res]], 405);
+
+
         try {
 
             $record = Record::create([
                 'telegram_user_id' => $request->client_id,
                 'service_id' => $request->service_id,
                 'address_id' => $request->address_id,
-                'user_id' => $request->user_id,
+                'user_id' => $request->has('user_id') ? $request->user_id: null,
                 'time' => $request->time,
                 'date' => Carbon::parse($request->date)->format('Y-m-d')
             ]);
@@ -276,7 +288,7 @@ class ScheduleController extends Controller
                 ],
                 )->delay(now()->addMinutes(2));
 
-            return response()->json(['ok' => 'Запись изменена'], 200);
+            return response()->json(['ok' => 'Запись изменена']);
         }
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);

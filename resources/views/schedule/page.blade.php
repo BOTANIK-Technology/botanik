@@ -12,7 +12,7 @@
         let endurl = '/{{$modal}}/{{$id}}';
         @endif
     </script>
-    <script src="{{asset('js/schedule.js')}}"></script>
+    <script src="{{asset('js/schedule/page.js')}}"></script>
 @endsection
 
 @section('content')

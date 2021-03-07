@@ -2,7 +2,7 @@
     <div class="modal-dialog">
         <div class="modal-content @if(isset($buttons) || isset($footer)) add-footer @endif">
             <div class="modal-header flex justify-content-between">
-                <div class="back align-self-center">{{ $header ?? '' }}</div><button type="button" class="close" onclick="closeModal('{{ $name ?? 'modal' }}')">×</button>
+                <div class="back align-self-center">{{ $header ?? '' }}</div><button type="button" class="close">×</button>
             </div>
             <div class="modal-body">
                 {{ $slot }}

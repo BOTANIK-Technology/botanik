@@ -4,8 +4,13 @@ namespace App\Http\Controllers\Root;
 
 use App\Models\Root\Business;
 use App\Models\Root\Package;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class ManagementController extends Controller
 {
@@ -39,7 +44,7 @@ class ManagementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     private function getView(Request $request)
     {
@@ -49,7 +54,7 @@ class ManagementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index(Request $request)
     {
@@ -58,7 +63,7 @@ class ManagementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function window(Request $request)
     {
@@ -68,8 +73,6 @@ class ManagementController extends Controller
             case 'chart':
                 $this->params['chart'] = $this->params['business'] ? $this->params['business']->getChart() : false;
                 break;
-            case 'edit':
-                $this->params['wh_info'] =  $this->params['business'] ? $this->params['business']->getWebhookInfo() : false;
             default:
                 $this->params['packages'] = Package::orderBy('id', 'DESC')->get() ?? false;
         }
@@ -81,8 +84,8 @@ class ManagementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @throws \Illuminate\Validation\ValidationException
+     * @return Factory|View
+     * @throws ValidationException
      */
     public function edit(Request $request)
     {
@@ -116,35 +119,40 @@ class ManagementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function pause(Request $request)
+    public function pause(Request $request): JsonResponse
     {
         $result = Business::changeStatus($request->id);
         if (is_array($result))
             return response()->json(['errors' => $result], 500);
         else
-            return response()->json(['ok' => true], 200);
+            return response()->json(['ok' => true]);
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws GuzzleException
      */
-    public function delete(Request $request)
+    public function delete(Request $request): JsonResponse
     {
         try {
             Business::find($request->id)->delete();
-            return response()->json(['ok' => true], 200);
+            return response()->json(['ok' => true]);
         }
         catch (\Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+            return response()->json(['errors' => ['message' => $e->getMessage()]], 501);
         }
     }
 
-    public function webhook (Request $request)
+    public function webhook (Request $request): JsonResponse
     {
-        $business = Business::find($request->id);
-        return  response()->json(['response' => $business->setWebhook()]);
+        $business = Business::findOrFail($request->id);
+        try {
+            return response()->json(['response' => $business->setWebhook()]);
+        } catch (GuzzleException $e) {
+            return response()->json(['errors' => ['message' => $e->getMessage()]], 501);
+        }
     }
 }

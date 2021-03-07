@@ -19,7 +19,7 @@ class Catalog extends Command
         if (is_null($this->pay_token)) {
             parent::sendMessage('Каталог временно недоступен.');
         } else {
-            parent::sendMessage('Выберите товар, который Вас интересует', $this->getCatalog());
+            parent::sendMessage('Выберете товар, который Вас интересует', $this->getCatalog());
         }
     }
 
