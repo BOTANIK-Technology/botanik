@@ -16,10 +16,6 @@ function getInputs () {
     }
 }
 
-function getImage () {
-    return img.files[img.files.length - 1] ?? false;
-}
-
 function getRadios () {
     return {
         'catalog' : document.querySelector('input[name=catalog]:checked'),

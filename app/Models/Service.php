@@ -24,16 +24,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read TypeService $typeServices
  * @property-read Collection|User[] $users
  * @property-read int|null $users_count
- * @property-read Collection|VisitHistory[] $visitHistories
- * @property-read int|null $visit_histories_count
  * @method static Builder|Service newModelQuery()
  * @method static Builder|Service newQuery()
  * @method static Builder|Service query()
  * @mixin Eloquent
  * @property-read Interval $interval
  * @property-read ServiceTimetable|null $timetable
- * @property-read \App\Models\GroupService|null $group
- * @property-read Collection|\App\Models\UserTimetable[] $userTimetables
+ * @property-read GroupService|null $group
+ * @property-read Prepayment|null $prepayment
+ * @property-read Collection|UserTimetable[] $userTimetables
  * @property-read int|null $user_timetables_count
  */
 class Service extends Model
@@ -64,6 +63,14 @@ class Service extends Model
     public function group(): HasOne
     {
         return $this->hasOne(GroupService::class);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function prepayment(): HasOne
+    {
+        return $this->hasOne(Prepayment::class);
     }
 
     /**
@@ -104,14 +111,6 @@ class Service extends Model
     public function records(): HasMany
     {
         return $this->hasMany(Record::class);
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function visitHistories(): HasMany
-    {
-        return $this->hasMany(VisitHistory::class);
     }
 
     /**
@@ -162,6 +161,18 @@ class Service extends Model
             $this->group()->update($group);
         } else {
             $this->group()->create($group);
+        }
+    }
+
+    /**
+     * @param array $prepayment
+     */
+    public function updatePrepayment ($prepayment = []) : void
+    {
+        if (isset($this->prepayment)) {
+            $this->prepayment()->update($prepayment);
+        } else {
+            $this->prepayment()->create($prepayment);
         }
     }
 

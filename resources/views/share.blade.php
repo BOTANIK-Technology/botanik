@@ -2,12 +2,14 @@
 
 @section('styles')
     <link href="{{ asset('css/mail.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/img-label.css') }}" rel="stylesheet">
     <link href="{{ asset('css/share.css') }}" rel="stylesheet">
 @endsection
 
 @section('scripts')
-    <script>let url = '{{url()->current()}}';</script>
+    <script>let slug = '{{$slug}}'</script>
     <script src="{{asset('js/requests.js')}}"></script>
+    <script src="{{asset('js/img-label.js')}}"></script>
     <script src="{{asset('js/share.js')}}"></script>
 @endsection
 
@@ -99,7 +101,9 @@
                 <input id="title" class="col-2" type="text" placeholder="Введите заголовок">
 
                 <label for="img" class="col-1">Обложка</label>
-                <input id="img" class="col-2" type="text" placeholder="Ссылка на изображение">
+                <label for="img" class="image-logo flex align-items-center col-2" id="img-label">
+                    <input type="file" accept="image/*" name="image" id="img">
+                </label>
 
                 <label for="text" class="col-1 align-self-start">Текст</label>
                 <textarea id="text" class="col-2" placeholder="Введите текст"></textarea>
@@ -112,7 +116,15 @@
             </div>
 
             @slot('buttons')
-                <button id="createShare" type="button" class="btn-primary">Создать</button>
+                <button
+                    id="createShare"
+                    type="button"
+                    class="btn-primary"
+                    data-storage="{{route('api.storage')}}"
+                    data-url="{{route('share.create', ['business' => $slug])}}"
+                >
+                    Создать
+                </button>
                 <a href="{{route('share', ['business' => $slug, 'sort' => $sort])}}" id="refresh-modal"></a>
             @endslot
 
@@ -128,7 +140,9 @@
                 <input id="title" class="col-2 {{$share->title ? 'active' : ''}}" type="text" value="{{$share->title}}" placeholder="Введите заголовок">
 
                 <label for="img" class="col-1">Обложка</label>
-                <input id="img" class="col-2 {{$share->img ? 'active' : ''}}" type="text" value="{{$share->img}}" placeholder="Ссылка на изображение">
+                <label for="img" class="image-logo flex align-items-center col-2 {{$share->img ? 'active' : ''}}" id="img-label">
+                    <input type="file" accept="image/*" name="image" id="img">
+                </label>
 
                 <label for="text" class="col-1 align-self-start">Текст</label>
                 <textarea id="text" class="col-2 {{$share->text ? 'active' : ''}}" placeholder="Введите текст">{{$share->text}}</textarea>
@@ -141,7 +155,15 @@
             </div>
 
             @slot('buttons')
-                <button id="editShare" type="button" data-id="{{$share->id}}" class="btn-primary">Сохранить</button>
+                <button
+                    id="editShare"
+                    type="button"
+                    data-storage="{{route('api.storage')}}"
+                    data-url="{{route('share.update', ['business' => $slug, 'id' => $share->id])}}"
+                    class="btn-primary"
+                >
+                    Сохранить
+                </button>
                 <a href="{{route('share', ['business' => $slug, 'sort' => $sort])}}" id="refresh-modal"></a>
             @endslot
 
@@ -153,11 +175,16 @@
 
             <div class="delete">
                 Вы действительно<br>
-                хотите удалить акцию <br>
+                хотите удалить акцию<br>
                 <b>“{{$share->title}}”</b>?
             </div>
             @slot('buttons')
-                <button type="button" id="delete" data-id="{{$share->id}}" class="btn-primary">
+                <button
+                    type="button"
+                    id="delete"
+                    data-url="{{route('share.delete', ['business' => $slug, 'id' => $share->id])}}"
+                    class="btn-primary"
+                >
                     {{ __('Удалить') }}
                 </button>
                 <a href="{{route('share', ['business' => $slug, 'sort' => $sort])}}" id="refresh-modal"></a>
@@ -171,7 +198,7 @@
             <div class="view-body flex direction-column">
                 <h1>{{$share->title}}</h1>
                 @if (!is_null($share->img))
-                    <img src="{{$share->img}}" class="img">
+                    <img src="{{asset('public/storage/'.$share->img)}}" class="img" alt="">
                 @endif
                 <p class="mail-text">{{$share->text}}</p>
                 <span class="modal-date date">{{\Carbon\Carbon::parse($share->created_at)->format('Y-m-d')}}</span>

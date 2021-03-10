@@ -9,15 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * App\Models\GroupService
+ * App\Models\Prepayment
  *
  * @property-read Service $service
- * @method static Builder|GroupService newModelQuery()
- * @method static Builder|GroupService newQuery()
- * @method static Builder|GroupService query()
+ * @method static Builder|Prepayment newModelQuery()
+ * @method static Builder|Prepayment newQuery()
+ * @method static Builder|Prepayment query()
  * @mixin Eloquent
  */
-class GroupService extends Model
+class Prepayment extends Model
 {
     use HasFactory;
 

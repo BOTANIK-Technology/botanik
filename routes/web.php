@@ -132,8 +132,8 @@ Route::group(
                  */
                 Route::get('/schedule', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedule');
                 Route::get('/schedule/{modal}/{id?}', [App\Http\Controllers\ScheduleController::class, 'window'])->name('window.schedule');
-                Route::post('/schedule/{modal}/{id}/confirm', [App\Http\Controllers\ScheduleController::class, 'deleteSchedule']);
-                Route::post('/schedule/update', [App\Http\Controllers\ScheduleController::class, 'editSchedule'])->name('schedule.update');
+                Route::post('/schedule/delete/{id}', [App\Http\Controllers\ScheduleController::class, 'deleteSchedule'])->name('schedule.delete');
+                Route::post('/schedule/update/{id}', [App\Http\Controllers\ScheduleController::class, 'editSchedule'])->name('schedule.update');
                 Route::post('/schedule/create', [App\Http\Controllers\ScheduleController::class, 'createRecord'])->name('schedule.create');
 
                 /**
@@ -206,18 +206,18 @@ Route::group(
                          * Mail routes
                          */
                         Route::get('/mail', [App\Http\Controllers\MailController::class, 'index'])->name('mail');
-                        Route::get('/mail/window/{modal}', [App\Http\Controllers\MailController::class, 'create'])->name('mail.create');
-                        Route::get('/mail/window/{modal}/{id}', [App\Http\Controllers\MailController::class, 'view'])->name('mail.view');
-                        Route::post('/mail/window/create/confirm', [App\Http\Controllers\MailController::class, 'createConfirm']);
+                        Route::get('/mail/window/create', [App\Http\Controllers\MailController::class, 'create'])->name('mail.window.create');
+                        Route::get('/mail/window/view/{id}', [App\Http\Controllers\MailController::class, 'view'])->name('mail.window.view');
+                        Route::post('/mail/create', [App\Http\Controllers\MailController::class, 'createConfirm'])->name('mail.create');
 
                         /**
                          * Share routes
                          */
                         Route::get('/share', [App\Http\Controllers\ShareController::class, 'index'])->name('share');
                         Route::get('/share/window/{modal}/{id?}', [App\Http\Controllers\ShareController::class, 'window'])->name('window.share');
-                        Route::post('/share/window/delete/{id}/confirm', [App\Http\Controllers\ShareController::class, 'deleteConfirm']);
-                        Route::post('/share/window/edit/{id}/confirm', [App\Http\Controllers\ShareController::class, 'editConfirm']);
-                        Route::post('/share/window/create/confirm', [App\Http\Controllers\ShareController::class, 'createConfirm']);
+                        Route::post('/share/delete/{id}', [App\Http\Controllers\ShareController::class, 'deleteConfirm'])->name('share.delete');
+                        Route::post('/share/update/{id}', [App\Http\Controllers\ShareController::class, 'editConfirm'])->name('share.update');
+                        Route::post('/share/create', [App\Http\Controllers\ShareController::class, 'createConfirm'])->name('share.create');
 
                     });
 
@@ -226,9 +226,9 @@ Route::group(
                      */
                     Route::get('/info', [App\Http\Controllers\InfoController::class, 'index'])->name('info');
                     Route::get('/info/window/{modal}/{id?}', [App\Http\Controllers\InfoController::class, 'window'])->name('window.info');
-                    Route::post('/info/window/delete/{id}/confirm', [App\Http\Controllers\InfoController::class, 'deleteConfirm']);
-                    Route::post('/info/window/edit/{id}/confirm', [App\Http\Controllers\InfoController::class, 'editConfirm']);
-                    Route::post('/info/window/create/confirm', [App\Http\Controllers\InfoController::class, 'createConfirm'])->middleware('package:pro,base');
+                    Route::post('/info/delete/{id}', [App\Http\Controllers\InfoController::class, 'deleteConfirm'])->name('info.delete');
+                    Route::post('/info/update/{id}', [App\Http\Controllers\InfoController::class, 'editConfirm'])->name('info.update');
+                    Route::post('/info/create', [App\Http\Controllers\InfoController::class, 'createConfirm'])->middleware('package:pro,base')->name('info.create');
 
                     /**
                      * Support routes
@@ -246,8 +246,8 @@ Route::group(
                     /**
                      * Api routes
                      */
-                    Route::get( '/partner-api', [App\Http\Controllers\PartnerApiController::class, 'index'])->name('api');
-                    Route::post('/partner-api/{slug}/update', [App\Http\Controllers\PartnerApiController::class, 'update'])->name('api.update');
+                    Route::get('/partner-api', [App\Http\Controllers\PartnerApiController::class, 'index'])->name('api');
+                    Route::put('/partner-api/{slug}/update', [App\Http\Controllers\PartnerApiController::class, 'update'])->name('api.update');
                     Route::post('/partner-api/{slug}/{method}', [App\Http\Controllers\PartnerApiController::class, 'call'])->name('api.call');
 
                     /**

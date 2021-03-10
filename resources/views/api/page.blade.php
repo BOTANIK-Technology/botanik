@@ -5,7 +5,10 @@
 @endsection
 
 @section('scripts')
-    <script src="{{asset('js/api.js')}}"></script>
+    <script src="{{asset('js/requests.js')}}"></script>
+    <script src="{{asset('js/api/page.js')}}"></script>
+    <script src="{{asset('js/api/beauty.js')}}"></script>
+    <script src="{{asset('js/api/yclients.js')}}"></script>
 @endsection
 
 @section('content')

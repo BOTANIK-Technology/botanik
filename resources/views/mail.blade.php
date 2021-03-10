@@ -2,11 +2,13 @@
 
 @section('styles')
     <link href="{{ asset('css/mail.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/img-label.css') }}" rel="stylesheet">
 @endsection
 
 @section('scripts')
-    <script>let url = '{{url()->current()}}';</script>
+    <script>let slug = '{{$slug}}'</script>
     <script src="{{asset('js/requests.js')}}"></script>
+    <script src="{{asset('js/img-label.js')}}"></script>
     <script src="{{asset('js/mail.js')}}"></script>
 @endsection
 
@@ -14,7 +16,7 @@
     @component('layouts.content')
         @slot('header')
             <header class="flex align-items-center">
-                <a href="{{route('mail.create', ['business' => $slug, 'modal' => 'create', 'load' => $load])}}" class="btn full-width text-decoration-none flex justify-content-around align-items-center">{!! file_get_contents(public_path('images/add-w.svg')) !!}Создать расслылку</a>
+                <a href="{{route('mail.window.create', ['business' => $slug, 'modal' => 'create', 'load' => $load])}}" class="btn full-width text-decoration-none flex justify-content-around align-items-center">{!! file_get_contents(public_path('images/add-w.svg')) !!}Создать расслылку</a>
                 <span class="sort">Сортировка: </span>
                 <span>
                     <span class="{{$sort == 'asc' || $sort == 'desc' ? 'active' : ''}}">по дате</span>
@@ -40,7 +42,7 @@
                         </div>
 
                         <div class="flex align-items-center justify-content-center">
-                            <a href="{{route('mail.view', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div></a>
+                            <a href="{{route('mail.window.view', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div></a>
                         </div>
                     @endforeach
                 @else
@@ -54,7 +56,7 @@
                         </div>
 
                         <div class="flex align-items-center justify-content-center">
-                            <a href="{{route('mail.view', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div></a>
+                            <a href="{{route('mail.window.view', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort, 'load' => $load])}}"><div class="view-icon"></div></a>
                         </div>
 
                         <div class="flex align-items-center justify-content-center date">
@@ -165,7 +167,9 @@
                 <input id="title" class="col-2" type="text" placeholder="Введите заголовок">
 
                 <label for="img" class="col-1">Обложка</label>
-                <input id="img" class="col-2" type="text" placeholder="Ссылка на изображение">
+                <label for="img" class="image-logo flex align-items-center col-2" id="img-label">
+                    <input type="file" accept="image/*" name="image" id="img">
+                </label>
 
                 <label for="text" class="col-1 align-self-start">Текст</label>
                 <textarea id="text" class="col-2" placeholder="Введите текст"></textarea>
@@ -176,7 +180,15 @@
             </div>
 
             @slot('buttons')
-                <button id="createMail" type="button" class="btn-primary">Создать</button>
+                <button
+                    id="createMail"
+                    type="button"
+                    class="btn-primary"
+                    data-storage="{{route('api.storage')}}"
+                    data-url="{{route('mail.create', ['business' => $slug])}}"
+                >
+                    Создать
+                </button>
                 <a href="{{route('mail', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
             @endslot
 
@@ -188,7 +200,7 @@
             <div class="view-body flex direction-column">
                 <h1>{{$mail->title}}</h1>
                 @if (!is_null($mail->img))
-                    <img src="{{$mail->img}}" class="img">
+                    <img src="{{asset('public/storage/'.$mail->img)}}" class="img">
                 @endif
                 <p class="mail-text">{{$mail->text}}</p>
                 <span class="modal-date date">{{\Carbon\Carbon::parse($mail->created_at)->format('Y-m-d')}}</span>

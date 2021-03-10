@@ -2,20 +2,22 @@
 
 namespace App\Services\Telegram;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\TelegramUser;
 
 class Telegram
 {
 
-    private $nsCommands = 'App\\Services\\Telegram\\Commands\\';
-    private $nsCallback = 'App\\Services\\Telegram\\Callback\\';
+    private string $nsCommands = 'App\\Services\\Telegram\\Commands\\';
+    private string $nsCallback = 'App\\Services\\Telegram\\Callback\\';
 
     /**
      * @param Request $request
      * @return bool
      */
-    public function doCommand(Request $request) {
+    public function doCommand(Request $request): bool
+    {
 
         $dir = dirname(__FILE__).'/Commands/';
         $files = scandir($dir);
@@ -50,7 +52,8 @@ class Telegram
      * @param Request $request
      * @return bool
      */
-    public function textCommand(Request $request) {
+    public function textCommand(Request $request): bool
+    {
         switch ($request->input('message.text')) {
             case 'Запись':
                 $class = $this->nsCommands.'TypesOfServices';
@@ -86,7 +89,7 @@ class Telegram
 
     /**
      * @param Request $request
-     * @return bool
+     * @return JsonResponse|false
      */
     public function doButton(Request $request) {
         if ($request->input('callback_query.data') == '-')
@@ -94,14 +97,15 @@ class Telegram
         $data = $request->input('callback_query.data');
         $class = $this->nsCallback.substr($data, 0, strpos($data, '_'));
         $a = new $class($request);
-        return response()->json($a->result, 200);
+        return response()->json($a->result);
     }
 
     /**
      * @param Request $request
      * @return bool
      */
-    public function getNumber(Request $request) {
+    public function getNumber(Request $request): bool
+    {
         if ($request->has('client'))
             return $this->redirectToStart($request);
 
@@ -125,7 +129,7 @@ class Telegram
      * @param Request $request
      * @return bool
      */
-    public function redirectToStart(Request $request)
+    public function redirectToStart(Request $request): bool
     {
         $class = $this->nsCommands.'Start';
         new $class($request);

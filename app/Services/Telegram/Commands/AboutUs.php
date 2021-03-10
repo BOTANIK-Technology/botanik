@@ -5,6 +5,9 @@ namespace App\Services\Telegram\Commands;
 
 use App\Models\Information;
 use Illuminate\Http\Request;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class AboutUs extends Command
 {
@@ -12,8 +15,8 @@ class AboutUs extends Command
      * AboutUs constructor.
      * @param Request $request
      * @param bool $back
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function __construct(Request $request, bool $back = false)
     {
@@ -22,9 +25,10 @@ class AboutUs extends Command
     }
 
     /**
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return InlineKeyboardMarkup
      */
-    private function getInfo() {
+    private function getInfo(): InlineKeyboardMarkup
+    {
         $infos = Information::all();
         $array = [];
         foreach ($infos as $info) {

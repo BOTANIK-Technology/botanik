@@ -8,21 +8,48 @@ use GuzzleHttp\Exception\GuzzleException;
 class BeautyProApi
 {
     const BASE_URI = 'https://api.aihelps.com/v1/';
+
     private Client $guzzle;
+    private string $token;
 
     /**
      * BeautyProApi constructor.
      * @param string $token
      */
-    public function __construct(string $token)
+    public function __construct(string $token = '')
     {
-        $this->guzzle = new Client([
+        $params = [
             'base_uri' => self::BASE_URI,
             'timeout'  => 2.0,
-            'headers' => [
+        ];
+
+        if (!empty($token)) {
+            $this->token = $token;
+            $params['headers'] = [
                 'Authorization' => 'Bearer ' . $token,
-            ]
-        ]);
+            ];
+        }
+
+        $this->guzzle = new Client($params);
+    }
+
+    /**
+     * @param string $application_id
+     * @param string $application_secret
+     * @param int $database_code
+     * @return array
+     */
+    public function getBearer (string $application_id, string $application_secret, int $database_code): array
+    {
+        return $this->request(
+            'auth/database',
+            [
+                'application_id' => $application_id,
+                'application_secret' => $application_secret,
+                'database_code' => $database_code
+            ],
+            'query'
+        );
     }
 
     /**
@@ -61,21 +88,22 @@ class BeautyProApi
     /**
      * @param string $url
      * @param array $parameters
+     * @param string $params_type
      * @param string $method
      * @return array
      */
-    protected function request(string $url, $parameters = [], $method = 'GET'): array
+    protected function request(string $url, array $parameters = [], string $params_type = 'form_params', string $method = 'GET'): array
     {
         try {
             $response = $this->guzzle->request(
                 $method,
                 $url,
                 [
-                    'form_params' => $parameters
+                    $params_type => $parameters
                 ]
             );
 
-            return json_decode($response->getBody()->getContents());
+            return json_decode($response->getBody()->getContents(), JSON_OBJECT_AS_ARRAY);
 
         } catch (GuzzleException $e) {
             return $this->exception($e);

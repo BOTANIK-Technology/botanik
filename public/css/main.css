@@ -273,11 +273,11 @@ b {
     color: #5B5B5B;
     padding-left: 24px;
 }
-input[type=radio] {
+input[type=radio],input[type=checkbox] {
     display:none;
     margin:10px;
 }
-input[type=radio] + label {
+input[type=radio] + label,input[type=checkbox] + label {
     display:inline-block;
     margin:-2px;
     padding: 8px 12px;
@@ -292,7 +292,7 @@ input[type=radio] + label {
     text-transform: uppercase;
     cursor: pointer;
 }
-input[type=radio]:checked + label {
+input[type=radio]:checked + label,input[type=checkbox]:checked + label {
     background-image: none;
     color: #FFFFFF;
 }

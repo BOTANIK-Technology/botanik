@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Share;
+use Exception;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Validator;
+use Illuminate\View\View;
 
 class ShareController extends Controller
 {
@@ -12,14 +17,14 @@ class ShareController extends Controller
      *
      * @var array
      */
-    public $params = [];
+    public array $params = [];
 
     /**
      * View name
      *
      * @var string
      */
-    public $view = 'share';
+    public string $view = 'share';
 
 
     /**
@@ -37,7 +42,7 @@ class ShareController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getView (Request $request)
     {
@@ -46,7 +51,8 @@ class ShareController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param Request $request
+     * @return Factory|View
      */
     public function index (Request $request)
     {
@@ -55,7 +61,7 @@ class ShareController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function window(Request $request)
     {
@@ -71,24 +77,20 @@ class ShareController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function deleteConfirm (Request $request)
+    public function deleteConfirm (Request $request): JsonResponse
     {
-        try {
-            Share::find($request->id)->delete();
-            return response()->json(['ok' => true], 200);
-        }
-        catch (\Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
-        }
+        return response()->json(
+            ['destroyed' => Share::destroy($request->id)]
+        );
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function createConfirm(Request $request)
+    public function createConfirm(Request $request): JsonResponse
     {
         $validator = $this->validateShare($request);
 
@@ -107,18 +109,18 @@ class ShareController extends Controller
                 ]
             );
 
-            return response()->json(['ok' => true], 200);
+            return response()->json(['ok' => true]);
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function editConfirm(Request $request)
+    public function editConfirm(Request $request): JsonResponse
     {
         $validator = $this->validateShare($request);
 
@@ -126,33 +128,34 @@ class ShareController extends Controller
             return response()->json(['errors' => $validator->errors()], 405);
         }
 
+        $update = [
+            'title' => $request->input('title'),
+            'text' => $request->input('text'),
+            'button' => $request->has('button') ? $request->input('button') : null,
+            'user_id' => $request->input('user_id'),
+        ];
+
+        if ($request->has('img') && !empty($request->input('img'))) $update['img'] = $request->input('img');
+
         try {
-            Share::where('id', $request->input('id'))->update(
-                [
-                    'title' => $request->input('title'),
-                    'text' => $request->input('text'),
-                    'img' => $request->has('img') ? $request->input('img') : null ,
-                    'button' => $request->has('button') ? $request->input('button') : null,
-                    'user_id' => $request->input('user_id'),
-                ]
-            );
-            return response()->json(['ok' => true], 200);
+            Share::findOrFail($request->id)->update($update);
+            return response()->json(['ok' => true]);
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Validation\Validator
+     * @return Validator
      */
-    private function validateShare(Request $request)
+    private function validateShare(Request $request): Validator
     {
         return \Validator::make($request->all(), [
             'title'   => 'required|string|min:1|max:255',
             'text'    => 'required|string|min:1',
-            'img'     => 'nullable|active_url',
+            'img'     => 'nullable|string',
             'button'  => 'nullable|active_url',
             'user_id' => 'required|integer|min:0',
         ]);

@@ -2,20 +2,35 @@
 
 namespace App\Services\Telegram;
 
+use App\Jobs\SendNotice;
+use App\Jobs\TelegramFeedBack;
+use App\Jobs\TelegramNotice;
+use App\Models\Payment;
+use App\Models\Record;
+use App\Models\Service;
+use App\Models\TelegramSession;
+use Carbon\Carbon;
+use ConnectService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use \TelegramBot\Api\BotApi;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
+use TelegramBot\Api\Types\Message;
+use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 
 class TelegramAPI
 {
-    public $bot;
+    public BotApi $bot;
     public $user = false;
     public $package;
-    public $token;
-    public $pay_token;
-    public $chat_id;
-    public $message_id;
-    public $business_db;
-    public $menu = [
+    public string $token;
+    public string $pay_token;
+    public int $chat_id;
+    public int $message_id;
+    public string $business_db;
+    public array $menu = [
         [
             'Запись'
         ],
@@ -75,11 +90,11 @@ class TelegramAPI
      * @param null $replyTo
      * @param string $parseMode
      * @param bool $disablePreview
-     * @return \TelegramBot\Api\Types\Message
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @return Message
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
-    public function sendMessage($text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disablePreview = false)
+    public function sendMessage($text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disablePreview = false): Message
     {
         return $this->bot->sendMessage($this->chat_id, $text, $parseMode, $disablePreview, $replyTo, $keyboard);
     }
@@ -91,11 +106,11 @@ class TelegramAPI
      * @param null $replyTo
      * @param string $parseMode
      * @param bool $disableNotification
-     * @return \TelegramBot\Api\Types\Message
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @return Message
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
-    public function sendPhoto($photo, $text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disableNotification = false)
+    public function sendPhoto($photo, $text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disableNotification = false): Message
     {
         return $this->bot->sendPhoto($this->chat_id, $photo, $text, $replyTo, $keyboard, $disableNotification, $parseMode);
     }
@@ -105,9 +120,9 @@ class TelegramAPI
      * @param null $keyboard
      * @param string $parseMode
      * @param bool $disablePreview
-     * @return \TelegramBot\Api\Types\Message
+     * @return Message
      */
-    public function editMessage($text, $keyboard = null, $parseMode = 'HTML', $disablePreview = false)
+    public function editMessage($text, $keyboard = null, $parseMode = 'HTML', $disablePreview = false): Message
     {
         return $this->bot->editMessageText($this->chat_id, $this->message_id, $text, $parseMode, $disablePreview, $keyboard);
     }
@@ -115,7 +130,7 @@ class TelegramAPI
     /**
      * @return bool
      */
-    public function deleteMessage()
+    public function deleteMessage(): bool
     {
         return $this->bot->deleteMessage($this->chat_id, $this->message_id);
     }
@@ -123,26 +138,26 @@ class TelegramAPI
     /**
      * @param array $buttons
      * @param bool $oneTime
-     * @return \TelegramBot\Api\Types\ReplyKeyboardMarkup
+     * @return ReplyKeyboardMarkup
      */
-    public function buildReplyKeyboard($buttons = [], $oneTime = true)
+    public function buildReplyKeyboard($buttons = [], $oneTime = true): ReplyKeyboardMarkup
     {
-        return $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup($buttons, $oneTime);
+        return $keyboard = new ReplyKeyboardMarkup($buttons, $oneTime);
     }
 
     /**
      * @param array $buttons
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return InlineKeyboardMarkup
      */
-    public function buildInlineKeyboard($buttons = [])
+    public function buildInlineKeyboard($buttons = []): InlineKeyboardMarkup
     {
-        return $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup($buttons);
+        return $keyboard = new InlineKeyboardMarkup($buttons);
     }
 
     /**
      * @return bool
      */
-    public function isUser()
+    public function isUser(): bool
     {
         if (empty($this->user))
             return false;
@@ -151,9 +166,9 @@ class TelegramAPI
     }
 
     /**
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return InlineKeyboardMarkup
      */
-    public function buildStars()
+    public function buildStars(): InlineKeyboardMarkup
     {
         $star = hex2bin('E2AD90');
         return $this->buildInlineKeyboard(
@@ -169,11 +184,11 @@ class TelegramAPI
 
     /**
      * @param $text
-     * @return \TelegramBot\Api\Types\Message
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @return Message
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
-    public function getMenu($text)
+    public function getMenu($text): Message
     {
         return $this->sendMessage(
             $text,
@@ -184,7 +199,7 @@ class TelegramAPI
     /**
      * @return mixed
      */
-    public function getData ()
+    public function getData (): bool
     {
         return json_decode($this->user->telegramSession->data) ?? false;
     }
@@ -199,7 +214,7 @@ class TelegramAPI
             $this->user->telegramSession->data = json_encode($data);
             $this->user->telegramSession->save();
         } else {
-            $session = new \App\Models\TelegramSession();
+            $session = new TelegramSession();
             $session->data = json_encode($data);
             $this->user->telegramSession()->save($session);
         }
@@ -218,7 +233,7 @@ class TelegramAPI
     /**
      * @return int
      */
-    public function getStars()
+    public function getStars(): int
     {
         return $this->user->telegramSession->stars;
     }
@@ -226,7 +241,7 @@ class TelegramAPI
     /**
      * @return int
      */
-    public function getTypeID ()
+    public function getTypeID (): int
     {
         return $this->user->telegramSession->type;
     }
@@ -242,7 +257,7 @@ class TelegramAPI
     /**
      * @return int
      */
-    public function getAddressID ()
+    public function getAddressID (): int
     {
         return $this->user->telegramSession->address;
     }
@@ -250,7 +265,7 @@ class TelegramAPI
     /**
      * @return int
      */
-    public function getMasterID ()
+    public function getMasterID (): int
     {
         return $this->user->telegramSession->master;
     }
@@ -274,7 +289,7 @@ class TelegramAPI
     /**
      * @return int
      */
-    public function getRecordID ()
+    public function getRecordID (): int
     {
         return $this->user->telegramSession->record;
     }
@@ -283,7 +298,7 @@ class TelegramAPI
      * @param mixed ...$packages
      * @return bool
      */
-    public function hasPackage(...$packages)
+    public function hasPackage(...$packages): bool
     {
         foreach ($packages as $package)
             if ($this->package == $package)
@@ -296,19 +311,19 @@ class TelegramAPI
      * @param bool $status
      * @param bool $online_pay
      * @param int $bonus
-     * @return \App\Models\Record|\Illuminate\Database\Eloquent\Model|bool
+     * @return Record|Model|bool
      */
     protected function createRecord ($status = true, $online_pay = false, $bonus = 0)
     {
         try {
-            $service = \App\Models\Service::find( $this->getServiceID() );
+            $service = Service::find( $this->getServiceID() );
         } catch (\Exception $e) {
             return false;
         }
         $price = intval( $service->price );
         if ($bonus > 0) $price = $this->currentPrice($price, $bonus);
 
-        $record = \App\Models\Record::create([
+        $record = Record::create([
             'telegram_user_id' => $this->user->id,
             'service_id' => $this->getServiceID(),
             'address_id' => $this->getAddressID(),
@@ -318,12 +333,12 @@ class TelegramAPI
             'status' => $status
         ]);
 
-        \App\Models\Payment::create([
+        Payment::create([
             'online_pay' => $online_pay,
             'money' => $price,
             'bonuses' => $bonus,
             'status' => $status,
-            'refund' => \Carbon\Carbon::now()->addHours(3),
+            'refund' => Carbon::now()->addHours(3),
             'record_id' => $record->id
         ]);
 
@@ -350,21 +365,25 @@ class TelegramAPI
         return $record;
     }
 
-    private function groupMessage (\App\Models\Service $service)
+    private function groupMessage (Service $service)
     {
         if (!isset($service->group))
             return;
 
-        $records = \App\Models\Record::where('service_id', $service->id)->where('date', $this->getDate())->where('time', $this->getTime());
+        $records = Record::where('service_id', $service->id)->where('date', $this->getDate())->where('time', $this->getTime());
 
         if ($records->count() < $service->group->quantity)
             return;
 
         foreach ($records as $record) {
-            $this->bot->sendMessage(
+            try {
+                $this->bot->sendMessage(
                     $record->telegramUser->chat_id,
                     $service->group->message
-            );
+                );
+            } catch (Exception $e) {
+                continue;
+            }
         }
     }
 
@@ -374,14 +393,14 @@ class TelegramAPI
      */
     private function createRecordNotice ($service_name, $record_id)
     {
-        if (!\ConnectService::prepareJob())
+        if (!ConnectService::prepareJob())
             return;
 
         /**
          * Admin & Master notice
          */
         $notice_mess = __('Новая запись на услугу').' <b>'.$service_name.'</b> от '.$this->user->first_name.' на '.$this->getDate(). ' в '.$this->getTime();
-        \App\Jobs\SendNotice::dispatch(
+        SendNotice::dispatch(
             $this->business_db,
             [
                 [
@@ -398,7 +417,7 @@ class TelegramAPI
         /*
          * Client notice
          */
-        \App\Jobs\TelegramNotice::dispatch(
+        TelegramNotice::dispatch(
             $this->business_db,
             $this->chat_id,
             $record_id,
@@ -406,19 +425,19 @@ class TelegramAPI
             $this->getDate(),
             $this->getTime(),
             $this->token
-        )->delay(\Carbon\Carbon::parse($this->getDate().$this->getTime())->subHour());
+        )->delay(Carbon::parse($this->getDate().$this->getTime())->subHour());
 
         /*
          * Client feedback
          */
-        \App\Jobs\TelegramFeedBack::dispatch(
+        TelegramFeedBack::dispatch(
             $this->business_db,
             $this->chat_id,
             $record_id,
             $this->token
-        )->delay(\Carbon\Carbon::parse($this->getDate().$this->getTime())->addDay());
+        )->delay(Carbon::parse($this->getDate().$this->getTime())->addDay());
 
-        \ConnectService::dbConnect($this->business_db);
+        ConnectService::dbConnect($this->business_db);
     }
 
     /**

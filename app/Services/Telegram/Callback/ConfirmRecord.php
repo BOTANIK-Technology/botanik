@@ -2,8 +2,10 @@
 
 namespace App\Services\Telegram\Callback;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Jenssegers\Date\Date;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class ConfirmRecord extends CallbackQuery
 {
@@ -15,7 +17,8 @@ class ConfirmRecord extends CallbackQuery
         parent::editMessage($this->getText($time), $this->getButtons());
     }
 
-    private function getText($time) {
+    private function getText($time): string
+    {
         if (is_null(parent::getMasterID()))
             return
                 'Оформление записи:'."\n".
@@ -29,22 +32,31 @@ class ConfirmRecord extends CallbackQuery
             'Оформление записи:'."\n".
             '1. Услуга: '.\App\Models\Service::find( $this->getServiceID() )->name."\n".
             '2. Адрес: '.\App\Models\Address::find( $this->getAddressID() )->address."\n".
-            '3. Специалист: '.\App\Models\User::find( $this->getMasterID() )->name."\n".
+            '3. Специалист: '. User::find( $this->getMasterID() )->name."\n".
             '4. Дата: '.Date::parse( parent::getDate() )->format('l j F Y')."\n".
             '5. Время: '.$time."\n".
             '6. Стоимость: '.\App\Models\Service::find( parent::getServiceID() )->price.' грн'."\n\n".
             'Оплата:';
     }
 
-    private function getButtons () {
+    /**
+     * @return InlineKeyboardMarkup
+     */
+    private function getButtons (): InlineKeyboardMarkup
+    {
+        $service = \App\Models\Service::find(parent::getServiceID());
 
-        if ( parent::hasPackage('pro', 'base') && !empty($this->pay_token) && !is_null($this->pay_token) )
+        if ( parent::hasPackage('pro', 'base') && !empty($this->pay_token) && !is_null($this->pay_token) && $service->online_pay)
             $buttons[] = [['text' => 'Онлайн','callback_data' => 'OnlinePay_']];
 
-        $buttons[] = [['text' => 'На месте','callback_data' => 'CashPay_']];
+        if ( $service->cash_pay )
+            $buttons[] = [['text' => 'На месте','callback_data' => 'CashPay_']];
 
-        if ( parent::hasPackage('pro') )
+        if ( parent::hasPackage('pro') && $service->bonus_pay)
             $buttons[] = [['text' => 'Бонусами','callback_data' => 'BonusPay_']];
+
+        if ( !is_null($service->prepayment) )
+            $buttons[] = [['text' => 'Бонусами','callback_data' => 'PrePay_']];
 
         return parent::buildInlineKeyboard($buttons);
 

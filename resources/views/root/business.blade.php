@@ -77,7 +77,14 @@
                     </label>
                 </div>
 
-                <button class="btn-primary" data-storage="{{route('api.storage')}}" data-href="{{route('root.business.create')}}" id="create">{{__('Создать')}}</button>
+                <button
+                    class="btn-primary"
+                    data-storage="{{route('api.storage')}}"
+                    data-href="{{route('root.business.create')}}"
+                    id="create"
+                >
+                    {{__('Создать')}}
+                </button>
 
             </div>
         </div>

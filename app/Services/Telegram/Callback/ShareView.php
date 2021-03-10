@@ -4,14 +4,16 @@ namespace App\Services\Telegram\Callback;
 
 use App\Models\Share;
 use Illuminate\Http\Request;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
 
 class ShareView extends CallbackQuery
 {
     /**
      * ShareView constructor.
      * @param Request $request
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function __construct(Request $request)
     {
@@ -21,8 +23,8 @@ class ShareView extends CallbackQuery
     }
 
     /**
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     private function view() {
         $share = Share::find($this->getCallbackID());
@@ -38,6 +40,6 @@ class ShareView extends CallbackQuery
         $mess = '<b>'.$share->title.'</b>'."\n\n".$share->text;
 
         if (is_null($share->img)) parent::sendMessage($mess, $keyboard);
-        else  parent::sendPhoto($share->img, $mess, $keyboard);
+        else  parent::sendPhoto(asset('public/storage/'.$share->img), $mess, $keyboard);
     }
 }

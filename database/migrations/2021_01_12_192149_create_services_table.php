@@ -23,8 +23,12 @@ class CreateServicesTable extends Migration
 
             $table->unsignedBigInteger('interval_id')->nullable();
             $table->foreign('interval_id')->references('id')->on('intervals')->onDelete('cascade');
-
             $table->integer('range')->default(0);
+
+            $table->boolean('cash_pay')->default(0);
+            $table->boolean('bonus_pay')->default(0);
+            $table->boolean('online_pay')->default(0);
+
             $table->timestamps();
         });
     }

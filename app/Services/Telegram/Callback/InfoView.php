@@ -4,14 +4,16 @@ namespace App\Services\Telegram\Callback;
 
 use App\Models\Information;
 use Illuminate\Http\Request;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
 
 class InfoView extends CallbackQuery
 {
     /**
      * ShareView constructor.
      * @param Request $request
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function __construct(Request $request)
     {
@@ -21,8 +23,8 @@ class InfoView extends CallbackQuery
     }
 
     /**
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     private function view() {
         $info = Information::find($this->getCallbackID());
@@ -31,7 +33,7 @@ class InfoView extends CallbackQuery
             return;
 
         if (!is_null($info->addresses)) {
-            $addrs = \GuzzleHttp\json_decode($info->addresses);
+            $addrs = json_decode($info->addresses);
             foreach ($addrs as $addr)
                 $more[] = [['text' => $addr, 'url' => 'https://www.google.com/maps/search/?api=1&query='.str_replace(" ","+", $addr)]];
         }
@@ -49,7 +51,7 @@ class InfoView extends CallbackQuery
         if (is_null($info->img)) parent::editMessage($mess, $keyboard);
         else  {
             parent::deleteMessage();
-            parent::sendPhoto($info->img, $mess, $keyboard);
+            parent::sendPhoto(asset('public/storage/'.$info->img), $mess, $keyboard);
         }
     }
 }
