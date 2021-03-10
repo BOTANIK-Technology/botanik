@@ -61,6 +61,12 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
         document.getElementById('message-'+id).value = '';
     }
 
+    function prepayOff (prepayBlock, id) {
+        addClass(prepayBlock, 'hide');
+        document.getElementById('card-'+id).value = '';
+        document.getElementById('prepay-message-'+id).value = '';
+    }
+
     function intervalVal (id) {return getCheckedVal(document.getElementsByName('interval-'+id))}
     function addressSelectors (id) {return document.getElementsByName('addresses-'+id+'[]')}
     function groupVal (id) {return getCheckedVal(document.getElementsByName('group-'+id))}
@@ -76,7 +82,13 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
             'bonus': document.getElementById('bonus-'+id).value,
             'grouped': groupVal(id),
             'quantity': document.getElementById('quantity-'+id).value,
-            'message': document.getElementById('message-'+id).value
+            'message': document.getElementById('message-'+id).value,
+            'prepay': document.getElementById('prepay-'+id).checked,
+            'cashpay': document.getElementById('cashpay-'+id).checked,
+            'onlinepay': document.getElementById('onlinepay-'+id).checked,
+            'bonuspay': document.getElementById('bonuspay-'+id).checked,
+            'prepay_message': document.getElementById('prepay-message-'+id).value,
+            'prepay_card': document.getElementById('card-'+id).value,
         }
     }
 
@@ -115,6 +127,12 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
             document.getElementById('bonus-'+id).value = inputs.bonus;
             document.getElementById('quantity-'+id).value = inputs.quantity;
             document.getElementById('message-'+id).value = inputs.message;
+            document.getElementById('prepay-'+id).checked = inputs.prepay;
+            document.getElementById('cashpay-'+id).checked = inputs.cashpay;
+            document.getElementById('onlinepay-'+id).checked = inputs.onlinepay;
+            document.getElementById('bonuspay-'+id).checked = inputs.bonuspay;
+            document.getElementById('prepay-message-'+id).value = inputs.prepay_message;
+            document.getElementById('card-'+id).value = inputs.prepay_card;
 
             let selectors = addressSelectors(id);
             if (selectors.length < inputs.addresses.length) {
@@ -186,6 +204,17 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
                 if (this.value == 0) groupOff(groupBlock, id);
                 else removeClass(groupBlock, 'hide');
             })
+        });
+
+        let prepayBlock = document.getElementById('prepay-service-'+id);
+        let prepayBtn = document.querySelector('#prepay-'+id);
+        if (!prepayBtn.checked) prepayOff(prepayBlock, id);
+        else removeClass(prepayBlock, 'hide');
+        prepayBtn.addEventListener('change', function () {
+            if (this.checked)
+                removeClass(prepayBlock, 'hide');
+            else
+                prepayOff(prepayBlock, id)
         });
 
     });

@@ -80,7 +80,7 @@ class ServiceController extends Controller
             case 'timetable':
                 break;
             default:
-                return abort(404);
+                abort(404);
         }
 
         switch ($request->modal) {
@@ -210,13 +210,22 @@ class ServiceController extends Controller
             $service->range = $request->input('range');
             $service->price = $request->input('price');
             $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
+            $service->cash_pay = $request->input('cashpay');
+            $service->online_pay = $request->input('onlinepay');
+            $service->bonus_pay = $request->input('bonuspay');
             $type->services()->save($service);
             $service->attachAddresses($request->input('addresses'));
+
             if ($request->has('timetable'))
                 $service->attachTimetable($request->input('timetable'));
+
+            if ($request->prepay)
+                $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
+
             if (!empty($request->input('quantity')) &&  !empty($request->input('message')))
                 $service->group()->create(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
-            return response()->json(['ok' => true], 201);
+
+            return response()->json(['ok' => true]);
         }
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
@@ -243,13 +252,24 @@ class ServiceController extends Controller
             $service->range = $request->input('range');
             $service->price = $request->input('price');
             $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
+            $service->cash_pay = $request->input('cashpay');
+            $service->online_pay = $request->input('onlinepay');
+            $service->bonus_pay = $request->input('bonuspay');
             $service->save();
             $service->rewriteAddresses($request->input('addresses'));
+
             if ($request->has('timetable'))
                 $service->updateTimetable($request->input('timetable'));
+
+            if ($request->prepay)
+                $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
+
             if (!empty($request->input('quantity')) &&  !empty($request->input('message')))
                 $service->updateGroup(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
-            return response()->json(['ok' => true], 200);
+            else
+                if (isset($service->group)) $service->group->delete();
+
+            return response()->json(['ok' => true]);
         } catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage().' '.$e->getLine()]], 500);
         }
@@ -263,10 +283,10 @@ class ServiceController extends Controller
     {
         try {
             Service::find($request->id)->delete();
-            return response()->json(['ok' => true], 200);
+            return response()->json(['ok' => true]);
         }
         catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 200);
+            return response()->json(['errors' => ['server' => $e->getMessage()]]);
         }
     }
 
@@ -286,7 +306,14 @@ class ServiceController extends Controller
             'range'     => 'nullable|integer|min:0',
             'message'   => 'nullable|required_with:quantity|string',
             'quantity'  => 'nullable|required_with:message|integer|min:2',
-            'timetable' => 'nullable|array'
+            'timetable' => 'nullable|array',
+            'prepay'    => 'required|boolean',
+            'cashpay'   => 'required|boolean',
+            'onlinepay' => 'required|boolean',
+            'bonuspay'  => 'required|boolean',
+            'prepay_message' => 'nullable|string',
+            'prepay_card'    => 'nullable|string',
+
         ]);
     }
 }

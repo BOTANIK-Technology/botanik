@@ -30,6 +30,7 @@
             <label class="row-7 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
             <label class="row-8 col-1 align-self-center" for="calendar">{{__('Расписание')}}</label>
             <label class="row-9 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
+            <label class="row-10 col-1 align-self-center" for="prepay-1">{{__('Оплата *')}}</label>
 
             <div class="row-1 col-2">
                 <input id="service-name" class="inp" type="text" placeholder="{{__('Введите название')}}">
@@ -109,6 +110,17 @@
                 <label for="group-0" class="user-select-none">{{__('Нет')}}</label>
             </div>
 
+            <div class="row-10 col-2 grid intervals">
+                <input id="prepay" type="checkbox" name="pre" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+                <label for="prepay" class="user-select-none">{{__('Предоплата')}}</label>
+                <input id="cashpay" type="checkbox" name="cas" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+                <label for="cashpay" class="user-select-none">{{__('На месте')}}</label>
+                <input id="onlinepay" type="checkbox" name="online" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+                <label for="onlinepay" class="user-select-none">{{__('Онлайн')}}</label>
+                <input id="bonuspay" type="checkbox" name="bonuspay" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+                <label for="bonuspay" class="user-select-none">{{__('Бонусами')}}</label>
+            </div>
+
             <div id="type-block" class="row-2 col-3 flex align-items-center">
                 <div class="add-b-icon"></div><button id="add-type">{{__('Добавить тип в список')}}</button>
             </div>
@@ -128,6 +140,18 @@
             </div>
             <div class="row-2 col-2">
                 <textarea id="message" class="inp" type="text" placeholder="{{__('Введите сообщение')}}"></textarea>
+            </div>
+        </div>
+
+        <div id="prepay-service" class="grid group add-service hide">
+            <label class="row-1 col-1 align-self-center" for="card">{{__('Номер банковской карты *')}}</label>
+            <label class="row-2 col-1 align-self-center" for="prepay-message">{{__('Сообщение *')}}</label>
+
+            <div class="row-1 col-2">
+                <input id="card" class="inp align-self-center" type="text" placeholder="{{__('Введите номер карты')}}">
+            </div>
+            <div class="row-2 col-2 align-self-center">
+                <textarea id="prepay-message" class="inp" type="text" placeholder="{{__('Введите сообщение')}}"></textarea>
             </div>
         </div>
 

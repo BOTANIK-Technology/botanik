@@ -5,13 +5,6 @@
 @endsection
 
 @section('scripts')
-    <script>
-        let url = '{{url()->current()}}';
-        let baseUrl = '{{url('/').'/'.$slug.'/'.'schedule/'}}';
-        @if (isset($modal) && isset($id))
-        let endurl = '/{{$modal}}/{{$id}}';
-        @endif
-    </script>
     <script src="{{asset('js/schedule/page.js')}}"></script>
 @endsection
 

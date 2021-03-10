@@ -1,22 +1,6 @@
 <div class="schedule-pers flex">
-    <div class="date-sort flex direction-column">
-        <select id="months" class="border-color">
-            <option value="">{{__('Выберете месяц')}}</option>
-            @foreach($calendar as $m)
-                <option value="{{$loop->index}}" @if($date) @foreach($m as $d) {{$d == $date ? 'selected' : ''}} @endforeach @endif>{{$m[0]}}</option>
-            @endforeach
-        </select>
-        @foreach($calendar as $m)
-            <select id="days-{{$loop->index}}" class="border-color @if($date) @php foreach($m as $d){if($d==$date){$ok=true;break;}else{$ok=false;}} @endphp {{$ok ? '' : 'hide'}} @else {{$loop->first ? '' : 'hide'}} @endif">
-                <option value="">{{__('Выберете день')}}</option>
-                @foreach($m as $k => $d)
-                    @if (!$loop->first)
-                        <option value="{{$d}}" {{$d == $date ? 'selected' : ''}}>{{$k}}</option>
-                    @endif
-                @endforeach
-            </select>
-        @endforeach
-    </div>
+
+    @include('schedule.calendar')
 
     @if ($schedule)
 

@@ -54,11 +54,11 @@
 <div class="flex justify-content-around create">
 
     <label for="time">
-        <input id="time" type="text" class="int" placeholder="00:00">
+        <input id="time" type="text" class="inp" placeholder="00:00">
     </label>
 
     <label for="date">
-        <input id="date" type="text" class="int" placeholder="{{__('01.01.2020')}}">
+        <input id="date" type="text" class="inp" placeholder="{{__('01.01.2020')}}">
     </label>
 
 </div>

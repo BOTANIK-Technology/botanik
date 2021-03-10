@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mail;
 use App\Models\TypeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MailController extends Controller
@@ -53,7 +54,7 @@ class MailController extends Controller
         );
     }
 
-    public function createConfirm(Request $request)
+    public function createConfirm(Request $request): JsonResponse
     {
         $validator = \Validator::make($request->all(), [
             'title'            => 'required|string|min:1|max:255',
@@ -62,7 +63,7 @@ class MailController extends Controller
             'age_end'          => 'nullable|integer',
             'sex'              => 'nullable|boolean',
             'frequency'        => 'nullable|integer|min:0',
-            'img'              => 'nullable|active_url',
+            'img'              => 'nullable|string',
             'button'           => 'nullable|active_url',
             'last_service'     => 'nullable|integer|min:0',
             'favorite_service' => 'nullable|integer|min:0',
@@ -89,7 +90,7 @@ class MailController extends Controller
         try {
             Mail::doMails($request->token, $data);
             $mail->create($data);
-            return response()->json(['ok' => true], 200);
+            return response()->json(['ok' => true]);
         }
         catch (\Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);

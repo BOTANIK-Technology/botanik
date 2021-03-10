@@ -32,16 +32,10 @@ class PartnerApiRequest extends FormRequest
     public function rules(): array
     {
         switch ($this->method()) {
+            case 'PUT':
+            case 'PATCH':
             case 'POST':
                 return [
-                    'slug'   => 'required|string',
-                    'method' => 'required|string',
-                    'params' => 'nullable|array'
-                ];
-            case 'PATCH':
-            case 'PUT':
-                return [
-                    'slug'   => 'required|string',
                     'params' => 'nullable|array'
                 ];
         }

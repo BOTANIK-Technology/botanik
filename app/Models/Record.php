@@ -2,76 +2,78 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * App\Models\Record
  *
- * @property-read \App\Models\Address $address
- * @property-read \App\Models\Payment|null $payment
- * @property-read \App\Models\Service $service
- * @property-read \App\Models\TelegramUser $telegramUser
- * @property-read \App\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VisitHistory[] $visitHistories
+ * @property-read Address $address
+ * @property-read Payment|null $payment
+ * @property-read Service $service
+ * @property-read TelegramUser $telegramUser
+ * @property-read User $user
  * @property-read int|null $visit_histories_count
- * @method static \Illuminate\Database\Eloquent\Builder|Record newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Record newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Record query()
- * @mixin \Eloquent
+ * @method static Builder|Record newModelQuery()
+ * @method static Builder|Record newQuery()
+ * @method static Builder|Record query()
+ * @mixin Eloquent
  */
 class Record extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'telegram_user_id', 'service_id', 'address_id', 'user_id', 'transfer', 'status', 'time', 'date'
+        'telegram_user_id',
+        'service_id',
+        'address_id',
+        'user_id',
+        'transfer',
+        'status',
+        'time',
+        'date'
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function service()
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function address()
+    public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function telegramUser()
+    public function telegramUser(): BelongsTo
     {
         return $this->belongsTo(TelegramUser::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasOne
      */
-    public function visitHistories()
-    {
-        return $this->hasMany(VisitHistory::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function payment()
+    public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
     }

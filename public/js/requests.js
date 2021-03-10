@@ -10,9 +10,17 @@ function getMeta(metaName) {
     return false;
 }
 
+function putRequest(url, object = null, async = true) {
+    return defaultRequest(url, 'PUT', object, async);
+}
+
 function postRequest(url, object = null, async = true, contentType = 'application/json;charset=UTF-8') {
+    return defaultRequest(url, 'POST', object, async, contentType);
+}
+
+function defaultRequest (url, method = 'POST', object = null, async = true, contentType = 'application/json;charset=UTF-8') {
     let Request = new XMLHttpRequest();
-    Request.open("POST", url, async);
+    Request.open(method, url, async);
     Request.setRequestHeader("Content-Type", contentType);
     Request.setRequestHeader("X-CSRF-TOKEN", getMeta('csrf-token'));
     if (object)

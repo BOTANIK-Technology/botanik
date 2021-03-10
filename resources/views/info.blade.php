@@ -2,12 +2,14 @@
 
 @section('styles')
     <link href="{{ asset('css/mail.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/img-label.css') }}" rel="stylesheet">
     <link href="{{ asset('css/info.css') }}" rel="stylesheet">
 @endsection
 
 @section('scripts')
-    <script>let url = '{{url()->current()}}';</script>
+    <script>let slug = '{{$slug}}'</script>
     <script src="{{asset('js/requests.js')}}"></script>
+    <script src="{{asset('js/img-label.js')}}"></script>
     <script src="{{asset('js/info.js')}}"></script>
 @endsection
 
@@ -90,7 +92,9 @@
                 <input id="title" class="col-2" type="text" placeholder="Введите заголовок">
 
                 <label for="img" class="col-1">Обложка</label>
-                <input id="img" class="col-2" type="text" placeholder="Ссылка на изображение">
+                <label for="img" class="image-logo flex align-items-center col-2" id="img-label">
+                    <input type="file" accept="image/*" name="image" id="img">
+                </label>
 
                 <label for="text" class="col-1 align-self-start">Текст</label>
                 <textarea id="text" class="col-2" placeholder="Введите текст"></textarea>
@@ -101,7 +105,15 @@
             </div>
 
             @slot('buttons')
-                <button id="createInfo" type="button" class="btn-primary">Создать</button>
+                <button
+                    id="createInfo"
+                    type="button"
+                    class="btn-primary"
+                    data-storage="{{route('api.storage')}}"
+                    data-url="{{route('info.create', ['business' => $slug])}}"
+                >
+                    Создать
+                </button>
                 <a href="{{route('info', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
             @endslot
 
@@ -117,7 +129,9 @@
                 <input id="title" class="col-2 {{$info->title ? 'active' : ''}}" type="text" value="{{$info->title}}" placeholder="Введите заголовок">
 
                 <label for="img" class="col-1">Обложка</label>
-                <input id="img" class="col-2 {{$info->img ? 'active' : ''}}" type="text" value="{{$info->img}}" placeholder="Ссылка на изображение">
+                <label for="img" class="image-logo flex align-items-center col-2 {{$info->img ? 'active' : ''}}" id="img-label">
+                    <input type="file" accept="image/*" name="image" id="img">
+                </label>
 
                 <label for="text" class="col-1 align-self-start">Текст</label>
                 <textarea id="text" class="col-2 {{$info->text ? 'active' : ''}}" placeholder="Введите текст">{{$info->text}}</textarea>
@@ -128,7 +142,7 @@
                 @if (!is_null($info->addresses))
                     <label for="address" id="design-btn" class="col-1 best-design active">Адрес для маршрута</label>
                     <div id="address-block" class="col-2">
-                        @foreach(\GuzzleHttp\json_decode($info->addresses) as $address)
+                        @foreach(json_decode($info->addresses) as $address)
                             <input id="address" name="addresses[]" class="input-bg map-pin {{$address ? 'active' : ''}}" type="text" value="{{$address}}" placeholder="ул. Сумская №1">
                         @endforeach
                     </div>
@@ -140,7 +154,15 @@
             </div>
 
             @slot('buttons')
-                <button id="editInfo" type="button" data-id="{{$info->id}}" class="btn-primary">Сохранить</button>
+                <button
+                    id="editInfo"
+                    type="button"
+                    class="btn-primary"
+                    data-storage="{{route('api.storage')}}"
+                    data-url="{{route('info.update', ['business' => $slug, 'id' => $info->id])}}"
+                >
+                    Сохранить
+                </button>
                 <a href="{{route('info', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
             @endslot
 
@@ -152,11 +174,16 @@
 
             <div class="delete">
                 Вы действительно<br>
-                хотите удалить раздел <br>
+                хотите удалить раздел<br>
                 <b>“{{$info->title}}”</b>?
             </div>
             @slot('buttons')
-                <button type="button" id="delete" data-id="{{$info->id}}" class="btn-primary">
+                <button
+                    type="button"
+                    id="delete"
+                    data-url="{{route('info.delete', ['business' => $slug, 'id' => $info->id])}}"
+                    class="btn-primary"
+                >
                     {{ __('Удалить') }}
                 </button>
                 <a href="{{route('info', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
@@ -170,10 +197,10 @@
             <div class="view-body flex direction-column">
                 <h1>{{$info->title}}</h1>
                 @if (!is_null($info->img))
-                    <img src="{{$info->img}}" class="img">
+                    <img src="{{asset('public/storage/'.$info->img)}}" class="img" alt="">
                 @endif
                 @if (!is_null($info->addresses))
-                    @foreach(\GuzzleHttp\json_decode($info->addresses) as $address)
+                    @foreach(json_decode($info->addresses) as $address)
                         <a class="modal-date date" href="{{'https://www.google.com/maps/search/?api=1&query='.urlencode($address).'&sensor=false'}}">{{$address}}</a>
                     @endforeach
                 @endif

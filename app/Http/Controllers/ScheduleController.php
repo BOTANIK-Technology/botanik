@@ -60,7 +60,7 @@ class ScheduleController extends Controller
         if (isset($request->modal)) $this->params['modal'] = $request->modal;
 
         if ($user->hasRole('admin', 'owner')) {
-            $records = (new Record)->whereDate('date', Carbon::parse($this->params['date']))->get();
+            $records = Record::whereDate('date', Carbon::parse($this->params['date']))->get();
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
             $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
@@ -68,7 +68,7 @@ class ScheduleController extends Controller
             $this->params['current_type'] = $this->params['current_type']->id;
         } else {
             $schedule = UserTimetable::userSchedule($user, Carbon::parse($this->params['date']));
-            $records = (new Record)->where('user_id', $user->id)->whereDate( 'date', Carbon::parse($this->params['date']) )->get();
+            $records = Record::where('user_id', $user->id)->whereDate( 'date', Carbon::parse($this->params['date']) )->get();
             $this->params['schedule'] = $schedule['times'] ?? false;
             $this->params['address'] = $schedule['address'] ?? false;
         }
@@ -111,11 +111,14 @@ class ScheduleController extends Controller
                 $this->params['create_users'] = User::all();
                 $this->params['create_addresses'] = Address::all();
                 break;
-            case 'view':
             case 'edit':
+            case 'view':
             case 'delete':
-                $this->params['id'] = $request->id;
-                $this->params['record'] = Record::find($request->id);
+                $this->params['window_records'] =
+                    Record::whereDate('date', Carbon::parse($request->input('date')))
+                        ->where('service_id', $request->id)
+                        ->where('time', $request->time)
+                        ->get();
                 break;
         }
         return $this->getView($request);
@@ -249,7 +252,7 @@ class ScheduleController extends Controller
             $record = Record::find($request->id);
             $record->time = $request->time;
             $record->transfer = Carbon::parse($record->date)->format('Y-m-d');
-            $record->date = Carbon::parse($request->changeDate)->format('Y-m-d');
+            $record->date = Carbon::parse($request->date)->format('Y-m-d');
             $record->save();
         }
         catch (Exception $e) {
@@ -257,7 +260,7 @@ class ScheduleController extends Controller
         }
 
         $client = TelegramUser::find($record->telegram_user_id);
-        $type_service = TypeService::find($record->service->type_service_id);
+        $service_name = TypeService::find($record->service->name);
 
         if (!ConnectService::prepareJob())
             return response()->json(['errors' => ['server' => __('Запись изменена. Уведомления не будут отправлены.')]], 500);
@@ -267,13 +270,13 @@ class ScheduleController extends Controller
                 $request->business_db,
                 $client->chat_id,
                 $record->id,
-                __('Внимание! Запись на услугу').' "'.$type_service->type.'" перенесена на '.$request->date.' в '.$request->time,
+                __('Внимание! Запись на услугу').' "'.$service_name.'" перенесена на '.$request->date.' в '.$request->time,
                 $request->date,
                 $request->time,
                 $request->token
             )->delay(now()->addMinutes(2));
 
-            $notice_mess = __('Перенесена запись на услугу ').' <b>'.$type_service->type.'</b> от '.$client->getFio().' на '.$request->date. ' в '.$request->time;
+            $notice_mess = __('Перенесена запись на услугу ').' <b>'.$service_name.'</b> от '.$client->getFio().' на '.$request->date. ' в '.$request->time;
             SendNotice::dispatch(
                 $request->business_db,
                 [

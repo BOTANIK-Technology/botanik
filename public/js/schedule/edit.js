@@ -1,14 +1,8 @@
-/* Edit */
-let editBtn = document.getElementById('edit-schedule');
-let service = document.querySelector('#service');
-let address = document.querySelector('#address');
-let master  = document.querySelector('#master');
-let date    = document.querySelector('#date');
-let time    = document.querySelector('#time');
-
-editBtn.addEventListener('click', function () {
+function update () {
+    let id = this.dataset.id;
     let send = {
-
+        'date': document.querySelector('#date-'+id).value,
+        'time': document.querySelector('#time-'+id).value,
     };
     let Request = postRequest(this.dataset.href, send);
     Request.onload = function() {
@@ -18,5 +12,5 @@ editBtn.addEventListener('click', function () {
             showErrors(Request.response);
         }
     };
-});
+}
 

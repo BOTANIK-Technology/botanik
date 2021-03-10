@@ -22,7 +22,21 @@
                         <span class="data"><b>{{$service->price}} {{__('₴')}}</b></span>
                         <span class="label">{{__('Бонусы')}}</span>
                         <span class="data"><b>{{$service->bonus}}</b></span>
-                        @if($service->group)
+                        <span class="label">{{__('Оплата на месте')}}</span>
+                        <span class="data"><b>{{$service->cash_pay ? __('Да') : __('Нет')}}</b></span>
+                        <span class="label">{{__('Оплата онлайн')}}</span>
+                        <span class="data"><b>{{$service->online_pay ? __('Да') : __('Нет')}}</b></span>
+                        <span class="label">{{__('Оплата бонусами')}}</span>
+                        <span class="data"><b>{{$service->bonus_pay ? __('Да') : __('Нет')}}</b></span>
+                        <span class="label">{{__('Предоплата')}}</span>
+                        <span class="data"><b>{{isset($service->prepayment) ? __('Да') : __('Нет')}}</b></span>
+                        @if (isset($service->prepayment))
+                            <span class="label">{{__('Номер карты')}}</span>
+                            <span class="data"><b>{{$service->prepayment->card_number}}</b></span>
+                            <span class="label">{{__('Сообщение')}}</span>
+                            <span class="data"><b>{{$service->prepayment->message}}</b></span>
+                        @endif
+                        @if(isset($service->group))
                             <span class="label">{{__('Группа')}}</span>
                             <span class="data"><b>{{$service->group->quantity}} {{__('человек(а)')}}</b></span>
                             <span class="label">{{__('Сообщение')}}</span>

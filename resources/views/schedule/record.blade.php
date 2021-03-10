@@ -14,9 +14,9 @@
             <div class="flex align-items-center justify-content-center">
                 <div class="more-icon" data-id="{{$record->first()->id}}"></div>
                 <div id="menu-{{$record->first()->id}}" class="flex justify-content-around align-items-center more-menu service hide">
-                    <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'view', 'id' => $record->first()->id, 'current_month' => $current_month, 'current_type' => $current_type, 'date' => $date])}}"><div class="view-icon"></div></a>
-                    <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'edit', 'id' => $record->first()->id, 'current_month' => $current_month, 'current_type' => $current_type, 'date' => $date])}}"><div class="edit-icon"></div></a>
-                    <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'delete', 'id' => $record->first()->id, 'current_month' => $current_month, 'current_type' => $current_type, 'date' => $date])}}"><div class="delete-icon"></div></a>
+                    <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'view', 'id' => $record->first()->service_id, 'current_month' => $current_month, 'current_type' => $current_type, 'date' => $date, 'time' => $time])}}"><div class="view-icon"></div></a>
+                    <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'edit', 'id' => $record->first()->service_id, 'current_month' => $current_month, 'current_type' => $current_type, 'date' => $date, 'time' => $time])}}"><div class="edit-icon"></div></a>
+                    <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'delete', 'id' => $record->first()->service_id, 'current_month' => $current_month, 'current_type' => $current_type, 'date' => $date, 'time' => $time])}}"><div class="delete-icon"></div></a>
                     <div><div data-id="{{$record->first()->id}}" class="more-menu-close pointer color">x</div></div>
                 </div>
             </div>

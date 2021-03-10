@@ -47,6 +47,7 @@
                     <label class="row-7 col-1 align-self-start" for="bonus-{{$service->id}}">{{__('Бонусы')}}</label>
                     <label class="row-8 col-1 align-self-center" for="calendar-{{$service->id}}">{{__('Расписание')}}</label>
                     <label class="row-9 col-1 align-self-center" for="group-1-{{$service->id}}">{{__('Групповая услуга *')}}</label>
+                    <label class="row-10 col-1 align-self-center" for="prepay-1-{{$service->id}}">{{__('Оплата *')}}</label>
 
                     <div class="row-1 col-2">
                         <input id="service-name-{{$service->id}}" class="inp" type="text" value="{{$service->name}}" placeholder="{{__('Введите название')}}">
@@ -106,10 +107,21 @@
                     </div>
 
                     <div class="row-9 col-2 grid intervals">
-                        <input id="group-1-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="1" {{!empty($service->group) ? 'checked' : ''}}>
+                        <input id="group-1-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="1" {{!isset($service->group) ? 'checked' : ''}}>
                         <label for="group-1-{{$service->id}}" class="user-select-none">{{__('Да')}}</label>
-                        <input id="group-0-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="0" {{ empty($service->group) ? 'checked' : ''}}>
+                        <input id="group-0-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="0" {{ isset($service->group) ? 'checked' : ''}}>
                         <label for="group-0-{{$service->id}}" class="user-select-none">{{__('Нет')}}</label>
+                    </div>
+
+                    <div class="row-10 col-2 grid intervals">
+                        <input id="prepay-{{$service->id}}" type="checkbox" name="pre-{{$service->id}}" value="1" {{isset($service->prepayment) ? 'checked' : ''}}>
+                        <label for="prepay-{{$service->id}}" class="user-select-none">{{__('Предоплата')}}</label>
+                        <input id="cashpay-{{$service->id}}" type="checkbox" name="cash-{{$service->id}}" value="1" {{$service->cash_pay ? 'checked' : ''}}>
+                        <label for="cashpay-{{$service->id}}" class="user-select-none">{{__('На месте')}}</label>
+                        <input id="onlinepay-{{$service->id}}" type="checkbox" name="online-{{$service->id}}" value="1" {{$service->online_pay ? 'checked' : ''}}>
+                        <label for="onlinepay-{{$service->id}}" class="user-select-none">{{__('Онлайн')}}</label>
+                        <input id="bonuspay-{{$service->id}}" type="checkbox" name="bonuspay-{{$service->id}}" value="1" {{$service->bonus_pay ? 'checked' : ''}}>
+                        <label for="bonuspay-{{$service->id}}" class="user-select-none">{{__('Бонусами')}}</label>
                     </div>
 
                     <div class="row-1 col-3 align-self-start text-align-center">
@@ -135,6 +147,18 @@
                     </div>
                     <div class="row-2 col-2 align-self-center">
                         <textarea id="message-{{$service->id}}" class="inp" type="text" placeholder="{{__('Введите сообщение')}}">{{$service->group->message ?? ''}}</textarea>
+                    </div>
+                </div>
+
+                <div id="prepay-service-{{$service->id}}" class="grid group add-service hide">
+                    <label class="row-1 col-1 align-self-center" for="card-{{$service->id}}">{{__('Номер банковской карты *')}}</label>
+                    <label class="row-2 col-1 align-self-center" for="prepay-message-{{$service->id}}">{{__('Сообщение *')}}</label>
+
+                    <div class="row-1 col-2">
+                        <input id="card-{{$service->id}}" class="inp align-self-center" type="text" value="{{$service->prepayment->card_number ?? ''}}" placeholder="{{__('Введите номер карты')}}">
+                    </div>
+                    <div class="row-2 col-2 align-self-center">
+                        <textarea id="prepay-message-{{$service->id}}" class="inp" type="text" placeholder="{{__('Введите сообщение')}}">{{$service->prepayment->message ?? ''}}</textarea>
                     </div>
                 </div>
 

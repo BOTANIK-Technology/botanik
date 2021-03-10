@@ -4,14 +4,16 @@ namespace App\Services\Telegram\Callback;
 
 
 use Illuminate\Http\Request;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
 
 class AboutUs extends CallbackQuery
 {
     /**
      * Service constructor.
      * @param Request $request
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function __construct(Request $request)
     {

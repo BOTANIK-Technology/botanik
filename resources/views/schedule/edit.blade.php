@@ -1,33 +1,50 @@
 @section('modal-scripts')
-    <script src="{{asset('js/request.js')}}"></script>
+    <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/schedule/edit.js')}}"></script>
 @endsection
 
-<div class="edit">
-    <select id="edit-months" class="border-color">
-        @foreach($calendar as $m)
-            <option value="{{$loop->index}}" @if($date) @foreach($m as $d) {{$d == $date ? 'selected' : ''}} @endforeach @endif>{{$m[0]}}</option>
-        @endforeach
-    </select>
-    @foreach($calendar as $m)
-        <select
-            id="edit-days-{{$loop->index}}" class="border-color @if($date) @php foreach($m as $d){if($d==$date){$ok=true;break;}else{$ok=false;}} @endphp {{$ok ? '' : 'hide'}} @else {{$loop->first ? '' : 'hide'}} @endif">
-            @foreach($m as $k => $d)
-                @if (!$loop->first)
-                    <option value="{{$d}}" {{$d == $date ? 'selected' : ''}}>{{$k}}</option>
-                @endif
-            @endforeach
-        </select>
+<div class="margin">
+    @foreach($window_records as $record)
+        <div class="m20px-0">
+            <div class="grid create">
+
+                <label for="client-{{$record->id}}">
+                    <input id="client-{{$record->id}}" class="inp active" value="{{$record->telegramUser->getFio()}}" disabled>
+                </label>
+
+                <label for="phone-{{$record->id}}">
+                    <input id="phone-{{$record->id}}" class="inp active" value="{{$record->telegramUser->phone}}" disabled>
+                </label>
+
+            </div>
+
+            <div class="line margin"></div>
+
+            <div class="flex justify-content-around create">
+
+                <label for="time">
+                    <input id="time-{{$record->id}}" type="text" class="inp active" value="{{$record->time}}" placeholder="00:00">
+                </label>
+
+                <label for="date">
+                    <input id="date-{{$record->id}}" type="text" class="inp active" value="{{$record->date}}" placeholder="{{__('01.01.2020')}}">
+                </label>
+
+            </div>
+
+            <button
+                type="button"
+                id="edit-{{$record->id}}"
+                data-id="{{$record->id}}"
+                data-href="{{route('schedule.update', ['business' => $slug, 'id' => $record->id])}}"
+                class="btn-primary"
+                onclick="update()"
+            >
+                {{ __('Изменить') }}
+            </button>
+        </div>
+
     @endforeach
-    <select id="time-edit">
-        @foreach($times as $time)
-            <option value="{{$time}}" {{$time == $client_rec->time ? 'selected' : ''}}>{{$time}}</option>
-        @endforeach
-    </select>
 </div>
-@slot('buttons')
-    <button type="button" id="edit-schedule" class="btn-primary">
-        {{ __('Сохранить') }}
-    </button>
-    <a href="{{route('schedule', ['business' => $slug, 'date' => $date])}}" id="refresh-modal"></a>
-@endslot
+
+<a href="{{route('schedule', ['business' => $slug, 'date' => $date])}}" id="refresh-modal"></a>

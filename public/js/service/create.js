@@ -39,9 +39,16 @@ if (addService) {
 
     let groupBlock = document.getElementById('group-service');
     function groupOff () {
-        addClass(document.getElementById('group-service'), 'hide');
+        addClass(groupBlock, 'hide');
         document.getElementById('quantity').value = '';
         document.getElementById('message').value = '';
+    }
+
+    let prepayBlock = document.getElementById('prepay-service');
+    function prepayOff () {
+        addClass(prepayBlock, 'hide');
+        document.getElementById('card').value = '';
+        document.getElementById('prepay-message').value = '';
     }
 
     /**
@@ -57,6 +64,12 @@ if (addService) {
         document.getElementById('bonus').value = inputs.bonus;
         document.getElementById('quantity').value = inputs.quantity;
         document.getElementById('message').value = inputs.message;
+        document.getElementById('prepay').checked = inputs.prepay;
+        document.getElementById('cashpay').checked = inputs.cashpay;
+        document.getElementById('onlinepay').checked = inputs.onlinepay;
+        document.getElementById('bonuspay').checked = inputs.bonuspay;
+        document.getElementById('prepay-message').value = inputs.prepay_message;
+        document.getElementById('card').value = inputs.prepay_card;
 
         let selectors = addressSelectors();
         if (selectors.length < inputs.addresses.length) {
@@ -107,7 +120,13 @@ if (addService) {
             'bonus': document.getElementById('bonus').value,
             'grouped': groupVal(),
             'quantity': document.getElementById('quantity').value,
-            'message': document.getElementById('message').value
+            'message': document.getElementById('message').value,
+            'prepay': document.getElementById('prepay').checked,
+            'cashpay': document.getElementById('cashpay').checked,
+            'onlinepay': document.getElementById('onlinepay').checked,
+            'bonuspay': document.getElementById('bonuspay').checked,
+            'prepay_message': document.getElementById('prepay-message').value,
+            'prepay_card': document.getElementById('card').value,
         }
     }
 
@@ -245,6 +264,16 @@ if (addService) {
             if (this.value == 0) groupOff();
             else removeClass(groupBlock, 'hide');
         })
+    });
+
+    let prepayBtn = document.querySelector('#prepay');
+    if (!prepayBtn.checked) prepayOff();
+    else removeClass(prepayBlock, 'hide');
+    prepayBtn.addEventListener('change', function () {
+        if (this.checked)
+            removeClass(prepayBlock, 'hide');
+        else
+            prepayOff()
     });
 
     /*

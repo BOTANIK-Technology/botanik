@@ -1,12 +1,14 @@
 <?php
 
+
 namespace App\Services\Telegram\Callback;
+
 
 use Illuminate\Http\Request;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 
-class CashPay extends CallbackQuery
+class PrePay extends CallbackQuery
 {
     /**
      * CashPay constructor.
@@ -20,7 +22,12 @@ class CashPay extends CallbackQuery
         $record = $this->createRecord();
         if ($record) {
             parent::deleteMessage();
-            parent::getMenu(__('Спасибо! Активные записи доступны в <b>личном кабинете</b>.'));
+            parent::getMenu(
+                $record->service->prepayment->message."\n".
+                __('Номер карты:').' '.$record->service->prepayment->card_number."\n".
+                __('Активные записи доступны в <b>личном кабинете</b>.')
+
+            );
         }
     }
 }
