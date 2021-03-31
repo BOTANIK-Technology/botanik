@@ -8,6 +8,7 @@ use App\Models\TelegramSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use ConnectService;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class CallbackQuery extends TelegramAPI
 {
@@ -139,7 +140,7 @@ class CallbackQuery extends TelegramAPI
     /**
      * @return int
      */
-    public function setStarts()
+    public function setStarts(): int
     {
         $stars = $this->getID();
 
@@ -155,7 +156,7 @@ class CallbackQuery extends TelegramAPI
         return $stars;
     }
 
-    public function setRecordID()
+    public function setRecordID(): int
     {
         $id = $this->getID();
 
@@ -174,7 +175,7 @@ class CallbackQuery extends TelegramAPI
     /**
      * @return int
      */
-    protected function getCallbackID ()
+    protected function getCallbackID (): int
     {
         return $this->getID();
     }
@@ -190,7 +191,7 @@ class CallbackQuery extends TelegramAPI
     /**
      * @return int
      */
-    private function getID ()
+    private function getID (): int
     {
         return intval(substr($this->data, strpos($this->data, '_', 1)+1, 100));
     }
@@ -248,9 +249,9 @@ class CallbackQuery extends TelegramAPI
 
     /**
      * @param array $buttons
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return InlineKeyboardMarkup
      */
-    public function buildInlineKeyboard($buttons = [])
+    public function buildInlineKeyboard($buttons = []) : InlineKeyboardMarkup
     {
         if (!empty($this->back))
             $buttons[] = [['text' => '< НАЗАД', 'callback_data' => $this->back]];

@@ -46,6 +46,11 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        'root' => [
+            'driver' => 'session',
+            'provider' => 'roots',
+        ],
     ],
 
     /*
@@ -69,6 +74,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+        'roots' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Root\User::class,
         ],
 
         // 'users' => [

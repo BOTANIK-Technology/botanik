@@ -41,7 +41,7 @@
 }
 .add-service {
     grid-template-columns: 20% 36% 1fr;
-    grid-template-rows: 30px 30px 1fr 134px 30px 30px 30px minmax(30px, 1fr) 30px;
+    grid-template-rows: 30px 30px 1fr 208px 30px 30px 30px minmax(30px, 1fr) 30px;
     grid-gap: 29px 20px;
     width: 762px;
     padding-left: 43px;

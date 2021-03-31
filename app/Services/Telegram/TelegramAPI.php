@@ -26,7 +26,7 @@ class TelegramAPI
     public $user = false;
     public $package;
     public string $token;
-    public string $pay_token;
+    public ?string $pay_token;
     public int $chat_id;
     public int $message_id;
     public string $business_db;
@@ -56,7 +56,7 @@ class TelegramAPI
         // set object of telegram bot api
         $this->bot = new BotApi($this->token);
         // set pay token
-        $this->pay_token = $request->input('pay_token');
+        $this->pay_token = $request->input('pay_token') ?? null;
         // set business database name
         $this->business_db = $request->input('business_db');
         // set package of business
@@ -199,7 +199,7 @@ class TelegramAPI
     /**
      * @return mixed
      */
-    public function getData (): bool
+    public function getData ()
     {
         return json_decode($this->user->telegramSession->data) ?? false;
     }

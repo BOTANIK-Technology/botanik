@@ -11,27 +11,26 @@ class IsAuth
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param Closure $next
+     * @param string $guard
      * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, string $guard = 'web')
     {
 
         if (! $request->expectsJson()) {
 
-            if (!Auth::check()) {
+            if ( !Auth::guard($guard)->check() ) {
 
-                if ($business = $request->route()->parameter('business'))
+                if ($guard == 'web' && $business = $request->route()->parameter('business'))
                     return redirect()->route('login', $business);
 
-                elseif ($request->route()->getPrefix() == '/a-level')
-                    return redirect()->route('login', 'a-level');
+                elseif ($guard == 'root' && $request->route()->getPrefix() == '/a-level')
+                    return redirect()->route('root.login');
 
-                return redirect()->route('login');
-
+                abort(404);
             }
-
         }
 
         return $next($request);
