@@ -1,3 +1,7 @@
+window.onload = function() {
+    document.body.innerHTML = document.body.innerHTML.replace(/\u2028/g, '');
+}
+
 function changeClass(object, id, className, remove) {
     object.addEventListener('click', function () {
         if (remove)

@@ -1,3 +1,7 @@
+window.onload = function() {
+    document.body.innerHTML = document.body.innerHTML.replace(/\u2028/g, '');
+}
+
 function design() {
     let x = document.getElementById('best-design');
     document.getElementById('button').addEventListener('change', function () {

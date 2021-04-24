@@ -42,7 +42,7 @@ class ConfirmRecord extends CallbackQuery
     /**
      * @return InlineKeyboardMarkup
      */
-    private function getButtons (): ?InlineKeyboardMarkup
+    private function getButtons(): ?InlineKeyboardMarkup
     {
         $service = \App\Models\Service::find(parent::getServiceID());
 
@@ -56,7 +56,7 @@ class ConfirmRecord extends CallbackQuery
             $buttons[] = [['text' => 'Бонусами','callback_data' => 'BonusPay_']];
 
         if ( !is_null($service->prepayment) )
-            $buttons[] = [['text' => 'Бонусами','callback_data' => 'PrePay_']];
+            $buttons[] = [['text' => 'Предоплата','callback_data' => 'PrePay_']];
 
         if (empty($buttons))
             return null;

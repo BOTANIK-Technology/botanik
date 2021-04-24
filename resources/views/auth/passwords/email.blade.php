@@ -27,7 +27,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('password.email', ['business' => $prefix]) }}">
+            <form method="POST" action="{{ route('custom.reset', ['business' => $prefix]) }}">
                 @csrf
 
                 <div class="flex reset direction-column align-items-center">

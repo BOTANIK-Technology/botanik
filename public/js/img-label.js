@@ -2,6 +2,22 @@ let img = document.getElementById('img');
 let imgIcon = document.getElementById('img-label');
 let img_src = '';
 
+function sendForm (href, image = false, send = true) {
+    let data = null;
+    if (send) {
+        data = getValues();
+        image === false ? data.img = null : data.img = image;
+    }
+    let xhr = postRequest(href, data);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            closeModal();
+        } else {
+            showErrors(xhr.response);
+        }
+    };
+}
+
 if (img) {
 
     function getImage () {
@@ -27,22 +43,6 @@ if (img) {
             removeClass(imgIcon, 'active');
         }
     })
-
-    function sendForm (href, image = false, send = true) {
-        let data = null;
-        if (send) {
-            data = getValues();
-            image === false ? data.img = null : data.img = image;
-        }
-        let xhr = postRequest(href, data);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                closeModal();
-            } else {
-                showErrors(xhr.response);
-            }
-        };
-    }
 
     function sendEvent (event) {
         let url = this.dataset.url;

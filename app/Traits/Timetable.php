@@ -14,7 +14,7 @@ trait Timetable
     /**
      * @var array
      */
-    public static $hours = [
+    public static array $hours = [
         '09:00',
         '10:00',
         '11:00',
@@ -29,10 +29,21 @@ trait Timetable
         '20:00',
     ];
 
-    /**
-     * @var array
-     */
-    private static $mouths = [
+    public static array $intervals = [
+        '30 minutes',
+        '45 minutes',
+        '1 hour',
+        '2 hours',
+        '3 hours',
+        '4 hours',
+        '5 hours',
+        '6 hours',
+        '8 hours',
+        '12 hours',
+        '24 hours',
+    ];
+
+    private static array $mouths = [
         'january'   => 'январь',
         'february'  => 'февраль',
         'march'     => 'март',
@@ -47,10 +58,7 @@ trait Timetable
         'december'  => 'декабрь',
     ];
 
-    /**
-     * @var array
-     */
-    public static $days = [
+    public static array $days = [
         'monday'    => 'ПН',
         'tuesday'   => 'ВТ',
         'wednesday' => 'СР',

@@ -37,7 +37,7 @@ class SetBusiness
         if (!ConnectService::dbConnect($business->db_name))
             abort(501);
 
-        view()->share('logotype', !is_null($business->img) ? '/public/storage/'.$business->img : '/images/botanik-head.png');
+        view()->share('logotype', !is_null($business->img) ? url('public/storage/'.$business->img) : '/images/botanik-head.png');
         view()->share('package', $request->package);
         view()->share('slug', $request->route()->parameter('business'));
         view()->share('buss_name', $business->name);

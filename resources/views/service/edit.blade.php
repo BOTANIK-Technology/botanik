@@ -107,9 +107,9 @@
                     </div>
 
                     <div class="row-9 col-2 grid intervals">
-                        <input id="group-1-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="1" {{!isset($service->group) ? 'checked' : ''}}>
+                        <input id="group-1-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="1" {{isset($service->group) ? 'checked' : ''}}>
                         <label for="group-1-{{$service->id}}" class="user-select-none">{{__('Да')}}</label>
-                        <input id="group-0-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="0" {{ isset($service->group) ? 'checked' : ''}}>
+                        <input id="group-0-{{$service->id}}" type="radio" name="group-{{$service->id}}" value="0" {{!isset($service->group) ? 'checked' : ''}}>
                         <label for="group-0-{{$service->id}}" class="user-select-none">{{__('Нет')}}</label>
                     </div>
 
