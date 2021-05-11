@@ -16,6 +16,7 @@
 
     <div class="timetable admin grid">
 
+        @if(isset($services) && !$services->isEmpty())
         <div class="row-1 border-right-main border-bottom-main day"></div>
 
         @php $time_i = 2 @endphp
@@ -75,5 +76,6 @@
         @endforeach
 
     </div>
+    @endif
 
 </div>

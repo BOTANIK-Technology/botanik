@@ -1,3 +1,6 @@
+.modal-dialog {
+    width: 80%;
+}
 .table {
     grid-template-columns: 6.7% 1fr repeat(5, 8.3%);
 }

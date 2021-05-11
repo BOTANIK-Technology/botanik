@@ -21,11 +21,6 @@ class BusinessController extends Controller
         return view('root.business', ['packages' => $packages]);
     }
 
-    public function logotype ()
-    {
-
-    }
-
     /**
      * @param Request $request
      * @return JsonResponse
@@ -64,6 +59,8 @@ class BusinessController extends Controller
             ]);
 
         } catch (Exception $e) {
+            if (!empty($owner))
+                $owner->delete();
             return response()->json(['errors' => ['message' => $e->getMessage()]], '501');
         }
 

@@ -42,7 +42,7 @@ class DataBaseConnect
      * @param  string $db_name
      * @return boolean
      */
-    public function dbConnect (string $db_name)
+    public function dbConnect (string $db_name): bool
     {
         try {
             Config::set('database.connections.mysql.database', $db_name);

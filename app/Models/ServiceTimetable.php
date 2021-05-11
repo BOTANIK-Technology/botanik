@@ -57,7 +57,7 @@ class ServiceTimetable extends Model
      */
     public function getFreeTimes (string $date) : array
     {
-        Carbon::parse($date)->isToday() ? $check_hours = true : $check_hours = false;
+        $check_hours = Carbon::parse($date)->isToday();
         $l = mb_strtolower(Carbon::parse($date)->format('l'));
 
         if (is_null($this->$l)) return [];
@@ -69,23 +69,26 @@ class ServiceTimetable extends Model
         $comparison = false;
         foreach ($times as $time) {
 
+            if ($check_hours) {
+                if (!Carbon::parse($time)->greaterThan(Carbon::now())) {
+                    continue;
+                }
+            }
+
             if ($booked_array) {
                 foreach ($booked_array as $booked) {
                     if ($booked == $time) {
-                        if ($this->service->range > 0)
+                        if ($this->service->range > 0) {
                             $comparison = Carbon::parse($booked)->add($this->service->interval->value)->addMinutes($this->service->range);
-                        else
+                        } else {
                             $comparison = Carbon::parse($booked)->add($this->service->interval->value);
+                        }
                         break;
                     }
                 }
             }
 
-            if ($check_hours)
-                if (!Carbon::parse($time)->greaterThan(Carbon::now()))
-                    continue;
-
-            if (!$comparison || Carbon::parse($time)->greaterThanOrEqualTo($comparison))
+            if ($comparison === false || Carbon::parse($time)->greaterThanOrEqualTo($comparison))
                 $free[] = $time;
         }
 

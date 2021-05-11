@@ -40,7 +40,7 @@ class ConfirmPasswordController extends Controller
             $this->redirectTo = '/'.$business.$this->redirectTo;
 
         elseif (($request->route()->getPrefix()) == '/a-level')
-            $this->redirectTo = '//a-level'.RouteServiceProvider::ROOT;
+            $this->redirectTo = '/a-level'.RouteServiceProvider::ROOT;
 
         $this->middleware('auth');
     }

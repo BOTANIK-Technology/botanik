@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasRolesAndPermissions;
 use App\Traits\RelationHelper;
 use Eloquent;
+use Exception;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -67,6 +68,8 @@ use function Symfony\Component\Translation\t;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRolesAndPermissions, RelationHelper;
+
+    protected $guard = 'web';
 
     /**
      * The attributes that are mass assignable.
@@ -257,7 +260,7 @@ class User extends Authenticatable
                     $address = Address::find($addresses[$k]);
                     return __('Адрес').' "'.$address->address.'"" '.__('не привязан к услуге').' "'.$service->name.'".';
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                return $e->getMessage().' '.$e->getLine();
             }
         }

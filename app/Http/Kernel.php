@@ -68,6 +68,7 @@ class Kernel extends HttpKernel
         'is.auth' => \App\Http\Middleware\IsAuth::class,
         'package' => \App\Http\Middleware\Package::class,
         'has' => \App\Http\Middleware\Has::class,
+        'root.auth' => \App\Http\Middleware\RootAuth::class,
 
     ];
 }

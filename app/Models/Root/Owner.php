@@ -2,8 +2,11 @@
 
 namespace App\Models\Root;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Root\Owner
@@ -12,18 +15,18 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $fio
  * @property string $email
  * @property string $password
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Root\Business $business
- * @method static \Illuminate\Database\Eloquent\Builder|Owner newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Owner newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Owner query()
- * @method static \Illuminate\Database\Eloquent\Builder|Owner whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Owner whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Owner whereFio($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Owner whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Owner wherePassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Owner whereUpdatedAt($value)
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Business $business
+ * @method static Builder|Owner newModelQuery()
+ * @method static Builder|Owner newQuery()
+ * @method static Builder|Owner query()
+ * @method static Builder|Owner whereCreatedAt($value)
+ * @method static Builder|Owner whereEmail($value)
+ * @method static Builder|Owner whereFio($value)
+ * @method static Builder|Owner whereId($value)
+ * @method static Builder|Owner wherePassword($value)
+ * @method static Builder|Owner whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Owner extends Model
@@ -33,9 +36,9 @@ class Owner extends Model
     protected $guarded = ['id'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function business ()
+    public function business (): BelongsTo
     {
         return $this->belongsTo(Business::class);
     }

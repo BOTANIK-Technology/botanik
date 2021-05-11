@@ -89,7 +89,7 @@
             <div class="grid view-grid">
 
                 <div class="col-1-2 flex align-items-center direction-column">
-                    <img src="{{isset($business->img) ? asset('public/storage/'.$business->img) : asset("images/image-icon.svg")}}" class="view-logo">
+                    <img src="{{isset($business->img) ? asset('public/storage/'.$business->img) : asset("images/image-icon.svg")}}" class="view-logo" alt="business logotype">
                     <span class="view-title color"><b>{{$business->name}}</b></span>
                 </div>
 
@@ -183,10 +183,9 @@
                 <a href="{{route('root.management', ['load' => $load])}}" id="refresh-modal"></a>
             </form>
 
-            WEBHOOK STATUS: {{$wh_info}} <br>
             <form method="post" action="{{route('root.management.webhook', ['id' => $business->id])}}">
                 @csrf
-                <button type="submit">ПЕРЕУСТАНОВИТЬ</button>
+                <button type="submit">Rewrite webhook</button>
             </form>
 
         @elseif($modal === 'chart')

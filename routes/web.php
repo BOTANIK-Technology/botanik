@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Auth;
  * Index route
  */
 Route::get('/', function () {
+    Artisan::call('route:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
     abort(404);
 });
 
@@ -28,7 +31,8 @@ Route::get('/', function () {
 Route::group(
     [
         'as' => 'root.',
-        'prefix' => 'a-level'
+        'prefix' => 'a-level',
+        'middleware' => 'root.auth'
     ],
     function () {
 
@@ -40,7 +44,7 @@ Route::group(
         });
 
         /**
-         * Default auth laravel routes without registration
+         * Default auth routes without registration
          */
         Auth::routes(['register' => false]);
 
@@ -49,7 +53,7 @@ Route::group(
          */
         Route::group(
             [
-                'middleware' => 'is.auth'
+                'middleware' => 'is.auth:root',
             ],
             function () {
 
@@ -102,9 +106,15 @@ Route::group(
         });
 
         /**
-         * Default auth laravel routes without registration
+         * Default auth routes without registration
          */
         Auth::routes(['register' => false]);
+
+        /**
+         * Password Reset
+         */
+        Route::post('/custom-reset', [App\Http\Controllers\ResetController::class, 'reset'])->name('custom.reset');
+        Route::get('/reset/confirm', [App\Http\Controllers\ResetController::class, 'confirm'])->name('custom.reset.confirm');
 
         /**
          * Routes only for auth users

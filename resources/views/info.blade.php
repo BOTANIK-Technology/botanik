@@ -204,7 +204,7 @@
                         <a class="modal-date date" href="{{'https://www.google.com/maps/search/?api=1&query='.urlencode($address).'&sensor=false'}}">{{$address}}</a>
                     @endforeach
                 @endif
-                <p class="mail-text">{!! $info->text !!}</p>
+                <p class="mail-text">{{ $info->text }}</p>
                 <span class="modal-date date"><br>{{\Carbon\Carbon::parse($info->created_at)->format('Y-m-d')}}</span>
                 @if (!is_null($info->button))
                     <span id="best-design" class="active">Кнопка "Подробнее"</span>

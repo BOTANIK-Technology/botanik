@@ -142,38 +142,48 @@ class UserTimetable extends Model
      */
     public static function getFreeTimes (User $user, int $address_id, int $service_id, string $date) : array
     {
-        Carbon::parse($date)->isToday() ? $check_hours = true : $check_hours = false;
+        $check_hours = Carbon::parse($date)->isToday();
 
         $times = self::getTimes($user, $address_id, $service_id, $date);
-        if (!$times)
+
+        if (!$times) {
+
             return [];
+        }
 
         $table = $user->timetables->where('address_id', $address_id)->where('service_id', $service_id)->first();
 
         $booked_array = self::getBookedTimes($user, $date);
 
+        if (!$booked_array) {
+
+            return [];
+        }
+
         $free = [];
         $comparison = false;
         foreach ($times as $time) {
 
-            if ($booked_array) {
-                foreach ($booked_array as $booked) {
-                    if ($booked == $time) {
-                        if ($table->service->range > 0)
-                            $comparison = Carbon::parse($booked)->add($table->service->interval->value)->addMinutes($table->service->range);
-                        else
-                            $comparison = Carbon::parse($booked)->add($table->service->interval->value);
-                        break;
-                    }
+            if ($check_hours) {
+                if (!Carbon::parse($time)->greaterThan(Carbon::now())) {
+                    continue;
                 }
             }
 
-            if ($check_hours)
-                if (!Carbon::parse($time)->greaterThan(Carbon::now()))
-                    continue;
+            foreach ($booked_array as $booked) {
+                if ($booked == $time) {
+                    if ($table->service->range > 0) {
+                        $comparison = Carbon::parse($booked)->add($table->service->interval->value)->addMinutes($table->service->range);
+                    } else {
+                        $comparison = Carbon::parse($booked)->add($table->service->interval->value);
+                    }
+                    break;
+                }
+            }
 
-            if (!$comparison || Carbon::parse($time)->greaterThanOrEqualTo($comparison))
+            if (!$comparison || Carbon::parse($time)->greaterThanOrEqualTo($comparison)) {
                 $free[] = $time;
+            }
         }
 
         return $free;

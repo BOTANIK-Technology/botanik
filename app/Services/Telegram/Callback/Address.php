@@ -4,7 +4,7 @@ namespace App\Services\Telegram\Callback;
 
 
 use Illuminate\Http\Request;
-use App\Models\TypeService;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class Address extends CallbackQuery
 {
@@ -18,9 +18,10 @@ class Address extends CallbackQuery
 
     /**
      * @param $service_id
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return InlineKeyboardMarkup
      */
-    private function getAddress($service_id) {
+    private function getAddress($service_id): InlineKeyboardMarkup
+    {
         $service = \App\Models\Service::find($service_id);
         $addresses = [];
         foreach ($service->addresses as $address) {
