@@ -17,7 +17,7 @@ class InformationSeeder extends Seeder
         $contacts = new Information();
         $contacts->title = 'Контакты';
         $contacts->text = 'Ежедневно с 09:00 до 20:30'."\n".'+380 99 999 99 99'."\n".'+380 99 999 99 99'."\n".'+380 99 999 99 99'."\n".'salon-name@gmail.com';
-        $contacts->addresses = \GuzzleHttp\json_encode(['ул. Сумкая №1']);
+        $contacts->addresses = json_encode(['ул. Сумкая №1']);
         $contacts->save();
 
         $about = new Information();
