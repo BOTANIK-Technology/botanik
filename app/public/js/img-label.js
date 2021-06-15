@@ -45,7 +45,15 @@ if (img) {
     })
 
     function sendEvent (event) {
-        let url = this.dataset.url;
+        let url = "";
+        if(typeof this.dataset !== "undefined") {
+            url = this.dataset.url;
+        }
+
+        if(typeof event.dataset !== "undefined") {
+            url = event.dataset.url;
+        }
+        
         if (getImage()) {
 
             if (img_src !== '')

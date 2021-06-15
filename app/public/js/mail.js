@@ -24,10 +24,10 @@ function getValues () {
     };
 }
 
-let createBtn = document.getElementById('createMail');
-if (createBtn) {
-
-    design();
-
-    createBtn.addEventListener('click', sendEvent);
-}
+document.addEventListener('DOMContentLoaded', function(){
+    let createBtn = document.getElementById('createMail');
+    if (createBtn) {
+        design();
+        createBtn.addEventListener('click', sendEvent);
+    }
+});

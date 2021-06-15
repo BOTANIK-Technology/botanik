@@ -181,6 +181,7 @@
 
             @slot('buttons')
                 <button
+                    onclick="sendEvent(this);"
                     id="createMail"
                     type="button"
                     class="btn-primary"
