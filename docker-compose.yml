@@ -4,7 +4,7 @@ services:
     build:
       context: ./php
     volumes:
-      - './botanik/:/var/www/html'
+      - './app/:/var/www/html'
       - './data/sites:/etc/apache2/sites-available'
       - './data/dev:/home/dev'
     links:
