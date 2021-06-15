@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Root;
 
+use App\Facades\ConnectService;
 use App\Models\Root\Business;
 use App\Models\Root\Package;
 use GuzzleHttp\Exception\GuzzleException;
@@ -49,6 +50,8 @@ class ManagementController extends Controller
     private function getView(Request $request)
     {
         $this->setParams($request);
+
+//        dd($this);
         return view($this->view, $this->params);
     }
 
@@ -68,7 +71,6 @@ class ManagementController extends Controller
     public function window(Request $request)
     {
         $this->params['business'] = Business::find($request->id) ?? false;
-
         switch ($request->modal) {
             case 'chart':
                 $this->params['chart'] = $this->params['business'] ? $this->params['business']->getChart() : false;
@@ -76,9 +78,7 @@ class ManagementController extends Controller
             default:
                 $this->params['packages'] = Package::orderBy('id', 'DESC')->get() ?? false;
         }
-
         $this->params['modal'] = $request->modal;
-
         return $this->getView($request);
     }
 

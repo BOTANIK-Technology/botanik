@@ -38,11 +38,12 @@ class LoginController extends Controller
      */
     public function __construct(Request $request)
     {
-        if ($business = $request->route()->parameter('business'))
-            $this->redirectTo = '/'.$business.$this->redirectTo;
-
-        elseif (($request->route()->getPrefix()) == '/a-level')
+        if ($business = $request->route()->parameter('business')) {
+            $this->redirectTo = '/' . $business . $this->redirectTo;
+        }
+        elseif (($request->route()->getPrefix()) == '/a-level') {
             $this->redirectTo = '/'.'a-level'.RouteServiceProvider::ROOT;
+            }
 
         $this->middleware('guest:web,root')->except('logout');
     }

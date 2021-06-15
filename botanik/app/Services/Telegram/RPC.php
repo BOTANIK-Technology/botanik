@@ -2,7 +2,12 @@
 
 namespace App\Services\Telegram;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
+use TelegramBot\Api\Types\Message;
 
 
 class RPC
@@ -13,10 +18,9 @@ class RPC
 
     /**
      * @param Request $request
-     * @param $set boolean
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public static function setWebhook (Request $request)
+    public static function setWebhook (Request $request): JsonResponse
     {
         $options = ['url' => $request->input('params.url')];
         $base_url = self::TELEGRAM_API_URL . $request->input('token') . '/setWebhook';
@@ -25,11 +29,11 @@ class RPC
         $result_array = json_decode($result_json, JSON_OBJECT_AS_ARRAY);
 
         if ( !$result_array['ok'] || !$result_array['result'] ) {
-            \Log::warning($result_json.' *** Webhook cannot set. Bot name = "'.$request->bot_name.'"');
+            Log::warning($result_json.' *** Webhook cannot set. Bot name = "'.$request->bot_name.'"');
             $status = self::BAD_STATUS;
         }
         else {
-            \Log::notice($result_json.' *** Webhook was set. Bot name = "'.$request->bot_name.'"');
+            Log::notice($result_json.' *** Webhook was set. Bot name = "'.$request->bot_name.'"');
             $status = self::OK_STATUS;
         }
 
@@ -38,9 +42,9 @@ class RPC
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public static function deleteWebhook (Request $request)
+    public static function deleteWebhook (Request $request): JsonResponse
     {
         $options = ['drop_pending_updates' => true];
         $base_url = self::TELEGRAM_API_URL . $request->input('token') . '/deleteWebhook';
@@ -49,11 +53,11 @@ class RPC
         $result_array = json_decode($result_json, JSON_OBJECT_AS_ARRAY);
 
         if ( !$result_array['ok'] || !$result_array['result'] ) {
-            \Log::error($result_json.' *** Cannot delete webhook. Bot name = "'.$request->bot_name.'"');
+            Log::error($result_json.' *** Cannot delete webhook. Bot name = "'.$request->bot_name.'"');
             $status = self::BAD_STATUS;
         }
         else {
-            \Log::notice($result_json.' *** Webhook deleted. Bot name = "'.$request->bot_name.'"');
+            Log::notice($result_json.' *** Webhook deleted. Bot name = "'.$request->bot_name.'"');
             $status = self::OK_STATUS;
         }
 
@@ -62,9 +66,9 @@ class RPC
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public static function getWebhookInfo (Request $request)
+    public static function getWebhookInfo (Request $request): JsonResponse
     {
         $options = ['url' => $request->input('params.url')];
         $base_url = self::TELEGRAM_API_URL . $request->input('token') . '/getWebhookInfo';
@@ -75,20 +79,20 @@ class RPC
     /**
      * @param array $data
      * @param int $status
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public static function getResponse (array $data, int $status)
+    public static function getResponse (array $data, int $status): JsonResponse
     {
         return response()->json($data, $status);
     }
 
     /**
      * @param Request $request
-     * @return \TelegramBot\Api\Types\Message
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @return Message
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
-    public function sendMessage(Request $request)
+    public function sendMessage(Request $request): Message
     {
         $bot = new \TelegramBot\Api\BotApi($request->input('token'));
         return $bot->sendMessage($request->input('params.chat_id'), $request->input('params.message'));

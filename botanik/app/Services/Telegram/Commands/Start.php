@@ -3,11 +3,13 @@
 namespace App\Services\Telegram\Commands;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class Start extends Command
 {
 
     public function __construct(Request $request) {
+        Log::debug($request);
         parent::__construct($request);
         if ( parent::isUser() )
             return $this->redirect();

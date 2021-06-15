@@ -5,6 +5,7 @@ namespace App\Services\Telegram;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\TelegramUser;
+use Illuminate\Support\Facades\Log;
 
 class Telegram
 {
@@ -118,6 +119,7 @@ class Telegram
                 'phone'      => $request->input('message.contact.phone_number'),
             ]
         );
+
         if ($client) {
             $request->merge(['client' => $client]);
             return $this->redirectToStart($request);

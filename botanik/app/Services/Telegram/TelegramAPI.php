@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use ConnectService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use \TelegramBot\Api\BotApi;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
@@ -201,7 +202,7 @@ class TelegramAPI
      */
     public function getData ()
     {
-        return json_decode($this->user->telegramSession->data) ?? false;
+        return json_decode($this->user->telegramSession ? $this->user->telegramSession->data : '');
     }
 
     /**

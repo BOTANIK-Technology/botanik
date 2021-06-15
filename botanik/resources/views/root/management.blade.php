@@ -21,51 +21,51 @@
         <div class="table grid">
             @if (isset($table) && $table)
                 @phone
-                @foreach ($table as $item)
-                    <div class="flex align-items-center justify-content-center num">
-                        {{$loop->iteration}}
-                    </div>
-                    <div class="flex align-items-center text">
-                        {{$item->name}}
-                    </div>
-                    <div class="flex align-items-center justify-content-center">
-                        <div class="more-icon" data-id="{{$item->id}}"></div>
-                        <div id="menu-{{$item->id}}" class="more-menu hide">
-                            <ul>
-                                <li><a href="{{route('root.window.management', ['modal' => 'view',   'id' => $business->id, 'load' => $load])}}"><div class="view-icon"  ></div><span class="more-menu-text pur">Просмотр</span></a></li>
-                                <li><a href="{{route('root.window.management', ['modal' => 'edit',   'id' => $business->id, 'load' => $load])}}"><div class="edit-icon"  ></div><span class="more-menu-text pur">Редактировать</span></a></li>
-                                <li><a href="{{route('root.window.management', ['modal' => 'chart',  'id' => $business->id, 'load' => $load])}}"><div class="chart-icon" ></div><span class="more-menu-text pur">Статистика</span></a></li>
-                                <li><a href="{{route('root.window.management', ['modal' => 'pause',  'id' => $business->id, 'load' => $load])}}"><div class="pause-icon" ></div><span class="more-menu-text pur">Остановить</span></a></li>
-                                <li><a href="{{route('root.window.management', ['modal' => 'delete', 'id' => $business->id, 'load' => $load])}}"><div class="delete-icon"></div><span class="more-menu-text red">Удалить</span></a></li>
-                            </ul>
-                            <div data-id="{{$item->id}}" class="more-menu-close"></div>
+                    @foreach ($table as $item)
+                        <div class="flex align-items-center justify-content-center num">
+                            {{$loop->iteration}}
                         </div>
-                    </div>
-                @endforeach
-            @else
-                @foreach ($table as $item)
-                    <div class="flex align-items-center justify-content-center num">
-                        {{$loop->iteration}}
-                    </div>
-                    <div class="flex align-items-center text">
-                        {{$item->name}}
-                    </div>
-                    <div class="flex align-items-center justify-content-center">
-                        <a href="{{route('root.window.management', ['modal' => 'view', 'id' => $item->id, 'load' => $load])}}"><div class="view-icon"></div></a>
-                    </div>
-                    <div class="flex align-items-center justify-content-center">
-                        <a href="{{route('root.window.management', ['modal' => 'edit', 'id' => $item->id, 'load' => $load])}}"><div class="edit-icon"></div></a>
-                    </div>
-                    <div class="flex align-items-center justify-content-center">
-                        <a href="{{route('root.window.management', ['modal' => 'chart', 'id' => $item->id, 'load' => $load])}}"><div class="chart-icon icon"></div></a>
-                    </div>
-                    <div class="flex align-items-center justify-content-center">
-                        <a href="{{route('root.window.management', ['modal' => 'pause', 'id' => $item->id, 'load' => $load])}}"><div class="pause-icon icon"></div></a>
-                    </div>
-                    <div class="flex align-items-center justify-content-center">
-                        <a href="{{route('root.window.management', ['modal' => 'delete', 'id' => $item->id, 'load' => $load])}}"><div class="delete-icon"></div></a>
-                    </div>
-                @endforeach
+                        <div class="flex align-items-center text">
+                            {{$item->name}}
+                        </div>
+                        <div class="flex align-items-center justify-content-center">
+                            <div class="more-icon" data-id="{{$item->id}}"></div>
+                            <div id="menu-{{$item->id}}" class="more-menu hide">
+                                <ul>
+                                    <li><a href="{{route('root.window.management', ['modal' => 'view',   'id' => $item->id, 'load' => $load])}}"><div class="view-icon"  ></div><span class="more-menu-text pur">Просмотр</span></a></li>
+                                    <li><a href="{{route('root.window.management', ['modal' => 'edit',   'id' => $item->id, 'load' => $load])}}"><div class="edit-icon"  ></div><span class="more-menu-text pur">Редактировать</span></a></li>
+                                    <li><a href="{{route('root.window.management', ['modal' => 'chart',  'id' => $item->id, 'load' => $load])}}"><div class="chart-icon" ></div><span class="more-menu-text pur">Статистика</span></a></li>
+                                    <li><a href="{{route('root.window.management', ['modal' => 'pause',  'id' => $item->id, 'load' => $load])}}"><div class="pause-icon" ></div><span class="more-menu-text pur">Остановить</span></a></li>
+                                    <li><a href="{{route('root.window.management', ['modal' => 'delete', 'id' => $item->id, 'load' => $load])}}"><div class="delete-icon"></div><span class="more-menu-text red">Удалить</span></a></li>
+                                </ul>
+                                <div data-id="{{$item->id}}" class="more-menu-close"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    @foreach ($table as $item)
+                        <div class="flex align-items-center justify-content-center num">
+                            {{$loop->iteration}}
+                        </div>
+                        <div class="flex align-items-center text">
+                            {{$item->name}}
+                        </div>
+                        <div class="flex align-items-center justify-content-center">
+                            <a href="{{route('root.window.management', ['modal' => 'view', 'id' => $item->id, 'load' => $load])}}"><div class="view-icon"></div></a>
+                        </div>
+                        <div class="flex align-items-center justify-content-center">
+                            <a href="{{route('root.window.management', ['modal' => 'edit', 'id' => $item->id, 'load' => $load])}}"><div class="edit-icon"></div></a>
+                        </div>
+                        <div class="flex align-items-center justify-content-center">
+                            <a href="{{route('root.window.management', ['modal' => 'chart', 'id' => $item->id, 'load' => $load])}}"><div class="chart-icon icon"></div></a>
+                        </div>
+                        <div class="flex align-items-center justify-content-center">
+                            <a href="{{route('root.window.management', ['modal' => 'pause', 'id' => $item->id, 'load' => $load])}}"><div class="pause-icon icon"></div></a>
+                        </div>
+                        <div class="flex align-items-center justify-content-center">
+                            <a href="{{route('root.window.management', ['modal' => 'delete', 'id' => $item->id, 'load' => $load])}}"><div class="delete-icon"></div></a>
+                        </div>
+                    @endforeach
                 @endphone
             @endif
         </div>
@@ -81,7 +81,7 @@
 @endsection
 
 @if (isset($modal))
-@section('modal')
+    @section('modal')
     @component('modal')
 
         @if ($modal === 'view')
@@ -189,7 +189,6 @@
             </form>
 
         @elseif($modal === 'chart')
-
             <div class="grid view-grid">
 
                 <div class="flex direction-column view row-2 col-1">
@@ -263,7 +262,6 @@
             @endslot
 
         @endif
-
     @endcomponent
 @endsection
 @endif

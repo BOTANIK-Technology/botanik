@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\TelegramUser;
+use App\Services\Telegram\Commands\Command;
 use Illuminate\Http\Request;
-use TelegramService;
+use Illuminate\Support\Facades\Log;
+use App\Facades\TelegramService;
 
 class TelegramController extends Controller
 {
@@ -14,35 +16,52 @@ class TelegramController extends Controller
      */
     public function main(Request $request)
     {
-        if ($request->has('message.chat.id')) $id = $request->input('message.chat.id');
-        elseif ($request->has('callback_query.message.chat.id')) $id = $request->input('callback_query.message.chat.id');
-        elseif ($request->has('pre_checkout_query.from.id')) $id = $request->input('pre_checkout_query.from.id');
-
-        if ($client = TelegramUser::where('chat_id', $id)->first()) {
-            if ($client->status)
-                $request->merge(['client' => $client]);
-            else
-                abort(404);
+        Log::debug('Запрос прибыл');
+        $id = null;
+        if ($request->has('message.chat.id')) {
+            $id = $request->input('message.chat.id');
         }
+        else if ($request->has('callback_query.message.chat.id')) {
+            $id = $request->input('callback_query.message.chat.id');
+        }
+        else if ($request->has('pre_checkout_query.from.id')) {
+            $id = $request->input('pre_checkout_query.from.id');
+        }
+        if ($client = TelegramUser::where('chat_id', $id)->first()) {
+            if ($client->status) {
+                $request->merge(['client' => $client]);
+            }
+            else {
+               Log::info($id . ': Клиент неактивный');
+                abort(404);
+            }
+        }
+        else {
+            Log::debug($id . ': Клиент не создан');
+        }
+
 
         if ($request->has('callback_query')) {
 
             return $this->button($request);
 
-        } elseif ($request->has('message.entities')) {
+        }
+        else if ($request->has('message.entities')) {
 
             return $this->command($request);
 
-        } elseif ($request->has('pre_checkout_query')) {
+        }
+        else if ($request->has('pre_checkout_query')) {
 
             return $this->pay($request);
 
         }
-        elseif ($request->has('message.contact.phone_number')) {
+        else if ($request->has('message.contact.phone_number')) {
 
             return $this->number($request);
 
-        } else {
+        }
+        else {
 
             if ($request->has('message.text')) {
                 return $this->text($request);
@@ -64,7 +83,7 @@ class TelegramController extends Controller
      */
     public function admin(Request $request)
     {
-        if ( !$request->has('gess_key') || ($request->input('gess_key') !== env('APP_KEY')) )
+        if (!$request->has('gess_key') || ($request->input('gess_key') !== env('APP_KEY')))
             return abort('404');
         return TelegramService::rpcAdmin($request);
     }
