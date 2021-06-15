@@ -6,6 +6,13 @@
 
 <div class="date-sort flex direction-column">
     <div class="calendar border">
+        <a href="#">Пн</a>
+        <a href="#">Вт</a>
+        <a href="#">Ср</a>
+        <a href="#">Чт</a>
+        <a href="#">Пт</a>
+        <a href="#">Сб</a>
+        <a href="#">Вс</a>
         @foreach($days as $d => $day)
             <a href="{{route('schedule', ['business' => $slug, 'current_type' => $current_type, 'date' => $d, 'current_month' => $current_month])}}" class="border color cnt{{$d == $date ? ' bg-main border-main active' : ''}}">{{$day}}</a>
         @endforeach
