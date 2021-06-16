@@ -299,6 +299,10 @@ trait Timetable
     {
         $start = new Carbon('first monday of '.$month);
         $end   = Carbon::parse($start->toDateString())->endOfMonth();
+        $diff = (int)$start->format('d');
+        if($diff != 1) {
+            $start = $start->addDays(-7);
+        }
         return self::generateDateRangeBot($start, $end);
     }
 
