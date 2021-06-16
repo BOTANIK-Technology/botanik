@@ -30,4 +30,32 @@ inputActive([date, time]);
 selectActive([client, service, address, master]);
 
 
-create.addEventListener('click', send)
+create.addEventListener('click', send);
+
+document.addEventListener('DOMContentLoaded', function(){
+    const pickerBtn = document.querySelector('#select_datetime');
+    pickerBtn.addEventListener('click', function() {
+        const picker = new SimplePicker();
+        picker.enableTimeSection();
+        picker.on('submit', function(selectedDate) {
+            let day = selectedDate.getDate();
+            let month = selectedDate.getMonth() + 1;
+            let year = selectedDate.getFullYear();
+
+            let hours = selectedDate.getHours();
+            let minutes = selectedDate.getMinutes();
+
+            if(day < 10) day = '0' + day;
+            if(month < 10) month = '0' + month;
+
+            if(hours < 10) hours = '0' + hours;
+            if(minutes < 10) minutes = '0' + minutes;
+
+
+            date.value =  day + "." + month + "." + year;
+            time.value =  hours + ":" + minutes;
+        });
+        picker.open();
+    });
+
+});

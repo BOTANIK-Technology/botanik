@@ -1,6 +1,8 @@
 @section('modal-scripts')
+    <link rel="stylesheet" href="{{asset('css/simplepicker.css')}}">
     <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/schedule/create.js')}}"></script>
+    <script src="{{asset('js/simplepicker.js')}}"></script>
 @endsection
 
 <div class="grid create">
@@ -53,12 +55,14 @@
 
 <div class="flex justify-content-around create">
 
+    <button id="select_datetime" class="btn-primary" type="button">Дата и время</button>
+
     <label for="time">
-        <input id="time" type="text" class="inp" placeholder="00:00">
+        <input style="width: 50px;" readonly id="time" type="text" class="inp" placeholder="00:00">
     </label>
 
     <label for="date">
-        <input id="date" type="text" class="inp" placeholder="{{__('01.01.2020')}}">
+        <input style="width: 80px;" readonly id="date" type="text" class="inp" placeholder="{{__('01.01.2020')}}">
     </label>
 
 </div>
