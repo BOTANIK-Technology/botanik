@@ -2,11 +2,13 @@
     <link rel="stylesheet" href="{{asset('css/simplepicker.css')}}">
     <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/schedule/create.js')}}"></script>
+    <script src="{{asset('js/schedule/schedule_win.js')}}"></script>
     <script src="{{asset('js/simplepicker.js')}}"></script>
 @endsection
 
 <div class="grid create">
-
+    <input id="url_slug" type="hidden" value="{{$slug}}" name="url_slug">
+    <input id="token_id" type="hidden" name="_token" value="{{ csrf_token() }}" />
     <label for="client">
         <select id="client">
             <option value="">{{__('ID, фамилия и имя клиента')}}</option>
@@ -31,7 +33,7 @@
         </select>
     </label>
 
-    <label for="address">
+    <label id="address_label" for="address" style="display: none;">
         <select id="address">
             <option value="">{{__('Адрес *')}}</option>
             @foreach($create_addresses as $address)
@@ -40,7 +42,7 @@
         </select>
     </label>
 
-    <label for="master">
+    <label id="master_label" for="master" style="display: none;">
         <select id="master">
             <option value="">{{__('Специалист')}}</option>
             @foreach($create_users as $user)

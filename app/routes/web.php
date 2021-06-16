@@ -88,6 +88,8 @@ Route::group(
     }
 );
 
+
+
 /**
  * Business routes
  */
@@ -97,6 +99,18 @@ Route::group(
         'middleware' => 'set.business'
     ],
     function () {
+
+        Route::group(
+            [
+                'prefix' => '/api',
+                'middleware' => 'api'
+            ],
+            function() {
+                Route::post('/services_addresses', [App\Http\Controllers\ScheduleController::class, 'getAddresses'])->name('api.services_addresses');
+                Route::post('/services_masters', [App\Http\Controllers\ScheduleController::class, 'getMasters'])->name('api.services_masters');
+            }
+        );
+
 
         /**
          * Redirect from index to login route

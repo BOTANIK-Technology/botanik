@@ -104,6 +104,7 @@ class ScheduleController extends Controller
      */
     public function window (Request $request)
     {
+
         switch ($request->modal) {
             case 'create':
                 $this->params['create_clients'] = TelegramUser::all();
@@ -297,6 +298,55 @@ class ScheduleController extends Controller
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getAddresses(Request $request): JsonResponse
+    {
+        $addresses = [];
+        $service_id = $request->service_id;
+        if($service_id > 0) {
+            $ids = Service::query()
+                ->where('id', $service_id)
+                ->join('services_addresses', 'services.id', '=', 'services_addresses.service_id')
+                ->get('services_addresses.address_id')
+                ->toArray();
+            foreach ($ids as $item) {
+                $addresses[] = Address::query()
+                    ->where('id', $item['address_id'])
+                    ->get(['id', 'address'])
+                    ->toArray();
+            }
+        }
+        return response()->json(["result" => "OK", "addresses" => $addresses]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getMasters(Request $request): JsonResponse
+    {
+        $masters = [];
+        $service_id = $request->service_id;
+        if($service_id > 0) {
+            $ids = Service::query()
+                ->where('id', $service_id)
+                ->join('users_services', 'services.id', '=', 'users_services.service_id')
+                ->get('users_services.user_id')
+                ->toArray();
+            foreach ($ids as $item) {
+                $masters[] = User::query()
+                    ->where('id', $item['user_id'])
+                    ->get(['id', 'name'])
+                    ->toArray();
+            }
+        }
+        return response()->json(["result" => "OK", "masters" => $masters]);
+    }
+
 }
 
 
