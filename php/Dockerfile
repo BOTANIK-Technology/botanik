@@ -23,6 +23,7 @@ RUN docker-php-ext-install  gd soap zip mysqli pdo_mysql bcmath exif sockets
 ADD ./php.ini /usr/local/etc/php/php.ini
 
 RUN a2enmod rewrite
+
 RUN service apache2 restart
 
 RUN wget https://getcomposer.org/installer -O - -q \
@@ -35,5 +36,5 @@ RUN echo "export TERM=xterm-256color" > /home/dev/.profile
 RUN chown -R dev:www-data /home/dev
 RUN chmod -R 775 /home/dev
 
-USER dev
+USER root
 
