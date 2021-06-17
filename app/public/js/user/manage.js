@@ -1,7 +1,10 @@
 function getTimetables() {
     let array = [];
-    for (let i = 0; i < countService; i++)
-        array.push(JSON.parse(getCookie('timetable-'+i)));
+    for (let i = 0; i < countService; i++) {
+        if(typeof(getCookie('timetable-' + i)) !== 'undefined') {
+            array.push(JSON.parse(getCookie('timetable-' + i)));
+        }
+    }
     return array;
 }
 
