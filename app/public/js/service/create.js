@@ -9,10 +9,13 @@ if (addService) {
     let calendar = document.getElementById('calendar');
 
     let addressSelector = document.getElementById('more-addresses');
+    let addressSelectorSelect = document.getElementById('more-addresses-select');
     let moreBtn = document.getElementById('include-address');
     let addressesBlock = document.getElementById('addresses');
     function addressSelectors () {return document.getElementsByName('addresses[]')}
-    function addAddressSelector () {addressesBlock.insertAdjacentHTML('beforeEnd', addressSelector.innerHTML)}
+    function addAddressSelector () {
+        addressesBlock.insertAdjacentHTML('beforeEnd', addressSelector.innerHTML)
+    }
 
     function issetTimetable() {
         let timetable = getCookie('timetable');
@@ -186,6 +189,12 @@ if (addService) {
                         let response = JSON.parse(Request.response);
                         removeClass(addrsList, 'none');
                         addrsList.insertAdjacentHTML(
+                            'beforeEnd',
+                            '<option value="'+ response.id +'">' +
+                            response.address +
+                            '</option>'
+                        );
+                        addressSelectorSelect.insertAdjacentHTML(
                             'beforeEnd',
                             '<option value="'+ response.id +'">' +
                             response.address +

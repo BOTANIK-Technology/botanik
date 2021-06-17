@@ -10,7 +10,7 @@
 
         @if ($addresses)
             <div id="more-addresses" class="hide">
-                <select name="addresses[]">
+                <select id="more-addresses-select" name="addresses[]">
                     <option value="none">{{__('Выберете адрес')}}</option>
                     @foreach($addresses as $addr)
                         <option value="{{$addr->id}}">{{$addr->address}}</option>
