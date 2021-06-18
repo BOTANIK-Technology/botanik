@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function(){
         design();
         createBtn.addEventListener('click', sendEvent);
     }
-    widow.setTimeout(function() {
+    window.setTimeout(function() {
         let closeBtn = document.getElementById('modal-close-btn');
         closeBtn.addEventListener('click', closeModal);
     },1000);
