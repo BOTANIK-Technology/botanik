@@ -32,7 +32,5 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     let closeBtn = document.getElementById('modal-close-btn');
-    closeBtn.addEventListener('click', function(e) {
-        closeModal(e);
-    });
+    closeBtn.addEventListener('click', closeModal);
 });
