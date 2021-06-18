@@ -1,4 +1,4 @@
-<div class="modal hide {{ $class ?? '' }}" id="{{ $name ?? 'modal' }}" tabindex="-1" role="dialog" onclick="closeModal();">
+<div class="modal hide {{ $class ?? '' }}" id="{{ $name ?? 'modal' }}" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content @if(isset($buttons) || isset($footer)) add-footer @endif">
             <div class="modal-header flex justify-content-between">
