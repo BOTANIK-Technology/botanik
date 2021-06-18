@@ -213,12 +213,12 @@ class ScheduleController extends Controller
             )->afterCommit();//->delay(Carbon::parse($request->date.' '.$request->time)->subHour());
 
 
-//            TelegramFeedBack::dispatch(
-//                $request->business_db,
-//                $client->chat_id,
-//                $record->id,
-//                $request->token
-//            )->delay(Carbon::parse($request->date.' '.$request->time)->addDay());
+            TelegramFeedBack::dispatch(
+                $request->business_db,
+                $client->chat_id,
+                $record->id,
+                $request->token
+            )->delay(Carbon::parse($request->date.' '.$request->time)->addDay());
 
             return response()->json(['ok' => 'Запись создана']);
 
