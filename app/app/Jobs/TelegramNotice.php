@@ -63,8 +63,11 @@ class TelegramNotice implements ShouldQueue
             Carbon::parse($this->date) == Carbon::parse($record->date) &&
             Carbon::parse($this->time) == Carbon::parse($record->time)
         ) {
-            $bot = new \TelegramBot\Api\BotApi($this->token);
-            $bot->sendMessage($this->chat_id, $this->message);
+//            $bot = new \TelegramBot\Api\BotApi($this->token);
+//            $bot->sendMessage($this->chat_id, $this->message);
         }
+
+        $bot = new \TelegramBot\Api\BotApi($this->token);
+        $bot->sendMessage($this->chat_id, $this->message);
     }
 }

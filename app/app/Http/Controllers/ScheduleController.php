@@ -163,7 +163,7 @@ class ScheduleController extends Controller
                 'service_id' => $request->service_id,
                 'address_id' => $request->address_id,
                 'user_id' => $request->has('user_id') ? $request->user_id: null,
-                'time' => $request->time,
+                'time' => explode(':',$request->time)[0] . ":00",
                 'date' => Carbon::parse($request->date)->format('Y-m-d')
             ]);
 
@@ -206,19 +206,19 @@ class ScheduleController extends Controller
                 $request->business_db,
                 $client->chat_id,
                 $record->id,
-                __('Напоминание. Сегодня Вы записаны на услугу').' "'.$service->name.'". Начало в '.$request->time,
+                __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date . " " . $request->time)->format('d.m.Y') . ' в ' . $request->time,
                 $request->date,
                 $request->time,
                 $request->token
-            )->delay(Carbon::parse($request->date.' '.$request->time)->subHour());
+            )->afterCommit();//->delay(Carbon::parse($request->date.' '.$request->time)->subHour());
 
 
-            TelegramFeedBack::dispatch(
-                $request->business_db,
-                $client->chat_id,
-                $record->id,
-                $request->token
-            )->delay(Carbon::parse($request->date.' '.$request->time)->addDay());
+//            TelegramFeedBack::dispatch(
+//                $request->business_db,
+//                $client->chat_id,
+//                $record->id,
+//                $request->token
+//            )->delay(Carbon::parse($request->date.' '.$request->time)->addDay());
 
             return response()->json(['ok' => 'Запись создана']);
 

@@ -3,7 +3,6 @@
         <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'create'])}}" class="btn full-width text-decoration-none flex justify-content-around align-items-center">{!! file_get_contents(public_path('images/add-w.svg')) !!}записать клиента</a>
     </header>
 @endslot
-
 <div class="schedule-main grid">
 
     @include('schedule.calendar')
@@ -13,7 +12,6 @@
             <a class="hashtag text-decoration-none{{$current_type === $type_link->id ? ' active' : ''}}" href="{{route('schedule', ['business' => $slug, 'current_type' => $type_link->id, 'date' => $date, 'current_month' => $current_month])}}">{{$type_link->type}}</a>
         @endforeach
     </div>
-
     <div class="timetable admin grid">
 
         @if(isset($services) && !$services->isEmpty())
@@ -34,6 +32,7 @@
                     @foreach($service->users as $user)
 
                         @php $row++ @endphp
+
                         @include('schedule.record', ['record' => $user->records->where('date', $date)->where('time', $time), 'main' => false, 'i' => $time_i, 'row' => $row])
 
                     @endforeach
