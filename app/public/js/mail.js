@@ -30,4 +30,9 @@ document.addEventListener('DOMContentLoaded', function(){
         design();
         createBtn.addEventListener('click', sendEvent);
     }
+
+    let closeBtn = document.getElementById('modal-close-btn');
+    closeBtn.addEventListener('click', function(e) {
+        closeModal(e);
+    });
 });
