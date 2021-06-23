@@ -159,7 +159,7 @@ Route::group(
                 Route::post('/schedule/delete/{id}', [App\Http\Controllers\ScheduleController::class, 'deleteSchedule'])->name('schedule.delete');
                 Route::post('/schedule/update/{id}', [App\Http\Controllers\ScheduleController::class, 'editSchedule'])->name('schedule.update');
                 Route::post('/schedule/create', [App\Http\Controllers\ScheduleController::class, 'createRecord'])->name('schedule.create');
-
+                Route::get('/testmail',[App\Http\Controllers\TestMailController::class, 'send'])->name('emails.user-create');
                 /**
                  * Reports routes
                  */
@@ -283,6 +283,7 @@ Route::group(
 
                 });
             }
+
         );
     }
 );
