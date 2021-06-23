@@ -39,10 +39,9 @@ class ServiceController extends Controller
      */
     public function setParams(Request $request)
     {
-        $this->params['countService'] = TypeService::count();
-        $this->params['load'] = $request->load ?? 5;
-        $this->params['types'] = TypeService::take($this->params['load'])->get();
-        if ( $this->params['types']->isEmpty() ) $this->params['types'] = 0;
+        $this->params['countService'] = Service::count();
+        $this->params['services'] = Service::all();
+        $this->params['load'] = $request->get('load') ?? 5;
     }
 
     /**

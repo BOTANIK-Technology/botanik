@@ -185,11 +185,9 @@ class Service extends Model
         if ($services->isEmpty())
             return false;
         $collection = collect();
-        foreach ($services as $service)
-            if (empty($service->timetable))
-                $collection->add($service);
-        if ($collection->isEmpty())
-            return false;
+        foreach ($services as $service) {
+            $collection->add($service);
+        }
        return $collection;
     }
 

@@ -9,11 +9,14 @@
     <script src="{{asset('js/cookie.min.js')}}"></script>
     <script src="{{asset('js/user/manage.js')}}"></script>
     <script src="{{asset('js/user/create.js')}}"></script>
+    <script src="{{asset('js/user/user_window.js')}}"></script>
 @endsection
 
 
 @section('modal')
     @component('modal')
+        <input id="url_slug" type="hidden" value="{{$slug}}" name="url_slug">
+        <input type="hidden" id="token_id" name="_token" value="{{ csrf_token() }}">
 
         <div class="hide">
             @if ($services)
@@ -51,7 +54,7 @@
             @for($i = 0; $i < $moreService; $i++)
                 <div id="service-types-{{$i}}" class="flex direction-column">
                     @if ($services)
-                        <select id="service-type-{{$i}}" data-id="{{$i}}" name="service-{{$i}}[]">
+                        <select onchange="userWin.changeService({{$i}});" id="service-type-{{$i}}" data-id="{{$i}}" name="service-{{$i}}[]">
                             @foreach($services as $service)
                                 <option value="{{$service->id}}">{{$service->name}}</option>
                             @endforeach
@@ -67,7 +70,7 @@
 
                 <div id="addresses-{{$i}}" class="flex direction-column">
                     @if ($addresses)
-                        <select id="address-{{$i}}" name="address-{{$i}}[]">
+                        <select id="address-{{$i}}" name="address-{{$i}}[]" style="display:none;">
                             @foreach($addresses as $addr)
                                 <option value="{{$addr->id}}">{{$addr->address}}</option>
                             @endforeach
