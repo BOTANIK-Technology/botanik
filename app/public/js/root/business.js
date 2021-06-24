@@ -45,7 +45,7 @@ function sendForm (href, image = false) {
     xhr.onload = function() {
         if (xhr.status === 200) {
             clearValues();
-            alert('Ok');
+            document.location.href = '/a-level/management';
         } else {
             showErrors(xhr.response);
         }

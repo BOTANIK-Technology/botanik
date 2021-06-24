@@ -79,6 +79,9 @@ class BusinessController extends Controller
      */
     public function validator (Request $request): \Illuminate\Validation\Validator
     {
+
+
+
         $rules = [
             'last_name' => 'required|string|min:1|max:30',
             'first_name' => 'required|string|min:1|max:30',
@@ -88,7 +91,7 @@ class BusinessController extends Controller
             'business_name' => 'required|string|min:1|max:255',
             'bot_name' => 'required|string|min:3|max:32',
             'package' => 'required|integer',
-            'slug' => 'required|string|min:3|max:32',
+            'slug' => 'required|string|min:3|max:32||regex:/^[a-z0-9]+$/i|',
             'tg_token' => 'required|string|max:255',
             'pay_token' => 'nullable|string|max:255',
             'logo' => 'nullable|file|image',

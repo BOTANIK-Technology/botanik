@@ -71,9 +71,9 @@
         </div>
 
         @if ($countItems > $load)
-            <form method="GET" action="{{route('service', ['load' => $load])}}">
+            <form method="GET" action="{{'/a-level/management?load=' . $load}}">
                 <input type="hidden" name="load" value="{{$load + 5}}">
-                <button class="btn load-more"><i class="load-icon cover"></i>Загрузить ещё</button>
+                <button class="btn load-more">Загрузить ещё</button>
             </form>
         @endif
 
@@ -96,6 +96,9 @@
                 <div class="flex direction-column view">
                     <span>Токен платежной системы</span>
                     <div>{{$business->pay_token}}</div>
+
+                    <span>Telegram bot</span>
+                    <div>{{$business->bot_name}}</div>
 
                     <span>Токен телеграм бота</span>
                     <div>{{$business->token}}</div>
@@ -122,6 +125,9 @@
 
                     <span>Статус</span>
                     <div>{{$business->status ? 'активен' : 'заблокирован'}}</div>
+
+                    <span>Каталог</span>
+                    <div>{{$business->catalog ? 'Вкл.' : 'Выкл.'}}</div>
                 </div>
 
             </div>
