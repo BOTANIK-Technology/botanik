@@ -21,7 +21,19 @@ if (document.querySelector('.modal-edit') !== null && ids !== false) {
         let addresses = document.getElementsByName('addresses-'+id+'[]');
         let array = [];
         Object.keys(addresses).forEach((el) => {
-            array.push(addresses[el].value);
+            let present = false;
+            for(let elm in array) {
+                if(Number(array[elm]) === Number(addresses[el].value)) {
+                    present = true;
+                }
+            }
+
+            if(present === true) {
+                addresses[el].style.borderColor="red";
+                alert("Этот адрес уже присутствует в списке");
+            } else {
+                array.push(addresses[el].value);
+            }
         });
         return array;
     }

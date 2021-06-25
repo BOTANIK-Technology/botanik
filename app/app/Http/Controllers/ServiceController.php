@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Interval;
+use App\Models\ServiceAddress;
 use App\Models\ServiceTimetable;
 use App\Models\TypeService;
 use App\Models\Address;
@@ -243,7 +244,9 @@ class ServiceController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 405);
         }
-
+//        if(!$this->extValidate($request->all())) {
+//            return response()->json(['errors' => ["message" => 'Такой адрес уже добавлен']], 405);
+//        }
         try {
             $service = Service::find($request->id);
             $service->type_service_id = $request->input('type');
@@ -303,7 +306,7 @@ class ServiceController extends Controller
             'addresses' => 'required|array',
             'name'      => 'required|string',
             'interval'  => 'required|integer|min:0|max:24',
-            'range'     => 'nullable|integer|min:0',
+            'range'     => 'integer|min:0',
             'message'   => 'nullable|required_with:quantity|string',
             'quantity'  => 'nullable|required_with:message|integer|min:2',
             'timetable' => 'nullable|array',
@@ -315,6 +318,17 @@ class ServiceController extends Controller
             'prepay_card'    => 'nullable|string',
 
         ]);
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    private function extValidate(array $data): bool
+    {
+        $count = ServiceAddress::query()->where('service_id', $data['service_id'])
+            ->where('address_id', $data['ddress_id'])->count();
+        if($count > 0) return false;
     }
 
 }

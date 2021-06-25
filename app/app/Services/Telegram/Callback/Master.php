@@ -3,7 +3,9 @@
 namespace App\Services\Telegram\Callback;
 
 
+use App\Models\TelegramSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class Master extends CallbackQuery
 {
@@ -26,12 +28,21 @@ class Master extends CallbackQuery
 
         $masters = [];
         $service = \App\Models\Service::find($service_id);
+        Log::debug("Мастера: ", $service->users);
+        foreach ($service->users as $user) {
+            foreach ($user->addresses as $user_address) {
+                if ($user_address->id == $address_id) {
+                    $session_id = $this->user->telegramSession->id;
+                    $query = TelegramSession::query()->where("id", $session_id);
+                    $query->update([
+                        'master'  => $user->id
+                    ]);
+                    $masters[] = [['text' => $user->name, 'callback_data' => 'DatesMaster_' . $user->id]];
+                }
+            }
+        }
 
-        foreach ($service->users as $user)
-            foreach ($user->addresses as $user_address)
-                if ($user_address->id == $address_id)
-                    $masters[] = [['text' => $user->name, 'callback_data' => 'DatesMaster_'.$user->id]];
-
+        Log::debug("Мастера: ", $service->users);
         return parent::buildInlineKeyboard($masters);
 
     }

@@ -62,8 +62,7 @@
                         </select>
                     </div>
                     <div id="more-address" class="row-2 col-3 flex">
-                        <div class="add-b-icon"></div>
-                        <button id="include-address" class="color">{{__('Добавить адрес к услуге')}}</button>
+                        <button id="include-address" class="color"><div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес к услуге')}}</button>
                     </div>
                 @else
                     <select id="address" class="none">
@@ -122,11 +121,11 @@
             </div>
 
             <div id="type-block" class="row-2 col-3 flex align-items-center">
-                <div class="add-b-icon"></div><button id="add-type">{{__('Добавить тип в список')}}</button>
+                <button id="add-type"><div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить тип в список')}}</button>
             </div>
 
             <div id="address-block" class="row-3 col-3 flex align-items-center align-self-start">
-                <div class="add-b-icon"></div><button id="add-address">{{__('Добавить адрес в список')}}</button>
+                <button id="add-address"><div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес в список')}}</button>
             </div>
 
         </div>

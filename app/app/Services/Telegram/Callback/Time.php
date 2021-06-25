@@ -7,6 +7,7 @@ use App\Models\UserTimetable;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Service;
+use Illuminate\Support\Facades\Log;
 
 class Time extends CallbackQuery
 {
@@ -42,6 +43,7 @@ class Time extends CallbackQuery
 
     private function getButtons ($times)
     {
+        Log::debug($times);
         $buttons = [];
         if (empty($times))
             $buttons[] = [['text' => __('Нет свободных ячеек.'), 'callback_data' => '-']];

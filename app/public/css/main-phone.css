@@ -135,3 +135,6 @@
     line-height: 13px;
     color: #5B5B5B;
 }
+.navbar-brand {
+    padding: 0;
+}

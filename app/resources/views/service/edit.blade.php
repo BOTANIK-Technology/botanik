@@ -72,8 +72,7 @@
                             @endforeach
                         </div>
                         <div id="more-address-{{$service->id}}" class="row-2 col-3 flex more-address">
-                            <div class="add-b-icon"></div>
-                            <button id="include-address-{{$service->id}}" data-id="{{$service->id}}" class="include-address color">{{__('Добавить адрес к услуге')}}</button>
+                            <button id="include-address-{{$service->id}}" data-id="{{$service->id}}" class="include-address color"><div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес к услуге')}}</button>
                         </div>
                     </div>
 

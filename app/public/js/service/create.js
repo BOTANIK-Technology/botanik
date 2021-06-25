@@ -91,7 +91,19 @@ if (addService) {
         let addresses = document.getElementsByName('addresses[]');
         let array = [];
         Object.keys(addresses).forEach((el) => {
-            if (el != 0) array.push(addresses[el].value);
+            let present = false;
+            for(let elm in array) {
+                if(Number(array[elm]) === Number(addresses[el].value)) {
+                    present = true;
+                }
+            }
+
+            if(present === true) {
+                addresses[el].style.borderColor="red";
+                alert("Этот адрес уже присутствует в списке");
+            } else {
+                if (el != 0) array.push(addresses[el].value);
+            }
         });
         return array;
     }
@@ -320,3 +332,4 @@ if (addService) {
         });
     }
 }
+
