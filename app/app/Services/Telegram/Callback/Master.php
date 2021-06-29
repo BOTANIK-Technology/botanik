@@ -25,10 +25,8 @@ class Master extends CallbackQuery
      * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
      */
     private function getMaster($service_id, $address_id) {
-
         $masters = [];
         $service = \App\Models\Service::find($service_id);
-        Log::debug("Мастера: ", $service->users);
         foreach ($service->users as $user) {
             foreach ($user->addresses as $user_address) {
                 if ($user_address->id == $address_id) {
@@ -41,8 +39,6 @@ class Master extends CallbackQuery
                 }
             }
         }
-
-        Log::debug("Мастера: ", $service->users);
         return parent::buildInlineKeyboard($masters);
 
     }

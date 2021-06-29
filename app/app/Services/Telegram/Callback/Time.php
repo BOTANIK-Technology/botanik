@@ -37,13 +37,19 @@ class Time extends CallbackQuery
     private function masterTime(int $master_id, int $service_id, int $address_id, string $date)
     {
         $master = User::find($master_id);
+        Log::debug("masterTime", [
+            "master_id" => $master_id,
+            "service_id" => $service_id,
+            "address_id" => $address_id,
+            "date"      => $date
+        ]);
         $times = UserTimetable::getFreeTimes($master, $address_id, $service_id, $date);
         return $this->getButtons($times);
     }
 
     private function getButtons ($times)
     {
-        Log::debug($times);
+        Log::debug("times:", $times);
         $buttons = [];
         if (empty($times))
             $buttons[] = [['text' => __('Нет свободных ячеек.'), 'callback_data' => '-']];

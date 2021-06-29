@@ -422,7 +422,7 @@ class TelegramAPI
             $this->business_db,
             $this->chat_id,
             $record_id,
-            __('Напоминание. Сегодня Вы записаны на услугу').' "'.$service_name.'". Начало в '.$this->getTime(),
+            __('Напоминание. Вы записаны на услугу').' "'.$service_name.'". Начало ' . Carbon::parse($this->getDate())->format("d.m.Y") . ' в '.$this->getTime(),
             $this->getDate(),
             $this->getTime(),
             $this->token

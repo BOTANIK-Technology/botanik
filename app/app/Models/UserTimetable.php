@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use \App\Traits\Timetable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
 
 /**
  * App\Models\Timetable
@@ -127,9 +128,9 @@ class UserTimetable extends Model
         $date = mb_strtolower(Carbon::parse($date)->format('l'));
 
         $table = $user->timetables->where('address_id', $address_id)->where('service_id', $service_id)->first();
-        if ($table && !is_null($table->$date))
+        if ($table && !is_null($table->$date)) {
             return json_decode($table->$date);
-
+        }
         return false;
     }
 
@@ -151,13 +152,15 @@ class UserTimetable extends Model
             return [];
         }
 
+
+
         $table = $user->timetables->where('address_id', $address_id)->where('service_id', $service_id)->first();
 
         $booked_array = self::getBookedTimes($user, $date);
 
         if (!$booked_array) {
 
-            return [];
+            $booked_array = [];
         }
 
         $free = [];
