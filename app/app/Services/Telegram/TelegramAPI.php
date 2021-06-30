@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use ConnectService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use \TelegramBot\Api\BotApi;
 use TelegramBot\Api\Exception;
@@ -256,6 +257,14 @@ class TelegramAPI
     }
 
     /**
+     * @return mixed
+     */
+    public function getSessionId ()
+    {
+        return $this->user->telegramSession->id;
+    }
+
+    /**
      * @return int
      */
     public function getAddressID (): int
@@ -292,7 +301,8 @@ class TelegramAPI
      */
     public function getRecordID (): int
     {
-        return $this->user->telegramSession->record;
+        $record_id = $this->user->telegramSession->record;
+        return is_null($record_id) ? 0 : $record_id;
     }
 
     /**
@@ -426,17 +436,17 @@ class TelegramAPI
             $this->getDate(),
             $this->getTime(),
             $this->token
-        )->delay(Carbon::parse($this->getDate().$this->getTime())->subHour());
+        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->subHour());
 
         /*
          * Client feedback
          */
-        TelegramFeedBack::dispatch(
-            $this->business_db,
-            $this->chat_id,
-            $record_id,
-            $this->token
-        )->delay(Carbon::parse($this->getDate().$this->getTime())->addDay());
+//        TelegramFeedBack::dispatch(
+//            $this->business_db,
+//            $this->chat_id,
+//            $record_id,
+//            $this->token
+//        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->addDay());
 
         ConnectService::dbConnect($this->business_db);
     }

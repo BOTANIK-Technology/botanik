@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services\Telegram;
+namespace App\Services\Telegram\Invoice;
 
 
+use App\Services\Telegram\TelegramAPI;
 use Illuminate\Http\Request;
 
 class OnlinePayProduct extends TelegramAPI

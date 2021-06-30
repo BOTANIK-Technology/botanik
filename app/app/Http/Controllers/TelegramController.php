@@ -16,7 +16,6 @@ class TelegramController extends Controller
      */
     public function main(Request $request)
     {
-        Log::debug('Запрос прибыл');
         $id = null;
         if ($request->has('message.chat.id')) {
             $id = $request->input('message.chat.id');
@@ -37,7 +36,7 @@ class TelegramController extends Controller
             }
         }
         else {
-            Log::debug($id . ': Клиент не создан');
+           Log::debug($id . ': Клиент не создан');
         }
 
 
@@ -61,6 +60,10 @@ class TelegramController extends Controller
             return $this->number($request);
 
         }
+
+        else if($request->has('message.successful_payment')) {
+            return $this->paymentStatus($request);
+        }
         else {
 
             if ($request->has('message.text')) {
@@ -75,6 +78,11 @@ class TelegramController extends Controller
     public function pay($request)
     {
         return TelegramService::confirmPay($request);
+    }
+
+    public function paymentStatus(Request $request) {
+        TelegramService::setSuccessPayment($request);
+        return TelegramService::redirectToStart($request);
     }
 
     /**
@@ -129,4 +137,5 @@ class TelegramController extends Controller
     {
         return TelegramService::getNumber($data);
     }
+
 }

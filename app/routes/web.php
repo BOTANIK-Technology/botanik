@@ -28,6 +28,7 @@ Route::get('/', function () {
 /**
  * A-level routes
  */
+
 Route::group(
     [
         'as' => 'root.',

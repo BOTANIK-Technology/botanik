@@ -2,6 +2,10 @@
 
 namespace App\Services\Telegram;
 
+use App\Models\Payment;
+use App\Models\Record;
+use App\Services\Telegram\Invoice\OnlinePayProduct;
+use App\Services\Telegram\Invoice\OnlinePayRecord;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\TelegramUser;
@@ -45,8 +49,30 @@ class Telegram
      */
     public function confirmPay(Request $request) {
         $payload = $request->input('pre_checkout_query.invoice_payload');
-        $class = substr($payload, 0, strpos($payload, '_'));
-        new $class($request, $payload);
+        if(!is_null($payload)) {
+            $payload = json_decode($payload, true);
+            $class = $payload["handler"];
+            if($class == "OnlinePayRecord") {
+                new OnlinePayRecord($request, $payload);
+            } elseif($class == "OnlinePayProduct") {
+                new OnlinePayProduct($request, $payload);
+            }
+        }
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setSuccessPayment(Request $request) {
+        /** @var TelegramUser $telegramUser */
+        $telegramUser = $request->input("client");
+        $record_id = $telegramUser->telegramSession->record;
+        if($record_id > 0) {
+            $query = Record::query()->where("id", $record_id);
+            $query->update(["status" => 1]);
+            $query = Payment::query()->where("record_id", $record_id);
+            $query->update(["status" => 1]);
+        }
     }
 
     /**

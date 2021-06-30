@@ -10,7 +10,6 @@ class OnlinePay extends CallbackQuery
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        parent::deleteMessage();
         parent::sendServiceInvoice();
     }
 }

@@ -219,6 +219,7 @@ class CallbackQuery extends TelegramAPI
      */
     protected function sendServiceInvoice($bonus = 0)
     {
+        $record_id = 0;
         try {
             $service = \App\Models\Service::find( $this->getServiceID() );
         } catch (\Exception $e) {
@@ -236,12 +237,15 @@ class CallbackQuery extends TelegramAPI
             $this->chat_id,
             $service->name,
             $description,
-            'OnlinePayRecord_'.$service->id,
+            json_encode([
+                "handler" => 'OnlinePayRecord',
+                "service_id" => $service->id,
+            ]),
             $this->pay_token,
             $this->chat_id,
             'UAH',
             [
-                ['label' => $service->name, 'amount' => $price],
+                ['label' => $service->name, 'amount' => $price * 100],
             ],
             false
         );

@@ -9,6 +9,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Exception;
 use Mail;
+use Swift_Mailer;
+use Swift_Message;
+use Swift_SmtpTransport;
 
 class SendMail implements ShouldQueue
 {
@@ -47,13 +50,15 @@ class SendMail implements ShouldQueue
      */
     public function handle()
     {
-        $email = $this->email;
-        $name = $this->name;
-        $business = $this->business_name;
+        $body = view('emails.user-create', ['login'=> $this->email, 'password' => $this->password, 'slug' => $this->slug]);
+        $transport = new Swift_SmtpTransport('localhost', 25);
+        $mailer = new Swift_Mailer($transport);
+        $message = (new Swift_Message('Доступ к BOTANIK - ' . $this->business_name))
+            ->setFrom([env('MAIL_FROM_ADDRESS') => 'Some One'])
+            ->setTo($this->email)
+            ->setBody($body);
 
-        Mail::send('emails.user-create', ['login' => $this->email, 'password' => $this->password, 'slug' => $this->slug], function ($message) use ($email, $name, $business) {
-            $message->to($email, 'To '.$name)->subject(__('Доступ к BOTANIK - '.$business));
-        });
+        $mailer->send($message);
     }
 
     /**

@@ -73,15 +73,15 @@ class TelegramFeedBack implements ShouldQueue
                 $user->telegramSession->save();
             }
 
-            $bot = new \TelegramBot\Api\BotApi($this->token);
-            $bot->sendMessage(
-                $this->chat_id,
-                __('Оцените услугу "'.$record->service->name.'"'),
-                null,
-                false,
-                null,
-                $keyboard
-            );
+            //$bot = new \TelegramBot\Api\BotApi($this->token);
+//            $bot->sendMessage(
+//                $this->chat_id,
+//                __('Оцените услугу "'.$record->service->name.'"'),
+//                null,
+//                false,
+//                null,
+//                $keyboard
+//            );
         }
     }
 }
