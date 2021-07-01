@@ -4,6 +4,7 @@ namespace App\Helpers\Beauty;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 class BeautyProApi
 {
@@ -95,6 +96,7 @@ class BeautyProApi
     protected function request(string $url, array $parameters = [], string $params_type = 'form_params', string $method = 'GET'): array
     {
         try {
+            Log::debug("Beauty URL: " . $url);
             $response = $this->guzzle->request(
                 $method,
                 $url,

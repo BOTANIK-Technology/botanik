@@ -1,11 +1,12 @@
 <div class="schedule-pers flex">
 
-    @include('schedule.calendar')
+    <div class="schedule-pers-calendar">
+        @include('schedule.calendar')
+    </div>
 
     @if ($schedule)
-
         @foreach($schedule as $times)
-            <div class="timetable pers grid">
+            <div class="schedule-pers-table pers grid">
                 <div class="row-1 border-right-main border-bottom-main day"></div>
                 <div class="day border-bottom-main cnt" style="grid-column:2">{{$address}}</div>
                 @foreach($times as $time)
@@ -29,7 +30,6 @@
                 @endforeach
             </div>
         @endforeach
-
     @else
 
         <h2>{{__('Выходной')}}</h2>

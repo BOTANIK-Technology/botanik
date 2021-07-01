@@ -198,6 +198,17 @@ Route::group(
                     Route::post('/services/window/edit/{id}/remove-address', [App\Http\Controllers\ServiceController::class, 'removeAddress']);
 
                     /**
+                     * Types routes
+                     */
+                    Route::get('/types/window/{id}/edit', [App\Http\Controllers\TypesController::class, 'edit'])->name('types.edit');
+                    Route::get('/types/{id}/delete', [App\Http\Controllers\TypesController::class, 'delete'])->name('types.delete');
+                    /**
+                     * Addresses routes
+                     */
+                    Route::get('/addresses/window/{id}/edit', [App\Http\Controllers\AddressesController::class, 'edit'])->name('addresses.edit');
+                    Route::get('/addresses/{id}/delete', [App\Http\Controllers\AddressesController::class, 'delete'])->name('addresses.delete');
+
+                    /**
                      * Users routes
                      */
                     Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('user');

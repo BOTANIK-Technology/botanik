@@ -354,7 +354,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @return Factory|View
+     * @return mixed
      */
     public function manageConfirm (Request $request)
     {
@@ -382,7 +382,7 @@ class UserController extends Controller
             )->delay(now()->addMinutes(2));
         }
 
-        return $this->index($request);
+        return response()->redirectTo($request->business . '/users?sort=moder&load=5');
     }
 
     /**

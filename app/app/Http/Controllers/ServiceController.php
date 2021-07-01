@@ -43,6 +43,8 @@ class ServiceController extends Controller
         $this->params['countService'] = Service::count();
         $this->params['types'] = TypeService::all();
         $this->params['services'] = Service::all();
+        $this->params['addresses'] = Address::all();
+        $this->params['view'] = $request->get('view') ?? 'services';
         $this->params['load'] = $request->get('load') ?? 5;
     }
 

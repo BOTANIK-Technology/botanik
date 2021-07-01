@@ -83,3 +83,42 @@ select {
 .border {
     border: 1px solid #EFCCB8;
 }
+
+.schedule-pers {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-left: 30px;
+}
+.schedule-pers-calendar {
+    margin-right: 50px;
+}
+.schedule-pers-calendar .calendar a.active {
+    color: #000;
+    background: #EFCCB8;
+}
+.schedule-pers .mouth-select {
+    display: flex;
+    align-content: start;
+    justify-content: space-between;
+    align-self: inherit;
+    width: 175px;
+    max-width: 100%;
+    margin: 0;
+    margin-bottom: 10px;
+}
+.schedule-pers .date-sort {
+    margin: 0;
+    margin-bottom: 20px;
+}
+.schedule-pers .timetable {
+    grid-template-columns: auto;
+    max-width: 175px;
+    margin: 0;
+}
+.schedule-pers-table div {
+    padding: 5px;
+}
+.schedule-pers-table .checkbox {
+    padding: 0;
+}

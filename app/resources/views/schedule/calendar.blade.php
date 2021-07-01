@@ -4,6 +4,7 @@
     <a href="{{route('schedule', ['business' => $slug, 'current_month' => $next_month, 'current_type' => $current_type, 'date' => $date])}}">{!! file_get_contents(public_path('images/next.svg')) !!}</a>
 </div>
 
+
 <div class="date-sort flex direction-column">
     <div class="calendar border">
         <a href="#">Пн</a>

@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     window.setTimeout(function() {
         let closeBtn = document.getElementById('modal-close-btn');
-        closeBtn.addEventListener('click', closeModal);
+        if(closeBtn !== null) {
+            closeBtn.addEventListener('click', closeModal);
+        }
     },1000);
 });

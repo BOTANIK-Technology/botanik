@@ -6,6 +6,7 @@ use App\Models\Api;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class BeautyPro
 {
@@ -59,6 +60,7 @@ class BeautyPro
             ];
 
         $response = $api->getBearer($config['application_id'], $config['application_secret'], $config['database_code']);
+        Log::debug("BeautyPro response:", $response);
         if (
             isset($response['status']) &&
             (
@@ -75,12 +77,12 @@ class BeautyPro
             ];
 
         $model = Api::where('slug', 'beauty')->first();
-        $model->updateConfig(
-            [
-                'access_token' => $response['access_token'],
-                'expires_at' => $response['expires_at']
-            ]
-        );
+        $data = array_merge($config, [
+            'access_token' => $response['access_token'],
+            'expires_at' => $response['expires_at']
+        ]);
+
+        $model->updateConfig($data);
 
         return $response['access_token'];
     }
