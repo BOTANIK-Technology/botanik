@@ -9,14 +9,14 @@
 
         <div class="delete">
             {{__('Вы действительно')}}<br>
-            {{__(' хотите удалить услугу ')}}<br>
-            <b>“{{$view_service->name}}”</b>?
+            {{__(' хотите удалить тип услуги ')}}<br>
+            <b>“{{$type->type}}”</b>?
         </div>
         @slot('buttons')
-            <button type="button" id="delete" data-type-id="{{$view_service->id}}" class="btn-primary">
+            <button type="button" id="delete" data-type-id="{{$type->id}}" class="btn-primary">
                 {{ __('Удалить') }}
             </button>
-            <a href="{{route('service', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
+            <a href="{{route('service', ['business' => $slug, 'load' => $load, 'view' => 'types'])}}" id="refresh-modal"></a>
         @endslot
 
     @endcomponent

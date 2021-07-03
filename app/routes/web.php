@@ -200,13 +200,17 @@ Route::group(
                     /**
                      * Types routes
                      */
-                    Route::get('/types/window/{id}/edit', [App\Http\Controllers\TypesController::class, 'edit'])->name('types.edit');
-                    Route::get('/types/{id}/delete', [App\Http\Controllers\TypesController::class, 'delete'])->name('types.delete');
+                    Route::get('/types/window/edit/{id}', [App\Http\Controllers\TypesController::class, 'edit'])->name('types.edit');
+                    Route::get('/types/window/delete/{id}', [App\Http\Controllers\TypesController::class, 'delete'])->name('types.delete');
+                    Route::post('/types/window/delete/{id}/confirm', [App\Http\Controllers\TypesController::class, 'confirmDelete']);
+                    Route::post('/types/window/edit/{id}/save', [App\Http\Controllers\TypesController::class, 'save']);
                     /**
                      * Addresses routes
                      */
-                    Route::get('/addresses/window/{id}/edit', [App\Http\Controllers\AddressesController::class, 'edit'])->name('addresses.edit');
-                    Route::get('/addresses/{id}/delete', [App\Http\Controllers\AddressesController::class, 'delete'])->name('addresses.delete');
+                    Route::get('/addresses/window/edit/{id}', [App\Http\Controllers\AddressesController::class, 'edit'])->name('addresses.edit');
+                    Route::get('/addresses/window/delete/{id}', [App\Http\Controllers\AddressesController::class, 'delete'])->name('addresses.delete');
+                    Route::post('/addresses/window/delete/{id}/confirm', [App\Http\Controllers\AddressesController::class, 'confirmDelete']);
+                    Route::post('/addresses/window/edit/{id}/save', [App\Http\Controllers\AddressesController::class, 'save']);
 
                     /**
                      * Users routes

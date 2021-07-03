@@ -5,6 +5,7 @@ namespace App\Helpers\Yclients;
 use App\Models\Api;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Yclients
 {
@@ -12,15 +13,17 @@ class Yclients
      * @param string $method
      * @param array $params
      * @return array
+     * @throws YclientsException
      */
     public static function apiCall (string $method, $params = []): array
     {
         $config = self::getConfig();
-        $api = new YclientsApi($config['partner_token']);
+        $api = new YclientsApi(
+            $config['login'],
+            $config['password'],
+            $config['partner_token']);
 
         if (method_exists($api,$method)) {
-            if (empty($params))
-                return $api->$method();
             return $api->$method($params);
         }
 

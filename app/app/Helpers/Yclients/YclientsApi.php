@@ -3,6 +3,7 @@
 namespace App\Helpers\Yclients;
 
 use DateTime;
+use Exception;
 
 /**
  * @see http://docs.yclients.apiary.io
@@ -23,6 +24,14 @@ class YclientsApi
     const METHOD_DELETE = 'DELETE';
 
     /**
+     * Данные аутентификации
+     *
+     * @var array @auth
+     * @access private
+     */
+    private array $auth;
+
+    /**
      * Токен доступа для авторизации партнёра
      *
      * @var string
@@ -31,13 +40,16 @@ class YclientsApi
     private string $tokenPartner;
 
     /**
+     * @param string $login
+     * @param string $password
      * @param string $tokenPartner
-     * @return void
      * @access public
+     * @throws YclientsException
      */
-    public function __construct($tokenPartner = null)
+    public function __construct(string $login, string $password, string $tokenPartner)
     {
         $this->setTokenPartner($tokenPartner);
+        $this->auth = $this->getAuth($login, $password);
     }
 
     /**
@@ -72,10 +84,12 @@ class YclientsApi
      */
     public function getAuth(string $login, string $password): array
     {
-        return $this->request('auth', [
+        $this->auth = $this->request('auth', [
             'login' => $login,
             'password' => $password,
         ], self::METHOD_POST);
+
+        return $this->auth;
     }
 
     /**
@@ -882,51 +896,24 @@ class YclientsApi
     /**
      * Получить список клиентов
      *
-     * @param integer $companyId - ID компании
-     * @param string $userToken - Токен для авторизации пользователя
-     * @param string $fullname
-     * @param string $phone
-     * @param string $email
-     * @param string $page
-     * @param string $count
+     * @param array $parameters
      * @return array
+     * @throws YclientsException
+     * @throws \Exception
      * @access public
      * @see http://docs.yclients.apiary.io/#reference/7/0/0
-     * @throws YclientsException
      */
-    public function getClients(
-        $companyId,
-        $userToken,
-        $fullname = null,
-        $phone = null,
-        $email = null,
-        $page = null,
-        $count = null
-    ): array
+    public function getClients(array $parameters = []): array
     {
-        $parameters = [];
-
-        if ($fullname !== null) {
-            $parameters['fullname'] = $fullname;
+        if($this->auth["success"] == true) {
+            $parameters = [
+                "id" => $this->auth["data"]["id"]
+            ];
+            return $this->request('clients/520831', $parameters, self::METHOD_GET, $this->getTokenPartner());
+        } else {
+            throw new Exception("Client auth false");
         }
 
-        if ($phone !== null) {
-            $parameters['phone'] = $phone;
-        }
-
-        if ($email !== null) {
-            $parameters['email'] = $email;
-        }
-
-        if ($page !== null) {
-            $parameters['page'] = $page;
-        }
-
-        if ($count !== null) {
-            $parameters['count'] = $count;
-        }
-
-        return $this->request('clients/' . $companyId, $parameters, self::METHOD_GET, $userToken);
     }
 
     /**
@@ -1442,7 +1429,10 @@ class YclientsApi
      */
     protected function request(string $url, $parameters = [], $method = 'GET', $auth = true): array
     {
-        $headers = ['Content-Type: application/json'];
+        $headers = [
+            'Accept: application/vnd.yclients.v2+json',
+            'Content-Type: application/json'
+        ];
 
         if ($auth) {
             if (!$this->tokenPartner) {

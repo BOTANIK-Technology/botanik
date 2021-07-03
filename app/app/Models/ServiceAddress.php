@@ -18,7 +18,7 @@ class ServiceAddress extends Model
 {
     use HasFactory, RelationHelper;
 
-    public $table = "services_address";
+    public $table = "services_addresses";
 
     public $timestamps = false;
 

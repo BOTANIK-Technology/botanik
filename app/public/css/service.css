@@ -120,3 +120,8 @@ input[type=radio] + label {
 .margin {
     margin: 10px 0 20px 0;
 }
+
+.edit-type {
+    padding: 0 10px;
+    width: 300px;
+}

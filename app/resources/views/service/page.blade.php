@@ -26,13 +26,13 @@
                     {{$service->name}}
                 </div>
                 <div class="flex align-items-center justify-content-center">
-                    <a href="{{route('window.service', ['business' => $slug, 'modal' => 'view', 'id' => $service->type_service_id, 'load' => $load])}}"><div class="view-icon"></div></a>
+                    <a href="{{route('window.service', ['business' => $slug, 'modal' => 'view', 'id' => $service->id, 'load' => $load])}}"><div class="view-icon"></div></a>
                 </div>
                 <div class="flex align-items-center justify-content-center">
-                    <a href="{{route('window.service', ['business' => $slug, 'modal' => 'edit', 'id' => $service->type_service_id, 'load' => $load])}}"><div class="edit-icon"></div></a>
+                    <a href="{{route('window.service', ['business' => $slug, 'modal' => 'edit', 'id' => $service->id, 'load' => $load])}}"><div class="edit-icon"></div></a>
                 </div>
                 <div class="flex align-items-center justify-content-center">
-                    <a href="{{route('window.service', ['business' => $slug, 'modal' => 'delete', 'id' => $service->type_service_id, 'load' => $load])}}"><div class="delete-icon"></div></a>
+                    <a href="{{route('window.service', ['business' => $slug, 'modal' => 'delete', 'id' => $service->id, 'load' => $load])}}"><div class="delete-icon"></div></a>
                 </div>
             @endforeach
             </div>
@@ -77,6 +77,14 @@
     @endcomponent
 @endsection
 
-@if (isset($modal))
+@if ($view == 'services' && isset($modal))
     @include('service.'.$modal)
+@endif
+
+@if ($view == 'types' && isset($modal))
+    @include('type.' . $modal)
+@endif
+
+@if ($view == 'addresses' && isset($modal))
+    @include('address.' . $modal)
 @endif

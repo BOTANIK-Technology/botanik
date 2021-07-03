@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Validator;
 use Illuminate\View\View;
 
@@ -73,9 +74,12 @@ class ServiceController extends Controller
      */
     public function window (Request $request)
     {
-        $this->params['modal'] = $request->modal;
+        $id = $request->id;
+        $business = $request->business;
+        $modal = $request->modal;
 
-        switch ($request->modal) {
+        $this->params['modal'] = $modal;
+        switch ($modal) {
             case 'delete':
             case 'view':
             case 'edit':
@@ -86,17 +90,19 @@ class ServiceController extends Controller
                 abort(404);
         }
 
-        switch ($request->modal) {
+        switch ($modal) {
             case 'delete':
-                $this->params['service_type'] = TypeService::find($request->id);
+                $this->params['view_service'] = Service::find($id);
                 break;
             case 'timetable':
                 $this->params['times'] = ServiceTimetable::getHours();
                 $this->params['days'] = ServiceTimetable::getDays();
-                $this->params['service_id'] = $request->service_id ?? $this->params['service_id'] = null;
-                $this->params['type_id'] = $request->type_id ?? $this->params['type_id'] = null;
-                if (!is_null($this->params['service_id']))
-                    $this->setTimetableCookies(Service::where('id', $request->service_id)->get(), $request->business, true);
+                $this->params['service_id'] = $id;
+                if (!is_null($this->params['service_id'])) {
+                    $this->params['type_id'] = Service::find($id)->type_service_id;
+                    $this->setTimetableCookies(Service::find($id), $business, true);
+                }
+
                 break;
             case 'create':
             case 'edit':
@@ -107,42 +113,38 @@ class ServiceController extends Controller
                 break;
         }
 
-        if ($request->modal == 'edit' || $request->modal == 'view') {
-            $this->params['service_type'] = TypeService::find($request->id);
-            $this->params['services'] = isset($this->params['service_type']->services) ?  $this->params['service_type']->services : false;
-            if ($request->modal == 'edit')
-                $this->setTimetableCookies($this->params['services'], $request->business);
+        if ($modal == 'edit' || $modal == 'view') {
+            $this->params['view_service'] = Service::find($id);
+            $this->params['view_service_type'] = TypeService::find($this->params['view_service']->type_service_id);
+            if ($modal == 'edit')
+                $this->setTimetableCookies($this->params['view_service'], $business);
         }
-
         return $this->getView($request);
     }
 
 
-    private function setTimetableCookies($services, $slug, $checked = false)
+    private function setTimetableCookies($view_service, $slug, $checked = false)
     {
-        if (!$services || $services->isEmpty())
+        if (!$view_service)
             return;
-        foreach ($services as $service) {
 
-            if ( isset($_COOKIE['timetable-'.$service->id]) )
-                continue;
+        if ( isset($_COOKIE['timetable-'.$view_service->id]) )
+            return;
 
-            if (!$service->timetable)
-                continue;
+        if (!$view_service->timetable)
+            return;
 
-            $days = ServiceTimetable::getDaysEn();
-            $timetable = [];
-            foreach ($days as $day)
-                if(!is_null($service->timetable->$day))
-                    $timetable[$day] = json_decode($service->timetable->$day);
+        $days = ServiceTimetable::getDaysEn();
+        $timetable = [];
+        foreach ($days as $day)
+            if(!is_null($view_service->timetable->$day))
+                $timetable[$day] = json_decode($view_service->timetable->$day);
 
-            switch ($checked) {
-                case false:
-                    setcookie('timetable-'.$service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
-                case true:
-                    setcookie('checked-'.$service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
-            }
-
+        switch ($checked) {
+            case false:
+                setcookie('timetable-'.$view_service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+            case true:
+                setcookie('checked-'.$view_service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
         }
     }
 
@@ -181,10 +183,10 @@ class ServiceController extends Controller
      * @return JsonResponse
      * @throws Exception
      */
-    public function deleteService(Request $request): JsonResponse
+    public function deleteService($business, $id, Request $request): JsonResponse
     {
         try {
-            TypeService::find($request->id)->delete();
+            Service::find($id)->delete();
         }
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
