@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Beauty\BeautyPro;
 use App\Helpers\Yclients\Yclients;
+use App\Helpers\Yclients\YclientsException;
 use App\Http\Requests\v1\PartnerApiRequest;
 use App\Models\Api;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PartnerApiController extends Controller
 {
@@ -52,6 +54,32 @@ class PartnerApiController extends Controller
         }
 
         return response()->json(['errors' => ['message' => ' "'.$request->slug.'" API integration not found.']], 404);
+    }
+
+    /**
+     * @param Request $request
+     * @return array|Application|Factory|View|mixed
+     * @throws YclientsException
+     */
+    public function synchronize(Request $request)
+    {
+        switch ($request->slug) {
+            case 'beauty':
+                $api = new BeautyPro();
+                //$api->synchronize();
+                break;
+            case 'yclients':
+                $api = new Yclients();
+                $api->synchronize();
+                break;
+        }
+
+        return view(
+            'api.page',
+            [
+                'apis' => Api::all()
+            ]
+        );
     }
 
 }

@@ -3,6 +3,7 @@ let yclientsSend = document.querySelector('#yclients_sendClients')
 let yclientsGet = document.querySelector('#yclients_getClients')
 
 yclientsBtn.addEventListener('click', function () {
+    return;
     let token = document.querySelector('#yclients_token')
     let login = document.querySelector('#yclients_login')
     let password = document.querySelector('#yclients_password')

@@ -1,5 +1,6 @@
 function requestListener (objects = []) {
     objects.forEach((object) => {
+        if(object == null) return;
         object.addEventListener('click', function () {
             let xhr = postRequest(this.dataset.url)
             xhr.onload = function() {

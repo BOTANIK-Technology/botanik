@@ -288,7 +288,7 @@ Route::group(
                      */
                     Route::get('/partner-api', [App\Http\Controllers\PartnerApiController::class, 'index'])->name('api');
                     Route::put('/partner-api/{slug}/update', [App\Http\Controllers\PartnerApiController::class, 'update'])->name('api.update');
-                    Route::post('/partner-api/{slug}/{method}', [App\Http\Controllers\PartnerApiController::class, 'call'])->name('api.call');
+                    Route::get('/partner-api/{slug}/synchronize', [App\Http\Controllers\PartnerApiController::class, 'synchronize'])->name('api.synchronize');
 
                     /**
                      * Users routes

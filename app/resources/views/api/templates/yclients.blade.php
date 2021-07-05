@@ -31,23 +31,7 @@
     <div class="input-block">
         <label for="method">Клиенты</label>
         <div class="buttons">
-            <button
-                name="method"
-                class="btn"
-                data-url="{{route('api.call', ['business' => $slug, 'slug' => 'yclients', 'method' => 'getClients'])}}"
-                id="yclients_sendClients"
-            >
-                Отправить
-            </button>
-
-            <button
-                name="method"
-                class="btn"
-                data-url="{{route('api.call', ['business' => $slug, 'slug' => 'yclients', 'method' => 'sendClients'])}}"
-                id="yclients_getClients"
-            >
-                Загрузить
-            </button>
+            <a style="text-decoration: none;" href="/{{$slug}}/partner-api/yclients/synchronize" class="btn">Синхронизация</a>
         </div>
     </div>
 </div>
