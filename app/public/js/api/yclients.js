@@ -1,9 +1,6 @@
 let yclientsBtn = document.querySelector('#yclients_update')
-let yclientsSend = document.querySelector('#yclients_sendClients')
-let yclientsGet = document.querySelector('#yclients_getClients')
 
 yclientsBtn.addEventListener('click', function () {
-    return;
     let token = document.querySelector('#yclients_token')
     let login = document.querySelector('#yclients_login')
     let password = document.querySelector('#yclients_password')
@@ -27,5 +24,3 @@ yclientsBtn.addEventListener('click', function () {
             showErrors(xhr.response)
     }
 })
-
-requestListener([yclientsSend, yclientsGet]);

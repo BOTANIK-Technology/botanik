@@ -65,8 +65,9 @@ class ScheduleController extends Controller
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
             $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
-            $this->params['services'] = $this->params['current_type']->services;
-            $this->params['current_type'] = $this->params['current_type']->id;
+
+            $this->params['services'] = !is_null($this->params['current_type']) ? $this->params['current_type']->services: [];
+            $this->params['current_type'] = !is_null($this->params['current_type']) ? $this->params['current_type']->id : 0;
         } else {
 
             $s = [];

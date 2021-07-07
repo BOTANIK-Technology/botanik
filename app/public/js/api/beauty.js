@@ -1,6 +1,4 @@
 let beautyBtn = document.querySelector('#beauty_update')
-let beautySend = document.querySelector('#beauty_sendClients')
-let beautyGet = document.querySelector('#beauty_getClients')
 
 beautyBtn.addEventListener('click', function () {
     let appId = document.querySelector('#beauty_application_id')
@@ -23,5 +21,3 @@ beautyBtn.addEventListener('click', function () {
             showErrors(xhr.response)
     }
 })
-
-requestListener([beautySend, beautyGet]);

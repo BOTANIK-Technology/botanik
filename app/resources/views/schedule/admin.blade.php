@@ -14,7 +14,7 @@
     </div>
     <div class="timetable admin grid">
 
-        @if(isset($services) && !$services->isEmpty())
+        @if(isset($services) && count($services) > 0)
         <div class="row-1 border-right-main border-bottom-main day"></div>
 
         @php $time_i = 2 @endphp
