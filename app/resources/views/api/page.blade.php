@@ -22,3 +22,7 @@
 
     @endcomponent
 @endsection
+
+@if (isset($modal))
+    @include('api.templates.' . $modal . "_res")
+@endif

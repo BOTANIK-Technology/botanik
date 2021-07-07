@@ -32,6 +32,7 @@ class Record extends Model
         'service_id',
         'address_id',
         'user_id',
+        'yclients_id',
         'transfer',
         'status',
         'time',

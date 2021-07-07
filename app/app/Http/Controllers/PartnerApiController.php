@@ -59,7 +59,6 @@ class PartnerApiController extends Controller
     /**
      * @param Request $request
      * @return array|Application|Factory|View|mixed
-     * @throws YclientsException
      */
     public function synchronize(Request $request)
     {
@@ -70,16 +69,14 @@ class PartnerApiController extends Controller
                 break;
             case 'yclients':
                 $api = new Yclients();
-                $api->synchronize();
+                $res = $api->synchronize();
+                if($res["result"] == "success") {
+                    return view('api.page', ['apis' => Api::all(), 'modal' => 'yclients', 'result' => $res]);
+                }
                 break;
         }
 
-        return view(
-            'api.page',
-            [
-                'apis' => Api::all()
-            ]
-        );
+        return view('api.page', ['apis' => Api::all()]);
     }
 
 }

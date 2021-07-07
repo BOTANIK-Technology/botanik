@@ -20,6 +20,16 @@ class Catalog extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'yclients_id',
+        'title',
+        'text',
+        'img',
+        'price',
+        'count',
+        'article',
+    ];
+
     protected $guarded = ['id'];
 
     /**

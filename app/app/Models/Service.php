@@ -39,6 +39,17 @@ class Service extends Model
 {
     use HasFactory, RelationHelper;
 
+    /** @var array $fillable  */
+    protected $fillable = [
+        'yclients_id',
+        'type_service_id',
+        'name',
+        'price',
+        'cash_pay',
+        'bonus_pay',
+        'online_pay'
+    ];
+
     protected $guarded = ['id'];
 
     /**
@@ -201,6 +212,17 @@ class Service extends Model
         if (empty($addr))
             return __('Услуга').' "'.$this->name.'" '.__('не привязана к выбранному адресу.');
         return true;
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function getByYClientsId($id)
+    {
+        return self::query()
+            ->where('yclients_id', '=', $id)
+            ->first();
     }
 
 }

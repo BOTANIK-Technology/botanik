@@ -2,6 +2,8 @@
 
 namespace App\Services\Telegram;
 
+use App\Helpers\Yclients\Yclients;
+use App\Helpers\Yclients\YclientsException;
 use App\Jobs\SendNotice;
 use App\Jobs\TelegramFeedBack;
 use App\Jobs\TelegramNotice;
@@ -344,6 +346,15 @@ class TelegramAPI
             'status' => $status
         ]);
 
+        try {
+            $yclients = new Yclients();
+            $yclients->synchronize();
+            Log::debug("Успешная сихронизация при добавлении записи на услугу");
+        } catch (YclientsException $ex) {
+            // Ошибка сихронизации
+            Log::debug("Ошибка сихронизации при добавлении записи на услугу: " . $ex->getMessage());
+        }
+
         Payment::create([
             'online_pay' => $online_pay,
             'money' => $price,
@@ -369,6 +380,7 @@ class TelegramAPI
             if($bonus == 0 && $service->bonus)
                 $this->user->bonus += $service->bonus;
             $this->user->save();
+
             $this->createRecordNotice($service->name, $record->id);
             $this->groupMessage($service);
         }

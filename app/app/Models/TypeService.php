@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,7 +30,8 @@ class TypeService extends Model
      * @var array
      */
     protected $fillable = [
-        'type'
+        'type',
+        'yclients_id',
     ];
 
     /**
@@ -46,5 +48,16 @@ class TypeService extends Model
     public function feedBacks()
     {
         return $this->hasMany(FeedBack::class);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function getByYClientsId($id)
+    {
+        return self::query()
+            ->where('yclients_id', '=', $id)
+            ->first();
     }
 }

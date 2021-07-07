@@ -2,6 +2,13 @@
 
 namespace App\Helpers\Yclients;
 
+use App\Models\Catalog;
+use App\Models\Record;
+use App\Models\Service;
+use App\Models\TelegramUser;
+use App\Models\TypeService;
+use App\Models\User;
+use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -141,12 +148,8 @@ class YclientsApi
      */
     public function getClients(): array
     {
-        $params = [
-            'company_id' => $this->getCompanyID(),
-        ];
-
         return $this->request("clients/" . $this->getCompanyID(),
-            $params,
+            [],
             self::METHOD_GET,
             $this->getUserToken()
         );
@@ -160,12 +163,8 @@ class YclientsApi
      */
     public function getStaff(): array
     {
-        $params = [
-            'company_id' => $this->getCompanyID(),
-        ];
-
         return $this->request("company/" . $this->getCompanyID() . '/staff',
-            $params,
+            [],
             self::METHOD_GET,
             $this->getUserToken()
         );
@@ -179,12 +178,8 @@ class YclientsApi
      */
     public function getServicesTypes(): array
     {
-        $params = [
-            'company_id' => $this->getCompanyID(),
-        ];
-
         return $this->request("service_categories/" . $this->getCompanyID(),
-            $params,
+            [],
             self::METHOD_GET,
             $this->getUserToken()
         );
@@ -198,16 +193,306 @@ class YclientsApi
      */
     public function getServices(): array
     {
-        $params = [
-            'company_id' => $this->getCompanyID(),
-        ];
-
         return $this->request("services/" . $this->getCompanyID(),
-            $params,
+            [],
             self::METHOD_GET,
             $this->getUserToken()
         );
     }
+
+    /**
+     * Получить список записей
+     *
+     * @return array
+     * @throws YclientsException
+     */
+    public function getRecords(): array
+    {
+        return $this->request("records/" . $this->getCompanyID(),
+            [],
+            self::METHOD_GET,
+            $this->getUserToken()
+        );
+    }
+
+    /**
+     * Получить список категорий товаров
+     *
+     * @return array
+     * @throws YclientsException
+     */
+    public function getCategories(): array
+    {
+        return $this->request("goods_categories/" . $this->getCompanyID(),
+            [],
+            self::METHOD_GET,
+            $this->getUserToken()
+        );
+    }
+
+    /**
+     * Получить список товаров
+     *
+     * @return array
+     * @throws YclientsException
+     */
+    public function getProducts(): array
+    {
+        return $this->request("goods/" . $this->getCompanyID(),
+            [],
+            self::METHOD_GET,
+            $this->getUserToken()
+        );
+    }
+
+    /**
+     * @param array $clients
+     * @return array
+     * @throws YclientsException
+     */
+    public function addClients(array $clients): array
+    {
+        foreach ($clients as $client) {
+            $res = $this->request("clients/" . $this->getCompanyID(),
+                [
+                    'name' => $client['first_name'],
+                    'phone' => $client['phone'],
+                    'email' => empty($client['email']) ?? null,
+                    'sex_id' => $client['sex'],
+                ],
+                self::METHOD_POST,
+                $this->getUserToken()
+            );
+
+            if($res["success"] == true) {
+                $id = $res["data"]["id"];
+                TelegramUser::query()
+                    ->where('id', $client['id'])
+                    ->update(['yclients_id' => $id]);
+            }
+        }
+
+        return $clients;
+    }
+
+    /**
+     * @param array $staffs
+     * @return array
+     * @throws YclientsException
+     */
+    public function addStaff(array $staffs): array
+    {
+        foreach ($staffs as $staff) {
+            $res = $this->request("staff/" . $this->getCompanyID(),
+                [
+                    'name' => $staff['name'],
+                    'specialization' => "Не указана",
+                ],
+                self::METHOD_POST,
+                $this->getUserToken()
+            );
+
+            if($res["success"] == true) {
+                $id = $res["data"]["id"];
+                User::query()
+                    ->where('id', $staff['id'])
+                    ->update(['yclients_id' => $id]);
+            }
+        }
+
+        return $staffs;
+    }
+
+    /**
+     * @param array $types
+     * @return array
+     * @throws YclientsException
+     */
+    public function addTypes(array $types): array
+    {
+        foreach ($types as $type) {
+            $res = $this->request("service_categories/" . $this->getCompanyID(),
+                [
+                    'title' => $type['type'],
+                ],
+                self::METHOD_POST,
+                $this->getUserToken()
+            );
+
+            if($res["success"] == true) {
+                $id = $res["data"]["id"];
+                TypeService::query()
+                    ->where('id', $type['id'])
+                    ->update(['yclients_id' => $id]);
+            }
+        }
+
+        return $types;
+    }
+
+    /**
+     * @param array $services
+     * @return array
+     * @throws YclientsException
+     */
+    public function addServices(array $services): array
+    {
+        foreach ($services as $service) {
+
+            $yclients_type = TypeService::query()->
+                where('id', $service['type_service_id'])->
+                get('yclients_id')->
+                first()->
+                toArray();
+
+            $res = $this->request("services/" . $this->getCompanyID(),
+                [
+                    'title' => $service['name'],
+                    'category_id' => $yclients_type['yclients_id'],
+                    'price_min' => $service['price'],
+                ],
+                self::METHOD_POST,
+                $this->getUserToken()
+            );
+
+            if($res["success"] == true) {
+                $id = $res["data"]["id"];
+                Service::query()
+                    ->where('id', $service['id'])
+                    ->update(['yclients_id' => $id]);
+            } else {
+                Log::debug("Add service: ", $res);
+            }
+        }
+
+        return $services;
+    }
+
+    /**
+     * @param array $records
+     * @return array
+     * @throws YclientsException
+     */
+    public function addRecords(array $records): array
+    {
+        foreach ($records as $record) {
+
+            $yclients_staff = User::query()->
+                where('id', $record['user_id'])->
+                get('yclients_id')->
+                first()->
+                toArray();
+
+            $yclients_services = Service::query()->
+                where('id', $record['service_id'])->
+                get()->
+                toArray();
+
+
+            $staff_id = $yclients_staff['yclients_id'];
+
+            $services = [];
+            foreach ($yclients_services as $service) {
+                $services[] = [
+                    "id" => $service["yclients_id"],
+                    "first_cost" => $service["price"],
+                    "cost" => $service["price"],
+                ];
+            }
+
+            $telegram_user = TelegramUser::query()->
+                where('id', $record['telegram_user_id'])
+                ->get()
+                ->first()
+                ->toArray();
+
+            $client = [
+                'phone' => $telegram_user['phone'],
+                'name'  => $telegram_user['first_name'],
+                'email' => $telegram_user['email']
+            ];
+
+            $datetime = Carbon::parse($record['date'] . $record['time'])->format('Y-m-d H:i');
+
+            $schedule = $this->request("schedule/" . $this->getCompanyID() ."/" . $staff_id . "/",
+                [
+                    'date'      => Carbon::parse($record['date'])->format('Y-m-d'),
+                    'is_working' => true,
+                ],
+                self::METHOD_PUT,
+                $this->getUserToken()
+            );
+
+            if(["success"] === false) {
+                Log::debug("Ошибка YClients (addSchedule): ", $schedule);
+            }
+
+            $res = $this->request("records/" . $this->getCompanyID(),
+                [
+                    'staff_id'      => $staff_id,
+                    'services'      => $services,
+                    'client'        => $client,
+                    'datetime'      => $datetime,
+                    'seance_length' => 3600,
+                    'save_if_busy'  => true,
+                    'send_sms'      => false,
+                ],
+                self::METHOD_POST,
+                $this->getUserToken()
+            );
+
+
+            if($res["success"] === true) {
+                $id = $res["data"]["id"];
+                Record::query()
+                    ->where('id', $record['id'])
+                    ->update(['yclients_id' => $id]);
+            } else {
+                Log::debug("Ошибка YClients (addRecord): ", $res["meta"]);
+            }
+        }
+
+        return $records;
+    }
+
+    /**
+     * @param array $products
+     * @return array
+     * @throws YclientsException
+     */
+    public function addProducts(array $products): array
+    {
+        // For now this method not allowed
+        return $products;
+
+        foreach ($products as $product) {
+            $res = $this->request("goods/" . $this->getCompanyID(),
+                [
+                    "title" => $product["title"],
+                    "value" => $product["title"],
+                    "label" => $product["text"],
+                    "article" => $product["article"],
+                    "category" => "",
+                    "category_id" => 0,
+                    "cost" => $product["price"],
+                ],
+                self::METHOD_POST,
+                $this->getUserToken()
+            );
+
+            if($res["success"] == true) {
+                $id = $res["data"]["id"];
+                Catalog::query()
+                    ->where('id', $product['id'])
+                    ->update(['yclients_id' => $id]);
+            } else {
+                Log::debug("Error upload product: ", $res);
+            }
+        }
+
+        return $products;
+    }
+
 
 
     /**

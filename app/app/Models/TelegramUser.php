@@ -38,6 +38,7 @@ class TelegramUser extends Model
      */
     protected $fillable = [
         'chat_id',
+        'yclients_id',
         'first_name',
         'middle_name',
         'last_name',
@@ -193,5 +194,16 @@ class TelegramUser extends Model
         $fio .= $this->first_name;
         is_null($this->middle_name) ?: $fio .= ' '.$this->middle_name;
         return $fio;
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function getByYClientsId($id)
+    {
+        return self::query()
+            ->where('yclients_id', '=', $id)
+            ->first();
     }
 }

@@ -77,7 +77,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'phone', 'password', 'created_by', 'updated_by', 'status',
+        'yclients_id', 'name', 'email', 'phone', 'password', 'created_by', 'updated_by', 'status',
     ];
 
     /**
@@ -292,5 +292,16 @@ class User extends Authenticatable
         if ($rewrite)
             $this->$relation()->detach($this->getIds($relation));
         $this->$relation()->attach($array);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function getByYClientsId($id)
+    {
+        return self::query()
+            ->where('yclients_id', '=', $id)
+            ->first();
     }
 }
