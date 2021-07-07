@@ -396,7 +396,7 @@ class Yclients
             ->toArray();
 
         foreach ($ext_products as $ext_product) {
-            $count = Record::query()
+            $count = Catalog::query()
                 ->where('yclients_id', $ext_product['good_id'])
                 ->count();
             if($count > 0) {
