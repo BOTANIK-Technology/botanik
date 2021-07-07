@@ -56,25 +56,12 @@
                 </div>
                 <div class="line"></div>
 
-                <p class="data"><b>{{__('Синхронизация каталогов')}}</b></p>
-                <div class="grid">
-                    <span class="label">{{__('Импортировано')}}</span>
-                    <span class="data"><b>{{count($result['categories']['create'])}}</b></span>
-                    <span class="label">{{__('Обновлено')}}</span>
-                    <span class="data"><b>{{count($result['categories']['update'])}}</b></span>
-                    <span class="label">{{__('Выгружено в YClients')}}</span>
-                    <span class="data"><b>{{count($result['categories']['upload'])}}</b></span>
-                </div>
-                <div class="line"></div>
-
                 <p class="data"><b>{{__('Синхронизация товаров')}}</b></p>
                 <div class="grid">
                     <span class="label">{{__('Импортировано')}}</span>
                     <span class="data"><b>{{count($result['products']['create'])}}</b></span>
                     <span class="label">{{__('Обновлено')}}</span>
                     <span class="data"><b>{{count($result['products']['update'])}}</b></span>
-                    <span class="label">{{__('Выгружено в YClients')}}</span>
-                    <span class="data"><b>{{count($result['products']['upload'])}}</b></span>
                 </div>
                 <div class="line"></div>
             @endif

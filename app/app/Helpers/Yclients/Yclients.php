@@ -13,8 +13,10 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Hashing\HashManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class Yclients
@@ -461,10 +463,14 @@ class Yclients
     {
         // Insert
         foreach ($action['create'] as $client) {
+
+            $pass = $this->generatePass();
+
             $staff_entity = new User([
                 'yclients_id'   => $client["id"],
                 'name'          => $client['name'],
-                'status'        => 1
+                'status'        => 1,
+                'password'      => Hash::make($pass)
             ]);
             $staff_entity->save();
         }
@@ -656,6 +662,24 @@ class Yclients
         // Upload
         if(count($action["upload"]) > 0)
             $res = $this->api->addProducts($action["upload"]);
+    }
+
+    /**
+     * @return string
+     */
+    private function generatePass(): string
+    {
+        $chars = 'abcdefghiklmnopqrstvwxyz';
+        $length = 6;
+        $numChars = strlen($chars);
+        $str = '';
+        for ($i = 0; $i < $length; $i++) {
+            $str .= substr($chars, rand(1, $numChars) - 1, 1);
+        }
+        $array_mix = preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
+        srand((float)microtime() * 1000000);
+        shuffle($array_mix);
+        return implode("", $array_mix);
     }
 
 }
