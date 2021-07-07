@@ -14,7 +14,7 @@ class AddYclientsToCatalogs extends Migration
     public function up()
     {
         Schema::table('catalogs', function (Blueprint $table) {
-            $table->bigInteger('yclients_id');
+            $table->bigInteger('yclients_id')->nullable();
         });
     }
 

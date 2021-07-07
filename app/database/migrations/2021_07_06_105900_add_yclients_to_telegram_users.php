@@ -14,7 +14,7 @@ class AddYclientsToTelegramUsers extends Migration
     public function up()
     {
         Schema::table('telegram_users', function (Blueprint $table) {
-            $table->bigInteger('yclients_id');
+            $table->bigInteger('yclients_id')->nullable();
         });
     }
 

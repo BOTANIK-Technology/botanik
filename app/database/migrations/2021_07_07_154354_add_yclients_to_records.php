@@ -14,7 +14,7 @@ class AddYclientsToRecords extends Migration
     public function up()
     {
         Schema::table('records', function (Blueprint $table) {
-            $table->bigInteger('yclients_id');
+            $table->bigInteger('yclients_id')->nullable();
         });
     }
 
