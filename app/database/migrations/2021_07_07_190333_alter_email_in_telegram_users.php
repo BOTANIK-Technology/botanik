@@ -15,6 +15,7 @@ class AlterEmailInTelegramUsers extends Migration
     {
         Schema::table('telegram_users', function (Blueprint $table) {
             $table->string('email')->nullable()->change();
+            $table->dropUnique(['email']);
         });
     }
 
