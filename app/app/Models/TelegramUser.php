@@ -39,6 +39,7 @@ class TelegramUser extends Model
     protected $fillable = [
         'chat_id',
         'yclients_id',
+        'beauty_id',
         'first_name',
         'middle_name',
         'last_name',

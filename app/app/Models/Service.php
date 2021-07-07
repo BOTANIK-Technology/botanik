@@ -42,6 +42,7 @@ class Service extends Model
     /** @var array $fillable  */
     protected $fillable = [
         'yclients_id',
+        'beauty_id',
         'type_service_id',
         'name',
         'price',

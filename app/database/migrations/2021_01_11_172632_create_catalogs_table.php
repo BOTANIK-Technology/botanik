@@ -15,7 +15,8 @@ class CreateCatalogsTable extends Migration
     {
         Schema::create('catalogs', function (Blueprint $table) {
             $table->id();
-
+            $table->bigInteger('yclients_id')->nullable();
+            $table->bigInteger('beauty_id')->nullable();
             $table->string('title');
             $table->text('text');
             $table->text('img')->nullable();

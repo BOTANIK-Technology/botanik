@@ -22,6 +22,7 @@ class Catalog extends Model
 
     protected $fillable = [
         'yclients_id',
+        'beauty_id',
         'title',
         'text',
         'img',

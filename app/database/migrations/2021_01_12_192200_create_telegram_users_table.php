@@ -16,11 +16,13 @@ class CreateTelegramUsersTable extends Migration
         Schema::create('telegram_users', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('chat_id')->nullable();
+            $table->bigInteger('yclients_id')->nullable();
+            $table->bigInteger('beauty_id')->nullable();
             $table->string('first_name');
             $table->string('last_name')->nullable();
             $table->string('middle_name')->nullable();
             $table->string('username', 32)->nullable();
-            $table->string('email')->unique()->nullable();
+            $table->string('email')->nullable();
             $table->string('phone', 50);
             $table->integer('age')->nullable();
             $table->boolean('sex')->nullable();

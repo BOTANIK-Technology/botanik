@@ -32,6 +32,7 @@ class TypeService extends Model
     protected $fillable = [
         'type',
         'yclients_id',
+        'beauty_id',
     ];
 
     /**
