@@ -209,7 +209,9 @@ class YclientsApi
     public function getRecords(): array
     {
         return $this->request("records/" . $this->getCompanyID(),
-            [],
+            [
+                "start_date" => Carbon::now()->format("Y-m-d")
+            ],
             self::METHOD_GET,
             $this->getUserToken()
         );

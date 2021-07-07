@@ -350,6 +350,7 @@ class Yclients
         $update = [];
         $upload = Record::query()
             ->whereNull('yclients_id')
+            ->where('created_at', '>', Carbon::now()->format('Y-m-d 00:00'))
             ->get()
             ->toArray();
 
