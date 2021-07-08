@@ -275,9 +275,9 @@ class TelegramAPI
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getMasterID (): int
+    public function getMasterID (): ?int
     {
         return $this->user->telegramSession->master;
     }
@@ -325,6 +325,7 @@ class TelegramAPI
      * @param bool $online_pay
      * @param int $bonus
      * @return Record|Model|bool
+     * @throws YclientsException
      */
     protected function createRecord ($status = true, $online_pay = false, $bonus = 0)
     {
@@ -346,14 +347,8 @@ class TelegramAPI
             'status' => $status
         ]);
 
-        try {
-            $yclients = new Yclients();
-            $yclients->synchronize();
-            Log::debug("Успешная сихронизация при добавлении записи на услугу");
-        } catch (YclientsException $ex) {
-            // Ошибка сихронизации
-            Log::debug("Ошибка сихронизации при добавлении записи на услугу: " . $ex->getMessage());
-        }
+        $yclients = new Yclients();
+        $yclients->api->addRecords([$record]);
 
         Payment::create([
             'online_pay' => $online_pay,
@@ -379,7 +374,7 @@ class TelegramAPI
             }
             if($bonus == 0 && $service->bonus)
                 $this->user->bonus += $service->bonus;
-            $this->user->save();
+            //$this->user->save();
 
             $this->createRecordNotice($service->name, $record->id);
             $this->groupMessage($service);

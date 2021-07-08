@@ -13,11 +13,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Hashing\HashManager;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class Yclients
 {
@@ -109,11 +106,10 @@ class Yclients
     private function clientsSync(): array
     {
         $clients = $this->api->getClients();
-        if($clients["success"] === true && count($clients["data"]) > 0) {
+        if($clients["success"] === true) {
             $ext_clients = (array)$clients["data"];
             $actions = $this->compareClients($ext_clients);
-            $this->doClients($actions);
-            return $actions;
+            return $this->doClients($actions);
         }
         return [];
     }
@@ -125,12 +121,10 @@ class Yclients
     private function staffSync(): array
     {
         $staff = $this->api->getStaff();
-        if($staff["success"] === true && count($staff["data"]) > 0) {
+        if($staff["success"] === true) {
             $ext_staff = (array)$staff["data"];
             $actions = $this->compareStaff($ext_staff);
-
-            $this->doStaff($actions);
-            return $actions;
+            return $this->doStaff($actions);
         }
         return [];
     }
@@ -142,11 +136,10 @@ class Yclients
     private function servicesTypesSync(): array
     {
         $services = $this->api->getServicesTypes();
-        if($services["success"] === true && count($services["data"]) > 0) {
+        if($services["success"] === true) {
             $ext_types = (array)$services["data"];
             $actions = $this->compareTypesServices($ext_types);
-            $this->doTypes($actions);
-            return $actions;
+            return $this->doTypes($actions);
         }
         return [];
     }
@@ -158,11 +151,10 @@ class Yclients
     private function servicesSync(): array
     {
         $services = $this->api->getServices();
-        if($services["success"] === true && count($services["data"]) > 0) {
+        if($services["success"] === true) {
             $ext_services = (array)$services["data"];
             $actions = $this->compareServices($ext_services);
-            $this->doServices($actions);
-            return $actions;
+            return $this->doServices($actions);
         }
         return [];
     }
@@ -174,11 +166,10 @@ class Yclients
     private function recordsSync(): array
     {
         $records = $this->api->getRecords();
-        if($records["success"] === true && count($records["data"]) > 0) {
+        if($records["success"] === true) {
             $ext_records = $records["data"];
             $actions = $this->compareRecords($ext_records);
-            $this->doRecords($actions);
-            return $actions;
+            return $this->doRecords($actions);
         }
         return [];
     }
@@ -190,9 +181,11 @@ class Yclients
     private function categoriesSync(): array
     {
         $categories = $this->api->getCategories();
-        if($categories["success"] === true && count($categories["data"]) > 0) {
+        if($categories["success"] === true) {
             $ext_categories = $categories["data"];
             $actions = $this->compareCategories($ext_categories);
+
+            // Not supported
             $this->doCategories($actions);
             return $actions;
         }
@@ -206,11 +199,10 @@ class Yclients
     private function productsSync(): array
     {
         $products = $this->api->getProducts();
-        if($products["success"] === true && count($products["data"]) > 0) {
+        if($products["success"] === true) {
             $ext_products = $products["data"];
             $actions = $this->compareProducts($ext_products);
-            $this->doProducts($actions);
-            return $actions;
+            return $this->doProducts($actions);
         }
         return [];
     }
@@ -247,7 +239,7 @@ class Yclients
     }
 
     /**
-     * @param array $ext_staff
+     * @param array $ext_staffs
      * @return array
      */
     private function compareStaff(array $ext_staffs): array
@@ -418,11 +410,13 @@ class Yclients
 
     /**
      * @param array $action
+     * @return array
      * @throws YclientsException
      */
-    private function doClients(array $action): void
+    private function doClients(array $action): array
     {
         // Insert
+        $create = [];
         foreach ($action['create'] as $client) {
             $client_entity = new TelegramUser([
                 'yclients_id'   => $client["id"],
@@ -434,9 +428,11 @@ class Yclients
                 'status'        => 1
             ]);
             $client_entity->save();
+            $create[] = $client_entity;
         }
 
         // Update
+        $update = [];
         foreach ($action['update'] as $client) {
             $fields = [
                 'first_name'    => $client['name'],
@@ -448,21 +444,31 @@ class Yclients
             TelegramUser::query()
                 ->where('yclients_id', $client['id'])
                 ->update($fields);
+            $update[] = $client;
         }
 
         // Upload
-        if(count($action["upload"]) > 0)
-            $this->api->addClients($action["upload"]);
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addClients($action["upload"]);
+        }
 
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
     }
 
     /**
      * @param array $action
+     * @return array
      * @throws YclientsException
      */
-    private function doStaff(array $action): void
+    private function doStaff(array $action): array
     {
         // Insert
+        $create = [];
         foreach ($action['create'] as $client) {
 
             $pass = $this->generatePass();
@@ -474,71 +480,99 @@ class Yclients
                 'password'      => Hash::make($pass)
             ]);
             $staff_entity->save();
+            $create[] = $client;
         }
 
         // Update
+        $update = [];
         foreach ($action['update'] as $client) {
             User::query()
                 ->where('yclients_id', $client['id'])
                 ->update([
                     'name'    => $client['name'],
                 ]);
+            $update[] = $client;
         }
 
         // Upload
-        if(count($action["upload"]) > 0)
-            $this->api->addStaff($action["upload"]);
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addStaff($action["upload"]);
+        }
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
+
     }
 
     /**
      * @param array $action
+     * @return array
      * @throws YclientsException
      */
-    private function doTypes(array $action): void
+    private function doTypes(array $action): array
     {
         // Insert
+        $create = [];
         foreach ($action['create'] as $type) {
             $type_entity = new TypeService([
                 'yclients_id'   => $type["id"],
                 'type'          => $type['title']
             ]);
             $type_entity->save();
+            $create[] = $type;
         }
 
         // Update
+        $update = [];
         foreach ($action['update'] as $type) {
             TypeService::query()
                 ->where('yclients_id', $type['id'])
                 ->update([
                     'type'    => $type['title'],
                 ]);
+            $update[] = $type;
         }
 
         // Upload
-        if(count($action["upload"]) > 0)
-            $this->api->addTypes($action["upload"]);
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addTypes($action["upload"]);
+        }
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
     }
 
     /**
      * @param array $action
+     * @return array
      * @throws YclientsException
      */
-    private function doServices(array $action): void
+    private function doServices(array $action): array
     {
         // Insert
+        $create = [];
         foreach ($action['create'] as $service) {
 
             $type = TypeService::getByYClientsId($service['category_id']);
             $service_entity = new Service([
                 'yclients_id'       => $service["id"],
                 'type_service_id'   => $type->id,
-                'name'              => $service['title'],
+                'name'              => $service['title'] . " (импорт yclients)",
                 'price'             => $service['price_min'],
                 'cash_pay'          => 1,
                 'bonus_pay'         => 1,
                 'online_pay'        => 1
             ]);
             $service_entity->save();
+            $create[] = $service;
 
             if(isset($service["staff"]) && count($service["staff"]) > 0) {
                 foreach ($service["staff"] as $staff) {
@@ -553,6 +587,7 @@ class Yclients
         }
 
         // Update
+        $update = [];
         foreach ($action['update'] as $service) {
             Service::query()
                 ->where('yclients_id', $service['id'])
@@ -560,20 +595,32 @@ class Yclients
                     'name'          => $service['title'],
                     'price'         => $service['price_min'],
                 ]);
+            $update[] = $service;
         }
 
         // Upload
-        if(count($action["upload"]) > 0)
-            $this->api->addServices($action["upload"]);
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addServices($action["upload"]);
+        }
+
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
     }
 
     /**
      * @param array $action
+     * @return array
      * @throws YclientsException
      */
-    private function doRecords(array $action): void
+    private function doRecords(array $action): array
     {
         // Insert
+        $create = [];
         foreach ($action['create'] as $record) {
 
             if(!isset($record["services"]) || count($record["services"]) == 0) {
@@ -584,25 +631,33 @@ class Yclients
             $service = Service::getByYClientsId($record["services"][0]['id']);
             $staff = User::getByYClientsId($record["staff"]["id"]);
 
-            $address = new Address([
-                "address" => "Адрес услуги " . $record["services"][0]["title"] . " (порт из YClients)"
-            ]);
-            $address->save();
+            if(!is_null($telegram_user) && !is_null($service) && !is_null($staff)) {
+                $address_text = "Адрес услуги " . $record["services"][0]["title"] . " (импортпорт из YClients)";
+                $address = Address::query()->where('address', $address_text)->first();
+                if(is_null($address)) {
+                    $address = new Address([
+                        "address" => $address_text
+                    ]);
+                    $address->save();
+                }
 
-            $record_entity = new Record([
-                'yclients_id'      => $record["id"],
-                'telegram_user_id' => $telegram_user->id,
-                'service_id'       => $service->id,
-                'address_id'       => $address->id,
-                'user_id'          => $staff->id,
-                'status'           => $record["confirmed"],
-                'date'             => Carbon::parse($record['date'])->format('Y-m-d'),
-                'time'             => Carbon::parse($record['date'])->format('H:i'),
-            ]);
-            $record_entity->save();
+                $record_entity = new Record([
+                    'yclients_id'      => $record["id"],
+                    'telegram_user_id' => $telegram_user->id,
+                    'service_id'       => $service->id,
+                    'address_id'       => $address->id,
+                    'user_id'          => $staff->id,
+                    'status'           => $record["confirmed"],
+                    'date'             => Carbon::parse($record['date'])->format('Y-m-d'),
+                    'time'             => Carbon::parse($record['date'])->format('H:i'),
+                ]);
+                $record_entity->save();
+                $create[] = $record;
+            }
         }
 
         // Update
+        $update = [];
         foreach ($action['update'] as $record) {
             Record::query()
                 ->where('yclients_id', $record['id'])
@@ -611,11 +666,21 @@ class Yclients
                     'date'   => Carbon::parse($record['date'])->format('Y-m-d'),
                     'time'   => Carbon::parse($record['date'])->format('H:i'),
                 ]);
+            $update[] = $record;
         }
 
         // Upload
-        if(count($action["upload"]) > 0)
-            $this->api->addRecords($action["upload"]);
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addRecords($action["upload"]);
+        }
+
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
     }
 
     /**
@@ -628,11 +693,13 @@ class Yclients
 
     /**
      * @param array $action
+     * @return array
      * @throws YclientsException
      */
-    private function doProducts(array $action): void
+    private function doProducts(array $action): array
     {
         // Insert
+        $create = [];
         foreach ($action['create'] as $product) {
             $product_entity = new Catalog([
                 'yclients_id'   => $product["good_id"],
@@ -644,9 +711,11 @@ class Yclients
                 'article'       => $product["article"],
             ]);
             $product_entity->save();
+            $create[] = $product;
         }
 
         // Update
+        $update = [];
         foreach ($action['update'] as $product) {
             Catalog::query()
                 ->where('yclients_id', $product['good_id'])
@@ -658,11 +727,20 @@ class Yclients
                     'count'         => 0,
                     'article'       => $product["article"],
                 ]);
+            $update[] = $product;
         }
 
         // Upload
-        if(count($action["upload"]) > 0)
-            $res = $this->api->addProducts($action["upload"]);
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addProducts($action["upload"]);
+        }
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
     }
 
     /**

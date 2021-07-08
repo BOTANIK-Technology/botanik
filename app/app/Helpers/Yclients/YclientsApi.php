@@ -254,6 +254,7 @@ class YclientsApi
      */
     public function addClients(array $clients): array
     {
+        $success = [];
         foreach ($clients as $client) {
             $res = $this->request("clients/" . $this->getCompanyID(),
                 [
@@ -271,10 +272,11 @@ class YclientsApi
                 TelegramUser::query()
                     ->where('id', $client['id'])
                     ->update(['yclients_id' => $id]);
+                $success[] = $client;
             }
         }
 
-        return $clients;
+        return $success;
     }
 
     /**
@@ -284,6 +286,7 @@ class YclientsApi
      */
     public function addStaff(array $staffs): array
     {
+        $success = [];
         foreach ($staffs as $staff) {
             $res = $this->request("staff/" . $this->getCompanyID(),
                 [
@@ -299,10 +302,11 @@ class YclientsApi
                 User::query()
                     ->where('id', $staff['id'])
                     ->update(['yclients_id' => $id]);
+                $success[] = $staff;
             }
         }
 
-        return $staffs;
+        return $success;
     }
 
     /**
@@ -312,6 +316,7 @@ class YclientsApi
      */
     public function addTypes(array $types): array
     {
+        $success = [];
         foreach ($types as $type) {
             $res = $this->request("service_categories/" . $this->getCompanyID(),
                 [
@@ -326,10 +331,11 @@ class YclientsApi
                 TypeService::query()
                     ->where('id', $type['id'])
                     ->update(['yclients_id' => $id]);
+                $success[] = $type;
             }
         }
 
-        return $types;
+        return $success;
     }
 
     /**
@@ -339,6 +345,7 @@ class YclientsApi
      */
     public function addServices(array $services): array
     {
+        $success = [];
         foreach ($services as $service) {
 
             $yclients_type = TypeService::query()->
@@ -362,12 +369,13 @@ class YclientsApi
                 Service::query()
                     ->where('id', $service['id'])
                     ->update(['yclients_id' => $id]);
+                $success[] = $service;
             } else {
                 Log::debug("Add service: ", $res);
             }
         }
 
-        return $services;
+        return $success;
     }
 
     /**
@@ -377,7 +385,10 @@ class YclientsApi
      */
     public function addRecords(array $records): array
     {
+        $success = [];
         foreach ($records as $record) {
+
+            if(is_null($record['user_id'])) continue;
 
             $yclients_staff = User::query()->
                 where('id', $record['user_id'])->
@@ -449,12 +460,13 @@ class YclientsApi
                 Record::query()
                     ->where('id', $record['id'])
                     ->update(['yclients_id' => $id]);
+                $success[] = $record;
             } else {
                 Log::debug("Ошибка YClients (addRecord): ", $res["meta"]);
             }
         }
 
-        return $records;
+        return $success;
     }
 
     /**

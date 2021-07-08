@@ -74,7 +74,7 @@ class ServiceController extends Controller
      */
     public function window (Request $request)
     {
-        $id = $request->id;
+        $id = $request->id ?? $request->service_id;
         $business = $request->business;
         $modal = $request->modal;
 
@@ -97,10 +97,10 @@ class ServiceController extends Controller
             case 'timetable':
                 $this->params['times'] = ServiceTimetable::getHours();
                 $this->params['days'] = ServiceTimetable::getDays();
-                $this->params['service_id'] = $id;
-                if (!is_null($this->params['service_id'])) {
-                    $this->params['type_id'] = Service::find($id)->type_service_id;
-                    $this->setTimetableCookies(Service::find($id), $business, true);
+                $this->params['service_id'] = $request->service_id;
+                if (!is_null($request->service_id)) {
+                    $this->params['type_id'] = Service::find($request->service_id)->type_service_id;
+                    $this->setTimetableCookies(Service::find($request->service_id), $business, true);
                 }
 
                 break;
@@ -143,8 +143,10 @@ class ServiceController extends Controller
         switch ($checked) {
             case false:
                 setcookie('timetable-'.$view_service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+                break;
             case true:
                 setcookie('checked-'.$view_service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+                break;
         }
     }
 

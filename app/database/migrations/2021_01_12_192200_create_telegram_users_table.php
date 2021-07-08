@@ -34,8 +34,8 @@ class CreateTelegramUsersTable extends Migration
 
             $table->unsignedBigInteger('last_service')->nullable();
             $table->unsignedBigInteger('favorite_service')->nullable();
-            $table->foreign('last_service')->references('id')->on('services')->onDelete('cascade');
-            $table->foreign('favorite_service')->references('id')->on('services')->onDelete('cascade');
+//            $table->foreign('last_service')->references('id')->on('services')->onDelete('cascade');
+//            $table->foreign('favorite_service')->references('id')->on('services')->onDelete('cascade');
 
             $table->timestamps();
         });

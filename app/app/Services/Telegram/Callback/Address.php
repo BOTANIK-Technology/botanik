@@ -25,11 +25,10 @@ class Address extends CallbackQuery
         $service = \App\Models\Service::find($service_id);
         $addresses = [];
         foreach ($service->addresses as $address) {
-            $addresses[] = [['text' => $address->address, 'callback_data' => 'Master_'.$address->id]];
-//            if (empty($service->timetable))
-//                $addresses[] = [['text' => $address->address, 'callback_data' => 'Master_'.$address->id]];
-//            else
-//                $addresses[] = [['text' => $address->address, 'callback_data' => 'DatesService_'.$address->id]];
+            if (empty($service->timetable))
+                $addresses[] = [['text' => $address->address, 'callback_data' => 'Master_'.$address->id]];
+            else
+                $addresses[] = [['text' => $address->address, 'callback_data' => 'DatesService_'.$address->id]];
         }
         return parent::buildInlineKeyboard($addresses);
     }
