@@ -13,9 +13,10 @@ function closeModal(event, id = 'modal', href = false) {
         if (href !== false)
             refresh.href = href;
         refresh.click();
-    }
-    else
+    } else {
         document.getElementById(id).remove();
+    }
+
 }
 if (close_modal.length > 0) {
     Object.keys(close_modal).forEach((k) => {

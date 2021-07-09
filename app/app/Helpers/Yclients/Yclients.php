@@ -217,6 +217,7 @@ class Yclients
         $update = [];
         $upload = TelegramUser::query()
             ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
             ->get()
             ->toArray();
 
@@ -248,6 +249,7 @@ class Yclients
         $update = [];
         $upload = User::query()
             ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
             ->get()
             ->toArray();
 
@@ -280,6 +282,7 @@ class Yclients
         $update = [];
         $upload = TypeService::query()
             ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
             ->get()
             ->toArray();
 
@@ -311,6 +314,7 @@ class Yclients
         $update = [];
         $upload = Service::query()
             ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
             ->get()
             ->toArray();
 
@@ -342,6 +346,7 @@ class Yclients
         $update = [];
         $upload = Record::query()
             ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
             ->where('created_at', '>', Carbon::now()->format('Y-m-d 00:00'))
             ->get()
             ->toArray();
@@ -387,6 +392,7 @@ class Yclients
         $update = [];
         $upload = Catalog::query()
             ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
             ->get()
             ->toArray();
 

@@ -1,9 +1,7 @@
 <?php
 
-namespace App\Helpers\Beauty;
+namespace App\Helpers\Beauty\Old;
 
-use App\Models\Api;
-use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
@@ -17,18 +15,14 @@ class BeautyProApi
 
     /**
      * BeautyProApi constructor.
-     * @param array $config
+     * @param string $token
      */
-    public function __construct(array $config)
+    public function __construct(string $token = '')
     {
         $params = [
             'base_uri' => self::BASE_URI,
             'timeout'  => 2.0,
         ];
-
-        $this->guzzle = new Client($params);
-        $response = $this->getBearer($config['application_id'], $config['application_secret'], $config['database_code']);
-        $token = $response['access_token'];
 
         if (!empty($token)) {
             $this->token = $token;
@@ -36,36 +30,8 @@ class BeautyProApi
                 'Authorization' => 'Bearer ' . $token,
             ];
         }
+
         $this->guzzle = new Client($params);
-
-        if (
-            isset($config['expires_at']) &&
-            isset($config['access_token']) &&
-            Carbon::parse($config['access_token'])->greaterThan(Carbon::now())
-        )
-            return $config['access_token'];
-
-        if (
-            !isset($config['application_id']) ||
-            !isset($config['application_secret']) ||
-            !isset($config['database_code'])
-        )
-            return [
-                'errors' => [
-                    __('Заполните настройки для API интеграции.')
-                ]
-            ];
-
-        if (isset($response['status']) && ($response['status'] != 'pending' || $response['status'] != 'refused')) {
-            $model = Api::where('slug', 'beauty')->first();
-            $data = array_merge($config, [
-                'access_token' => $response['access_token'],
-                'expires_at' => $response['expires_at']
-            ]);
-
-            $model->updateConfig($data);
-        }
-
     }
 
     /**
@@ -93,14 +59,6 @@ class BeautyProApi
      */
     public function getClients(array $filed = []): array
     {
-        // We not have accvess
-
-        return [
-            "success" => true,
-            "data" => []
-        ];
-
-
         if(empty($filed)) {
             $filed = [
                 'firstname',
@@ -111,40 +69,10 @@ class BeautyProApi
                 'email'
             ];
         }
-        $params['headers'] = [
-            'Authorization' => 'Bearer ' . $this->token,
-        ];
-        $params = array_merge($params, ['fields' => $filed]);
+
+        $params = ['fields' => $filed];
 
         return $this->request('clients', $params);
-    }
-
-    /**
-     * @return array
-     */
-    public function getStaff(): array
-    {
-        return $this->request('employees?fields=name');
-    }
-
-    /**
-     * @param array $clients
-     * @return array
-     */
-    public function addClients(array $clients): array
-    {
-        // We not have access
-        return [];
-    }
-
-    /**
-     * @param array $staffs
-     * @return array
-     */
-    public function addStaff(array $staffs): array
-    {
-        // We not have access
-        return [];
     }
 
     protected function exception (GuzzleException $e): array

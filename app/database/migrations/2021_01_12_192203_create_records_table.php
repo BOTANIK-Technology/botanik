@@ -16,7 +16,7 @@ class CreateRecordsTable extends Migration
         Schema::create('records', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('yclients_id')->nullable();
-            $table->bigInteger('beauty_id')->nullable();
+            $table->string('beauty_id', 255)->nullable();
             $table->unsignedBigInteger('telegram_user_id');
             $table->unsignedBigInteger('service_id');
             $table->unsignedBigInteger('address_id');

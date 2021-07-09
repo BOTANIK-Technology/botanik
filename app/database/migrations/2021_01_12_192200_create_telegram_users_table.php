@@ -17,7 +17,7 @@ class CreateTelegramUsersTable extends Migration
             $table->id();
             $table->bigInteger('chat_id')->nullable();
             $table->bigInteger('yclients_id')->nullable();
-            $table->bigInteger('beauty_id')->nullable();
+            $table->string('beauty_id', 255)->nullable();
             $table->string('first_name');
             $table->string('last_name')->nullable();
             $table->string('middle_name')->nullable();

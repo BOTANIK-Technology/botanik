@@ -16,7 +16,7 @@ class CreateTypeServicesTable extends Migration
         Schema::create('type_services', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('yclients_id')->nullable();
-            $table->bigInteger('beauty_id')->nullable();
+            $table->string('beauty_id', 255)->nullable();
             $table->text('type');
         });
     }

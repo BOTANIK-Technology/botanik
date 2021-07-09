@@ -3,104 +3,372 @@
 namespace App\Helpers\Beauty;
 
 use App\Models\Api;
+use App\Models\TelegramUser;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class BeautyPro
 {
+
+    /** @var BeautyProApi $api */
+    public BeautyProApi $api;
+
+
     /**
-     * @param string $method
-     * @param array $params
+     * Beauty constructor.
+     */
+    function __construct()
+    {
+        $config = $this->getConfig();
+        $this->api = new BeautyProApi($config);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function synchronize(): array
+    {
+        try {
+            // Синхронизация клиентов
+            $clients = $this->clientsSync();
+
+            // Синхронизация специалистов
+            $staff = $this->staffSync();
+
+            // Синхронизация типов (категорий) услуг
+            //$services_types = $this->servicesTypesSync();
+
+            // Синхронизация услуг
+            //$services = $this->servicesSync();
+
+            // Синхронизация записей
+            //$records = $this->recordsSync();
+
+            // Синхронизация каталогов
+            //$categories = $this->categoriesSync();
+
+            // Синхронизация товаров
+            //$products = $this->productsSync();
+
+        } catch (BeautyProException $e) {
+            return [
+                "result"    => "fail",
+                "code"      => $e->getCode(),
+                "message"   => $e->getMessage(),
+            ];
+        }
+        return [
+            "result"            => "success",
+            "clients"           => $clients,
+            "staff"             => $staff,
+            "services_types"    => ['create' => 0, 'update' => 0, 'upload' => 0], //$services_types,
+            "services"          => ['create' => 0, 'update' => 0, 'upload' => 0], //$services,
+            "records"           => ['create' => 0, 'update' => 0, 'upload' => 0], //$records,
+            "categories"        => ['create' => 0, 'update' => 0, 'upload' => 0], //$categories,
+            "products"          => ['create' => 0, 'update' => 0, 'upload' => 0], //$products,
+        ];
+    }
+
+    /**
      * @return array
      */
-    public static function apiCall (string $method, $params = []): array
+    private function clientsSync(): array
     {
-        $token = self::auth();
+        $clients = $this->api->getClients();
 
-        if(is_array($token))
-            return $token;
+        if($clients["success"] === true) {
+            $ext_clients = (array)$clients["data"];
+            $actions = $this->compareClients($ext_clients);
+            return $this->doClients($actions);
+        }
+        return [];
+    }
 
-        $api = new BeautyProApi($token);
+    /**
+     * @return array
+     */
+    private function staffSync(): array
+    {
+        $ext_staff = $this->api->getStaff();
+        if(!isset($ext_staff["error"])) {
+            $actions = $this->compareStaff($ext_staff);
+            return $this->doStaff($actions);
+        }
+        return [];
+    }
 
-        if (method_exists($api,$method)) {
-            if (empty($params))
-                return $api->$method();
-            return $api->$method($params);
+    /**
+     * @return array
+     */
+    private function servicesTypesSync(): array
+    {
+        $services = $this->api->getServicesTypes();
+        if($services["success"] === true) {
+            $ext_types = (array)$services["data"];
+            $actions = $this->compareTypesServices($ext_types);
+            return $this->doTypes($actions);
+        }
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    private function servicesSync(): array
+    {
+        $services = $this->api->getServices();
+        if($services["success"] === true) {
+            $ext_services = (array)$services["data"];
+            $actions = $this->compareServices($ext_services);
+            return $this->doServices($actions);
+        }
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    private function recordsSync(): array
+    {
+        $records = $this->api->getRecords();
+        if($records["success"] === true) {
+            $ext_records = $records["data"];
+            $actions = $this->compareRecords($ext_records);
+            return $this->doRecords($actions);
+        }
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    private function categoriesSync(): array
+    {
+        $categories = $this->api->getCategories();
+        if($categories["success"] === true) {
+            $ext_categories = $categories["data"];
+            $actions = $this->compareCategories($ext_categories);
+
+            // Not supported
+            $this->doCategories($actions);
+            return $actions;
+        }
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    private function productsSync(): array
+    {
+        $products = $this->api->getProducts();
+        if($products["success"] === true) {
+            $ext_products = $products["data"];
+            $actions = $this->compareProducts($ext_products);
+            return $this->doProducts($actions);
+        }
+        return [];
+    }
+
+    /**
+     * @param array $ext_clients
+     * @return array
+     */
+    private function compareClients(array $ext_clients): array
+    {
+        $create = [];
+        $update = [];
+        $upload = TelegramUser::query()
+            ->whereNull('beauty_id')
+            ->whereNull('yclients_id')
+            ->get()
+            ->toArray();
+
+        foreach ($ext_clients as $ext_client) {
+            $count = TelegramUser::query()
+                ->where('beauty_id', $ext_client['id'])
+                ->count();
+            if($count > 0) {
+                $update[] = $ext_client;
+            } else {
+                $create[] = $ext_client;
+            }
         }
 
-        return ['errors' => ['message' => 'The method does not exist.']];
+        return [
+            "create" => $create,
+            "update" => $update,
+            "upload" => $upload
+        ];
     }
 
     /**
-     * @return array|string
+     * @param array $ext_staffs
+     * @return array
      */
-    public static function auth ()
+    private function compareStaff(array $ext_staffs): array
     {
-        $config = self::getConfig();
-        $api = new BeautyProApi();
+        $create = [];
+        $update = [];
+        $upload = User::query()
+            ->whereNull('beauty_id')
+            ->whereNull('yclients_id')
+            ->get()
+            ->toArray();
 
-        if (
-            isset($config['expires_at']) &&
-            isset($config['access_token']) &&
-            Carbon::parse($config['access_token'])->greaterThan(Carbon::now())
-        )
-            return $config['access_token'];
+        foreach ($ext_staffs as $ext_staff) {
+            $count = User::query()
+                ->where('beauty_id', $ext_staff['id'])
+                ->count();
+            if($count > 0) {
+                $update[] = $ext_staff;
+            } else {
+                $create[] = $ext_staff;
+            }
+        }
 
-        if (
-            !isset($config['application_id']) ||
-            !isset($config['application_secret']) ||
-            !isset($config['database_code'])
-        )
-            return [
-                'errors' => [
-                    __('Заполните настройки для API интеграции.')
-                ]
+        return [
+            "create" => $create,
+            "update" => $update,
+            "upload" => $upload
+        ];
+
+    }
+
+    /**
+     * @param array $action
+     * @return array
+     */
+    private function doClients(array $action): array
+    {
+        // Insert
+        $create = [];
+        foreach ($action['create'] as $client) {
+            $client_entity = new TelegramUser([
+                'beauty_id'   => $client["id"],
+                'first_name'    => $client['name'],
+                'last_name'     => '',
+                'phone'    => $client['phone'],
+                'email'    => $client['email'],
+                'middle_name'   => '',
+                'status'        => 1
+            ]);
+            $client_entity->save();
+            $create[] = $client_entity;
+        }
+
+        // Update
+        $update = [];
+        foreach ($action['update'] as $client) {
+            $fields = [
+                'first_name'    => $client['name'],
+                'phone'    => $client['phone'],
             ];
 
-        $response = $api->getBearer($config['application_id'], $config['application_secret'], $config['database_code']);
-        Log::debug("BeautyPro response:", $response);
-        if (
-            isset($response['status']) &&
-            (
-                $response['status'] == 'pending' ||
-                $response['status'] == 'refused'
-            )
-        )
-            return [
-                'errors' => [
-                    '1. Call this method with specified application_id, application_secret and database_code will create access request. (ALREADY DONE)',
-                    '2. User login into desktop or web application, go to Settings->Marketplace, select needed application and press Grant access (in marketplace only public applications and applications that asked for access are shown).',
-                    '3. Call this method once again with specified application_id, application_secret and database_code will return access token information.'
-                ]
-            ];
+            if(!empty($client['email'])) $fields["email"] = $client['email'];
 
-        $model = Api::where('slug', 'beauty')->first();
-        $data = array_merge($config, [
-            'access_token' => $response['access_token'],
-            'expires_at' => $response['expires_at']
-        ]);
+            TelegramUser::query()
+                ->where('beauty_id', $client['id'])
+                ->update($fields);
+            $update[] = $client;
+        }
 
-        $model->updateConfig($data);
+        // Upload
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addClients($action["upload"]);
+        }
 
-        return $response['access_token'];
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
+    }
+
+    /**
+     * @param array $action
+     * @return array
+    */
+    private function doStaff(array $action): array
+    {
+        // Insert
+        $create = [];
+        foreach ($action['create'] as $client) {
+
+            $pass = $this->generatePass();
+
+            $staff_entity = new User([
+                'beauty_id'   => $client["id"],
+                'name'          => $client['name'],
+                'status'        => 1,
+                'password'      => Hash::make($pass)
+            ]);
+            $staff_entity->save();
+            $create[] = $client;
+        }
+
+        // Update
+        $update = [];
+        foreach ($action['update'] as $client) {
+            User::query()
+                ->where('beauty_id', $client['id'])
+                ->update([
+                    'name'    => $client['name'],
+                ]);
+            $update[] = $client;
+        }
+
+        // Upload
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addStaff($action["upload"]);
+        }
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
+
     }
 
     /**
      * @return array
      */
-    public static function getConfig (): array
+    public function getConfig (): array
     {
-        $data = self::getData();
+        $data = $this->getData();
         return json_decode($data->config, JSON_OBJECT_AS_ARRAY);
     }
 
     /**
      * @return Api|Builder|Model|object|null
      */
-    public static function getData ()
+    public function getData ()
     {
         return Api::where('slug', 'beauty')->firstOrFail();
+    }
+
+    /**
+     * @return string
+     */
+    private function generatePass(): string
+    {
+        $chars = 'abcdefghiklmnopqrstvwxyz';
+        $length = 6;
+        $numChars = strlen($chars);
+        $str = '';
+        for ($i = 0; $i < $length; $i++) {
+            $str .= substr($chars, rand(1, $numChars) - 1, 1);
+        }
+        $array_mix = preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
+        srand((float)microtime() * 1000000);
+        shuffle($array_mix);
+        return implode("", $array_mix);
     }
 }

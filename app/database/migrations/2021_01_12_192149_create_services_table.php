@@ -16,7 +16,7 @@ class CreateServicesTable extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('yclients_id')->nullable();
-            $table->bigInteger('beauty_id')->nullable();
+            $table->string('beauty_id', 255)->nullable();
             $table->unsignedBigInteger('type_service_id');
             $table->foreign('type_service_id')->references('id')->on('type_services')->onDelete('cascade');
             $table->string('name')->default('name')->unique();

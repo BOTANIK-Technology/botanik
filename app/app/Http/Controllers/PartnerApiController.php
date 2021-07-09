@@ -65,7 +65,10 @@ class PartnerApiController extends Controller
         switch ($request->slug) {
             case 'beauty':
                 $api = new BeautyPro();
-                //$api->synchronize();
+                $res = $api->synchronize();
+                if($res["result"] == "success") {
+                    return view('api.page', ['apis' => Api::all(), 'modal' => 'beauty', 'result' => $res]);
+                }
                 break;
             case 'yclients':
                 $api = new Yclients();
