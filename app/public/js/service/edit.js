@@ -264,13 +264,13 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
      */
     Object.keys(delBtns).forEach((del) => {
         delBtns[del].addEventListener('click', function () {
-
+            let slug = document.getElementById('edit_type_slug').value;
             let send = {'id':delBtns[del].dataset.service};
 
             let Request = postRequest(CURRENT_URL+'/remove-service', send);
             Request.onload = function() {
                 if (Request.status >= 200 && Request.status < 400) {
-                    window.location.reload();
+                    window.location.href = "/" + slug + "/services";
                 } else {
                     showErrors(Request.response)
                 }

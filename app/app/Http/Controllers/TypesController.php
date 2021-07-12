@@ -24,7 +24,7 @@ class TypesController extends Controller
             'view' => 'types',
             'types' => TypeService::all(),
             'slug' => $business,
-            'type' => TypeService::find($id),
+            'w_type' => TypeService::find($id),
             'load' => $request->load ?? 5,
             'modal' => $request->modal,
             'countService' => Service::where('type_service_id', $id)->count()

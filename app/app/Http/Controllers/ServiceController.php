@@ -42,11 +42,15 @@ class ServiceController extends Controller
     public function setParams(Request $request)
     {
         $this->params['countService'] = Service::count();
+        $this->params['countTypes'] = TypeService::count();
+        $this->params['countAddresses'] = Address::count();
         $this->params['types'] = TypeService::all();
         $this->params['services'] = Service::all();
         $this->params['addresses'] = Address::all();
         $this->params['view'] = $request->get('view') ?? 'services';
         $this->params['load'] = $request->get('load') ?? 5;
+        $this->params['load_types'] = $request->get('load_types') ?? 5;
+        $this->params['load_addresses'] = $request->get('load_addresses') ?? 5;
     }
 
     /**
@@ -115,10 +119,15 @@ class ServiceController extends Controller
 
         if ($modal == 'edit' || $modal == 'view') {
             $this->params['view_service'] = Service::find($id);
-            $this->params['view_service_type'] = TypeService::find($this->params['view_service']->type_service_id);
+
+            if($this->params['view_service']) {
+                $this->params['view_service_type'] = TypeService::find($this->params['view_service']->type_service_id);
+            }
+
             if ($modal == 'edit')
                 $this->setTimetableCookies($this->params['view_service'], $business);
         }
+
         return $this->getView($request);
     }
 

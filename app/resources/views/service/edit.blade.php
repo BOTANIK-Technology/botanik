@@ -29,7 +29,7 @@
                 </select>
             </div>
         @endif
-
+        <input type="hidden" value="{{$slug}}" id="edit_type_slug">
         @if ($view_service)
             <div class="grid add-service">
 

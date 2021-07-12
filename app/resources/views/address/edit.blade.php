@@ -14,8 +14,8 @@
 
         <div class="flex direction-column edit-type">
             <input type="hidden" value="{{$slug}}" id="edit_addr_slug">
-            <input type="hidden" value="{{$address->id}}" id="edit_addr_id">
-            <div><input type="text" value="{{$address->address}}" placeholder="{{__('Адрес')}}" id="edit_addr_name"></div>
+            <input type="hidden" value="{{$w_address->id}}" id="edit_addr_id">
+            <div><input type="text" value="{{$w_address->address}}" placeholder="{{__('Адрес')}}" id="edit_addr_name"></div>
         </div>
         <div class="line"></div>
         @slot('buttons')

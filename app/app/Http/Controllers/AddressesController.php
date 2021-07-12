@@ -25,12 +25,11 @@ class AddressesController extends Controller
             'view' => 'addresses',
             'addresses' => Address::all(),
             'slug' => $business,
-            'address' => Address::find($id),
+            'w_address' => Address::find($id),
             'load' => $request->load ?? 5,
             'modal' => $request->modal,
             'countService' => ServiceAddress::where('address_id', $id)->count()
         ];
-
         return view('service.page', $params);
     }
 
