@@ -110,8 +110,9 @@ class Yclients
             $ext_clients = (array)$clients["data"];
             $actions = $this->compareClients($ext_clients);
             return $this->doClients($actions);
+        } else {
+            throw new YclientsException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -125,8 +126,9 @@ class Yclients
             $ext_staff = (array)$staff["data"];
             $actions = $this->compareStaff($ext_staff);
             return $this->doStaff($actions);
+        } else {
+            throw new YclientsException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -140,8 +142,9 @@ class Yclients
             $ext_types = (array)$services["data"];
             $actions = $this->compareTypesServices($ext_types);
             return $this->doTypes($actions);
+        } else {
+            throw new YclientsException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -155,8 +158,9 @@ class Yclients
             $ext_services = (array)$services["data"];
             $actions = $this->compareServices($ext_services);
             return $this->doServices($actions);
+        } else {
+            throw new YclientsException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -170,8 +174,9 @@ class Yclients
             $ext_records = $records["data"];
             $actions = $this->compareRecords($ext_records);
             return $this->doRecords($actions);
+        } else {
+            throw new YclientsException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -188,8 +193,9 @@ class Yclients
             // Not supported
             $this->doCategories($actions);
             return $actions;
+        } else {
+            throw new YclientsException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -203,8 +209,9 @@ class Yclients
             $ext_products = $products["data"];
             $actions = $this->compareProducts($ext_products);
             return $this->doProducts($actions);
+        } else {
+            throw new YclientsException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -286,14 +293,14 @@ class Yclients
             ->get()
             ->toArray();
 
-        foreach ($ext_types as $ext_staff) {
+        foreach ($ext_types as $type) {
             $count = TypeService::query()
-                ->where('yclients_id', $ext_staff['id'])
+                ->where('yclients_id', $type['id'])
                 ->count();
             if($count > 0) {
-                $update[] = $ext_staff;
+                $update[] = $type;
             } else {
-                $create[] = $ext_staff;
+                $create[] = $type;
             }
         }
 

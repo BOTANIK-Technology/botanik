@@ -61,4 +61,16 @@ class TypeService extends Model
             ->where('yclients_id', '=', $id)
             ->first();
     }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function getByBeautyProId($id)
+    {
+        return self::query()
+            ->where('beauty_id', '=', $id)
+            ->first();
+    }
+
 }

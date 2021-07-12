@@ -1,7 +1,7 @@
 @section('modal')
     @component('modal')
         <div class="view">
-            @if($result)
+            @if($result && $result["result"] == "success")
                 <p class="data"><b>{{__('Синхронизация клиентов')}}</b></p>
                 <div class="line"></div>
                 <div class="grid">
@@ -63,6 +63,9 @@
                     <span class="label">{{__('Обновлено')}}</span>
                     <span class="data"><b>{{$result['products']['update']}}</b></span>
                 </div>
+                <div class="line"></div>
+            @else
+                <p class="data"><b>{{__($result['message'])}}</b></p>
                 <div class="line"></div>
             @endif
         </div>

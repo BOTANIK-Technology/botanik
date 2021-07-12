@@ -3,7 +3,9 @@
 namespace App\Helpers\Beauty;
 
 use App\Models\Api;
+use App\Models\Service;
 use App\Models\TelegramUser;
+use App\Models\TypeService;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,10 +42,10 @@ class BeautyPro
             $staff = $this->staffSync();
 
             // Синхронизация типов (категорий) услуг
-            //$services_types = $this->servicesTypesSync();
+            $services_types = $this->servicesTypesSync();
 
             // Синхронизация услуг
-            //$services = $this->servicesSync();
+            $services = $this->servicesSync();
 
             // Синхронизация записей
             //$records = $this->recordsSync();
@@ -65,8 +67,8 @@ class BeautyPro
             "result"            => "success",
             "clients"           => $clients,
             "staff"             => $staff,
-            "services_types"    => ['create' => 0, 'update' => 0, 'upload' => 0], //$services_types,
-            "services"          => ['create' => 0, 'update' => 0, 'upload' => 0], //$services,
+            "services_types"    => $services_types,
+            "services"          => $services,
             "records"           => ['create' => 0, 'update' => 0, 'upload' => 0], //$records,
             "categories"        => ['create' => 0, 'update' => 0, 'upload' => 0], //$categories,
             "products"          => ['create' => 0, 'update' => 0, 'upload' => 0], //$products,
@@ -75,58 +77,63 @@ class BeautyPro
 
     /**
      * @return array
+     * @throws BeautyProException
      */
     private function clientsSync(): array
     {
-        $clients = $this->api->getClients();
-
-        if($clients["success"] === true) {
-            $ext_clients = (array)$clients["data"];
+        $ext_clients = $this->api->getClients();
+        if(!isset($ext_clients["errors"])) {
             $actions = $this->compareClients($ext_clients);
             return $this->doClients($actions);
+        } else {
+            throw new BeautyProException("Ошибка доступа к API");
         }
-        return [];
+
     }
 
     /**
      * @return array
+     * @throws BeautyProException
      */
     private function staffSync(): array
     {
         $ext_staff = $this->api->getStaff();
-        if(!isset($ext_staff["error"])) {
+        if(!isset($ext_staff["errors"])) {
             $actions = $this->compareStaff($ext_staff);
             return $this->doStaff($actions);
+        } else {
+            throw new BeautyProException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
      * @return array
+     * @throws BeautyProException
      */
     private function servicesTypesSync(): array
     {
-        $services = $this->api->getServicesTypes();
-        if($services["success"] === true) {
-            $ext_types = (array)$services["data"];
-            $actions = $this->compareTypesServices($ext_types);
+        $types = $this->api->getServicesTypes();
+        if(!isset($types["errors"])) {
+            $actions = $this->compareTypesServices($types);
             return $this->doTypes($actions);
+        } else {
+            throw new BeautyProException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
      * @return array
+     * @throws BeautyProException
      */
     private function servicesSync(): array
     {
         $services = $this->api->getServices();
-        if($services["success"] === true) {
-            $ext_services = (array)$services["data"];
-            $actions = $this->compareServices($ext_services);
+        if(!isset($services["errors"])) {
+            $actions = $this->compareServices($services);
             return $this->doServices($actions);
+        } else {
+            throw new BeautyProException("Ошибка доступа к API");
         }
-        return [];
     }
 
     /**
@@ -134,44 +141,15 @@ class BeautyPro
      */
     private function recordsSync(): array
     {
-        $records = $this->api->getRecords();
-        if($records["success"] === true) {
-            $ext_records = $records["data"];
-            $actions = $this->compareRecords($ext_records);
-            return $this->doRecords($actions);
-        }
-        return [];
-    }
 
-    /**
-     * @return array
-     */
-    private function categoriesSync(): array
-    {
-        $categories = $this->api->getCategories();
-        if($categories["success"] === true) {
-            $ext_categories = $categories["data"];
-            $actions = $this->compareCategories($ext_categories);
-
-            // Not supported
-            $this->doCategories($actions);
-            return $actions;
-        }
         return [];
-    }
-
-    /**
-     * @return array
-     */
-    private function productsSync(): array
-    {
-        $products = $this->api->getProducts();
-        if($products["success"] === true) {
-            $ext_products = $products["data"];
-            $actions = $this->compareProducts($ext_products);
-            return $this->doProducts($actions);
-        }
-        return [];
+//        $records = $this->api->getRecords();
+//        if(!isset($services["errors"]) {
+//            $actions = $this->compareRecords($records);
+//            return $this->doRecords($actions);
+//        } else {
+//            throw new BeautyProException("Ошибка доступа к API");
+//        }
     }
 
     /**
@@ -240,6 +218,70 @@ class BeautyPro
     }
 
     /**
+     * @param array $ext_types
+     * @return array
+     */
+    private function compareTypesServices(array $ext_types): array
+    {
+        $create = [];
+        $update = [];
+        $upload = TypeService::query()
+            ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
+            ->get()
+            ->toArray();
+
+        foreach ($ext_types as $type) {
+            $count = TypeService::query()
+                ->where('beauty_id', $type['id'])
+                ->count();
+            if($count > 0) {
+                $update[] = $type;
+            } else {
+                $create[] = $type;
+            }
+        }
+
+        return [
+            "create" => $create,
+            "update" => $update,
+            "upload" => $upload
+        ];
+    }
+
+    /**
+     * @param array $ext_services
+     * @return array
+     */
+    private function compareServices(array $ext_services): array
+    {
+        $create = [];
+        $update = [];
+        $upload = Service::query()
+            ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
+            ->get()
+            ->toArray();
+
+        foreach ($ext_services as $ext_service) {
+            $count = Service::query()
+                ->where('beauty_id', $ext_service['id'])
+                ->count();
+            if($count > 0) {
+                $update[] = $ext_service;
+            } else {
+                $create[] = $ext_service;
+            }
+        }
+
+        return [
+            "create" => $create,
+            "update" => $update,
+            "upload" => $upload
+        ];
+    }
+
+    /**
      * @param array $action
      * @return array
      */
@@ -252,8 +294,8 @@ class BeautyPro
                 'beauty_id'   => $client["id"],
                 'first_name'    => $client['name'],
                 'last_name'     => '',
-                'phone'    => $client['phone'],
-                'email'    => $client['email'],
+                'phone'    => isset($client['phone'][0]) ? $client['phone'][0] : "",
+                'email'    => isset($client['email'][0]) ? $client['email'][0] : "",
                 'middle_name'   => '',
                 'status'        => 1
             ]);
@@ -266,10 +308,9 @@ class BeautyPro
         foreach ($action['update'] as $client) {
             $fields = [
                 'first_name'    => $client['name'],
-                'phone'    => $client['phone'],
+                'phone'    => isset($client['phone'][0]) ? $client['phone'][0] : "",
+                'email'    => isset($client['email'][0]) ? $client['email'][0] : "",
             ];
-
-            if(!empty($client['email'])) $fields["email"] = $client['email'];
 
             TelegramUser::query()
                 ->where('beauty_id', $client['id'])
@@ -299,12 +340,12 @@ class BeautyPro
         // Insert
         $create = [];
         foreach ($action['create'] as $client) {
-
             $pass = $this->generatePass();
-
             $staff_entity = new User([
                 'beauty_id'   => $client["id"],
                 'name'          => $client['name'],
+                'phone'    => isset($client['phone'][0]) ? $client['phone'][0] : "",
+                'email'    => isset($client['email'][0]) ? $client['email'][0] : "",
                 'status'        => 1,
                 'password'      => Hash::make($pass)
             ]);
@@ -319,6 +360,8 @@ class BeautyPro
                 ->where('beauty_id', $client['id'])
                 ->update([
                     'name'    => $client['name'],
+                    'phone'    => isset($client['phone'][0]) ? $client['phone'][0] : "",
+                    'email'    => isset($client['email'][0]) ? $client['email'][0] : "",
                 ]);
             $update[] = $client;
         }
@@ -336,6 +379,101 @@ class BeautyPro
         ];
 
     }
+
+    /**
+     * @param array $action
+     * @return array
+     */
+    private function doTypes(array $action): array
+    {
+        // Insert
+        $create = [];
+        foreach ($action['create'] as $type) {
+            $type_entity = new TypeService([
+                'beauty_id'   => $type["id"],
+                'type'          => $type['name']
+            ]);
+            $type_entity->save();
+            $create[] = $type;
+        }
+
+        // Update
+        $update = [];
+        foreach ($action['update'] as $type) {
+            TypeService::query()
+                ->where('beauty_id', $type['id'])
+                ->update([
+                    'type'    => $type['name'],
+                ]);
+            $update[] = $type;
+        }
+
+        // Upload
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addTypes($action["upload"]);
+        }
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
+    }
+
+    /**
+     * @param array $action
+     * @return array
+     */
+    private function doServices(array $action): array
+    {
+        // Insert
+        $create = [];
+        foreach ($action['create'] as $service) {
+
+            $type = TypeService::getByBeautyProId($service['category']);
+            $service_entity = new Service([
+                'beauty_id'       => $service["id"],
+                'type_service_id'   => $type->id,
+                'name'              => $service['name'] . " (импорт beauty pro)",
+                'price'             => (isset($service['price']) && count($service["price"]) > 0) ?
+                    $service["price"][array_key_first($service["price"])] : 0,
+                'cash_pay'          => 1,
+                'bonus_pay'         => 1,
+                'online_pay'        => 1
+            ]);
+            $service_entity->save();
+            $create[] = $service;
+        }
+
+        // Update
+        $update = [];
+        foreach ($action['update'] as $service) {
+            Service::query()
+                ->where('yclients_id', $service['id'])
+                ->update([
+                    'name'          => $service['name'],
+                    'price'             => (isset($service['price']) && count($service["price"]) > 0) ?
+                        $service["price"][array_key_first($service["price"])] : 0,
+                ]);
+            $update[] = $service;
+        }
+
+        // Upload
+        $upload = [];
+        if(count($action["upload"]) > 0) {
+            $upload = $this->api->addServices($action["upload"]);
+        }
+
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
+    }
+
+
 
     /**
      * @return array

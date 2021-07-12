@@ -66,17 +66,11 @@ class PartnerApiController extends Controller
             case 'beauty':
                 $api = new BeautyPro();
                 $res = $api->synchronize();
-                if($res["result"] == "success") {
-                    return view('api.page', ['apis' => Api::all(), 'modal' => 'beauty', 'result' => $res]);
-                }
-                break;
+                return view('api.page', ['apis' => Api::all(), 'modal' => 'beauty', 'result' => $res]);
             case 'yclients':
                 $api = new Yclients();
                 $res = $api->synchronize();
-                if($res["result"] == "success") {
-                    return view('api.page', ['apis' => Api::all(), 'modal' => 'yclients', 'result' => $res]);
-                }
-                break;
+                return view('api.page', ['apis' => Api::all(), 'modal' => 'yclients', 'result' => $res]);
         }
 
         return view('api.page', ['apis' => Api::all()]);

@@ -13,7 +13,7 @@ class BeautyProApi
     const BASE_URI = 'https://api.aihelps.com/v1/';
 
     private Client $guzzle;
-    private string $token;
+    private ?string $token;
 
     /**
      * BeautyProApi constructor.
@@ -21,6 +21,8 @@ class BeautyProApi
      */
     public function __construct(array $config)
     {
+        $this->token = null;
+
         $params = [
             'base_uri' => self::BASE_URI,
             'timeout'  => 2.0,
@@ -28,15 +30,16 @@ class BeautyProApi
 
         $this->guzzle = new Client($params);
         $response = $this->getBearer($config['application_id'], $config['application_secret'], $config['database_code']);
-        $token = $response['access_token'];
 
-        if (!empty($token)) {
+        if(isset($response['access_token'])) {
+            $token = $response['access_token'];
+
             $this->token = $token;
             $params['headers'] = [
                 'Authorization' => 'Bearer ' . $token,
             ];
+            $this->guzzle = new Client($params);
         }
-        $this->guzzle = new Client($params);
 
         if (
             isset($config['expires_at']) &&
@@ -88,35 +91,11 @@ class BeautyProApi
     }
 
     /**
-     * @param array $filed
      * @return array
      */
-    public function getClients(array $filed = []): array
+    public function getClients(): array
     {
-        // We not have accvess
-
-        return [
-            "success" => true,
-            "data" => []
-        ];
-
-
-        if(empty($filed)) {
-            $filed = [
-                'firstname',
-                'middlename',
-                'lastname',
-                'gender',
-                'phone',
-                'email'
-            ];
-        }
-        $params['headers'] = [
-            'Authorization' => 'Bearer ' . $this->token,
-        ];
-        $params = array_merge($params, ['fields' => $filed]);
-
-        return $this->request('clients', $params);
+        return $this->request('clients?fields=name,firstname,lastname,phone,email');
     }
 
     /**
@@ -124,7 +103,31 @@ class BeautyProApi
      */
     public function getStaff(): array
     {
-        return $this->request('employees?fields=name');
+        return $this->request('employees?fields=name,phone,email');
+    }
+
+    /**
+     * @return array
+     */
+    public function getServicesTypes(): array
+    {
+        return $this->request('services/categories?fields=name');
+    }
+
+    /**
+     * @return array
+     */
+    public function getServices(): array
+    {
+        return $this->request('services?fields=name,category,price');
+    }
+
+    /**
+     * @return array
+     */
+    public function getRecords(): array
+    {
+        return $this->request('services?fields=name,category,price');
     }
 
     /**
@@ -142,6 +145,26 @@ class BeautyProApi
      * @return array
      */
     public function addStaff(array $staffs): array
+    {
+        // We not have access
+        return [];
+    }
+
+    /**
+     * @param array $types
+     * @return array
+     */
+    public function addTypes(array $types): array
+    {
+        // We not have access
+        return [];
+    }
+
+    /**
+     * @param array $services
+     * @return array
+     */
+    public function addServices(array $services): array
     {
         // We not have access
         return [];
