@@ -37,6 +37,7 @@ class UserTimetable extends Model
         'saturday',
         'sunday',
         'address_id',
+        'service_id',
         'user_id'
     ];
 

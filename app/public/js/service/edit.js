@@ -79,7 +79,9 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
         document.getElementById('prepay-message-'+id).value = '';
     }
 
-    function intervalVal (id) {return getCheckedVal(document.getElementsByName('interval-'+id))}
+    function intervalVal (id) {
+        return getCheckedVal(document.getElementsByName('interval-'+id))
+    }
     function addressSelectors (id) {return document.getElementsByName('addresses-'+id+'[]')}
     function groupVal (id) {return getCheckedVal(document.getElementsByName('group-'+id))}
 

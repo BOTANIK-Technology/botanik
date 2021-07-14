@@ -44,6 +44,9 @@ class BeautyPro
             // Синхронизация специалистов
             $staff = $this->staffSync();
 
+            // Синхронизация графиков специалистов
+            $schedules= $this->schedulesSync();
+
             // Синхронизация типов (категорий) услуг
             $services_types = $this->servicesTypesSync();
 
@@ -89,7 +92,7 @@ class BeautyPro
             $actions = $this->compareClients($ext_clients);
             return $this->doClients($actions);
         } else {
-            throw new BeautyProException("Ошибка доступа к API");
+            throw new BeautyProException("Ошибка получения клиентов из Beauty Pro API");
         }
 
     }
@@ -105,7 +108,26 @@ class BeautyPro
             $actions = $this->compareStaff($ext_staff);
             return $this->doStaff($actions);
         } else {
-            throw new BeautyProException("Ошибка доступа к API");
+            throw new BeautyProException("Ошибка получения сотрудников из Beauty Pro API");
+        }
+    }
+
+    /**
+     * @return array
+     * @throws BeautyProException
+     */
+    private function schedulesSync(): array
+    {
+        $ext_schedules = $this->api->getSchedules();
+        if(!isset($ext_schedules["errors"])) {
+            $ext_schedules = $this->convertScheidules($ext_schedules);
+
+            print_r($ext_schedules);die;
+
+            $actions = $this->compareSchedules($ext_schedules);
+            return $this->doScheduls($actions);
+        } else {
+            throw new BeautyProException("Ошибка получения графиков работы сотрудников из Beauty Pro API");
         }
     }
 
@@ -120,7 +142,7 @@ class BeautyPro
             $actions = $this->compareTypesServices($types);
             return $this->doTypes($actions);
         } else {
-            throw new BeautyProException("Ошибка доступа к API");
+            throw new BeautyProException("Ошибка получения типов услуг из Beauty Pro API");
         }
     }
 
@@ -135,12 +157,13 @@ class BeautyPro
             $actions = $this->compareServices($services);
             return $this->doServices($actions);
         } else {
-            throw new BeautyProException("Ошибка доступа к API");
+            throw new BeautyProException("Ошибка получения услуг из Beauty Pro API");
         }
     }
 
     /**
      * @return array
+     * @throws BeautyProException
      */
     private function recordsSync(): array
     {
@@ -149,7 +172,7 @@ class BeautyPro
             $actions = $this->compareRecords($records);
             return $this->doRecords($actions);
         } else {
-            throw new BeautyProException("Ошибка доступа к API");
+            throw new BeautyProException("Ошибка получения записей из Beauty Pro API");
         }
     }
 
@@ -372,6 +395,23 @@ class BeautyPro
     */
     private function doStaff(array $action): array
     {
+        // сли нужно почистить сотрудников
+        /*
+        $delete = [
+            "88d945e3-aa70-1529-625e-1e0146f641e4",
+            "88d9460a-03ae-f3c6-3775-f92b432194db",
+            "88d94605-0f6c-c829-3775-f92b62a9a44d",
+            "88d945fc-14c4-d8c9-3e86-30737c6fbca0",
+            "88d945fb-eae4-f1a8-0a89-712c29423f66",
+            "88d945f7-a0b4-5ecb-21ea-e066602049fd",
+            "88d9460a-03b7-5092-3e86-3073423d33b0",
+        ];
+
+
+        $res = $this->api->deleteStaffs($delete);
+
+        */
+
         // Insert
         $create = [];
         foreach ($action['create'] as $client) {
@@ -619,5 +659,20 @@ class BeautyPro
         srand((float)microtime() * 1000000);
         shuffle($array_mix);
         return implode("", $array_mix);
+    }
+
+    /**
+     * Convert to inner format
+     * @param $api_schedules
+     * @return array
+     */
+    private function convertSchedules($api_schedules): array
+    {
+        $schedules = [];
+        foreach ($api_schedules as $schedule) {
+            $schedules[] = [
+                "id" => $schedule["professional"]
+            ];
+        }
     }
 }

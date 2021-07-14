@@ -189,10 +189,20 @@ class BeautyProApi
     /**
      * @return array
      */
-    public function getStaffSchedule(): array
+    public function getSchedules(): array
     {
+        $now = Carbon::now();
+        $from = $now->startOfWeek()->format('Y-m-d\TH:i:00.000\Z');
+        $to = $now->endOfWeek()->format('Y-m-d\TH:i:00.000\Z');
 
+        $params = [
+            "query" => [
+                "from"  => $from,
+                "to"    => $to
+            ]
+        ];
 
+        return $this->request("schedule", $params);
     }
 
     /**
@@ -336,6 +346,25 @@ class BeautyProApi
         }
 
         return $success;
+    }
+
+    /**
+     * @param array $staffs
+     * @return array
+     */
+    public function deleteStaffs(array $staffs): array
+    {
+       $out = [];
+       foreach ($staffs as $staff_id) {
+           $res = $this->request("employees/" . $staff_id, [], 'DELETE');
+           if(!isset($res["errors"])) {
+               User::where("beauty_id", $staff_id)->delete();
+               $out[] = $res;
+           } else {
+               Log::debug("Ошибка удаления сотрудника: " . $staff_id, $res);
+           }
+       }
+       return $out;
     }
 
     /**
@@ -504,9 +533,9 @@ class BeautyProApi
      * @param string $url
      * @param array $parameters
      * @param string $method
-     * @return array
+     * @return array|null
      */
-    protected function request(string $url, array $parameters = [], string $method = 'GET'): array
+    protected function request(string $url, array $parameters = [], string $method = 'GET'): ?array
     {
         try {
             $response = $this->guzzle->request(
@@ -515,8 +544,8 @@ class BeautyProApi
                 $parameters
             );
 
-            return json_decode($response->getBody()->getContents(), JSON_OBJECT_AS_ARRAY);
-
+            $response = $response->getBody()->getContents();
+            return json_decode($response, JSON_OBJECT_AS_ARRAY);
         } catch (GuzzleException $e) {
             return $this->exception($e);
         }

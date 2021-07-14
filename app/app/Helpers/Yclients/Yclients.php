@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Models\TelegramUser;
 use App\Models\TypeService;
 use App\Models\User;
+use App\Models\UserTimetable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,15 @@ class Yclients
             $config['login'],
             $config['password'],
             $config['partner_token']);
+    }
+
+    public static function isActive(): bool
+    {
+        $config = self::getConfig();
+        return  isset($config['company_id']) &&
+                isset($config['login']) &&
+                isset($config['password']) &&
+                isset($config['partner_token']);
     }
 
     /**
@@ -462,9 +472,9 @@ class Yclients
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addClients($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addClients($action["upload"]);
+//        }
 
         return [
             "create" => count($create),
@@ -493,6 +503,12 @@ class Yclients
                 'password'      => Hash::make($pass)
             ]);
             $staff_entity->save();
+
+            DB::table('users_roles')->insert([
+                "user_id" => $staff_entity->id,
+                "role_id" => 3
+            ]);
+
             $create[] = $client;
         }
 
@@ -509,9 +525,9 @@ class Yclients
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addStaff($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addStaff($action["upload"]);
+//        }
 
         return [
             "create" => count($create),
@@ -552,9 +568,9 @@ class Yclients
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addTypes($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addTypes($action["upload"]);
+//        }
 
         return [
             "create" => count($create),
@@ -578,7 +594,8 @@ class Yclients
             $service_entity = new Service([
                 'yclients_id'       => $service["id"],
                 'type_service_id'   => $type->id,
-                'name'              => $service['title'] . " (импорт yclients)",
+                'name'              => $service['title'],
+                'interval_id'       => 3, // 1 hour from intervals table
                 'price'             => $service['price_min'],
                 'cash_pay'          => 1,
                 'bonus_pay'         => 1,
@@ -586,15 +603,29 @@ class Yclients
             ]);
             $service_entity->save();
             $create[] = $service;
+            $service_id = $service_entity->id;
 
+            // Адрес услуги
+            $address_text = "Адрес услуги " . $service_entity->name;
+            $address = Address::query()->where('address', $address_text)->first();
+
+            if(is_null($address)) {
+                $address = new Address([
+                    "address" => $address_text
+                ]);
+                $address->save();
+            }
+
+            DB::table("services_addresses")->insert([
+                "service_id" => $service_id,
+                "address_id" => $address->id
+            ]);
+
+            // Специалисты которые оказывают услугу
             if(isset($service["staff"]) && count($service["staff"]) > 0) {
                 foreach ($service["staff"] as $staff) {
-                    $row = User::query()->where('yclients_id', $staff["id"])->get('id')->first()->toArray();
-
-                    DB::table('users_services')->insert([
-                        'user_id' => $row['id'],
-                        'service_id' => $service_entity->id
-                    ]);
+                    $specialist = User::getByYClientsId($staff["id"]);
+                    $this->setSpecialists($specialist->id, $service_id);
                 }
             }
         }
@@ -608,14 +639,23 @@ class Yclients
                     'name'          => $service['title'],
                     'price'         => $service['price_min'],
                 ]);
+            // Специалисты которые оказывают услугу
+            $service_entity = Service::getByYClientsId($service['id']);
+            $service_id = $service_entity->id;
+            if(isset($service["staff"]) && count($service["staff"]) > 0) {
+                foreach ($service["staff"] as $staff) {
+                    $specialist = User::getByYClientsId($staff["id"]);
+                    $this->setSpecialists($specialist["id"], $service_id);
+                }
+            }
             $update[] = $service;
         }
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addServices($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addServices($action["upload"]);
+//        }
 
 
         return [
@@ -624,6 +664,67 @@ class Yclients
             "upload" => count($upload)
         ];
     }
+
+    private function setSpecialists(int $specialist_id, int $service_id): void
+    {
+
+        $specialist = User::find($specialist_id);
+
+        $service_entity = Service::find($service_id);
+
+        $address_text = "Адрес услуги " . $service_entity->name;
+        $address = Address::query()->where('address', $address_text)->first();
+
+        $count = DB::table('users_services')
+            ->where('user_id', $specialist_id)
+            ->where('service_id', $service_id)
+            ->count();
+        if($count == 0) {
+            DB::table('users_services')->insert([
+                'user_id' => $specialist_id,
+                'service_id' => $service_id
+            ]);
+        }
+
+        $count = DB::table('users_addresses')
+            ->where('user_id', $specialist_id)
+            ->where('address_id', $address->id)
+            ->count();
+        if($count == 0) {
+            DB::table('users_addresses')->insert([
+                'user_id' => $specialist_id,
+                'address_id' => $address->id
+            ]);
+        }
+
+        // Расписание работы специалиста
+        $staff_schedule = $this->api->getStaffSchedule($specialist["yclients_id"]);
+        if($staff_schedule["success"] === true) {
+            $schedule = $this->convertSchedules($staff_schedule["data"]);
+
+            // Удаляем старое расписание
+            UserTimetable::where("user_id", $specialist_id)
+                ->where("service_id", $service_id)
+                ->where("address_id", $address->id)
+                ->delete();
+
+            // Добавляем новое расписание
+            $userTimetable = new UserTimetable([
+                "user_id"       => $specialist_id,
+                "address_id"    => $address->id,
+                "service_id"    => $service_id,
+                "monday"        => $schedule[0],
+                "tuesday"       => $schedule[1],
+                "wednesday"     => $schedule[2],
+                "thursday"      => $schedule[3],
+                "friday"        => $schedule[4],
+                "saturday"      => $schedule[5],
+                "sunday"        => $schedule[6],
+            ]);
+            $userTimetable->save();
+        }
+    }
+
 
     /**
      * @param array $action
@@ -645,7 +746,7 @@ class Yclients
             $staff = User::getByYClientsId($record["staff"]["id"]);
 
             if(!is_null($telegram_user) && !is_null($service) && !is_null($staff)) {
-                $address_text = "Адрес услуги " . $record["services"][0]["title"] . " (импортпорт из YClients)";
+                $address_text = "Адрес услуги " . $record["services"][0]["title"];
                 $address = Address::query()->where('address', $address_text)->first();
                 if(is_null($address)) {
                     $address = new Address([
@@ -684,9 +785,9 @@ class Yclients
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addRecords($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addRecords($action["upload"]);
+//        }
 
 
         return [
@@ -745,9 +846,9 @@ class Yclients
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addProducts($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addProducts($action["upload"]);
+//        }
 
         return [
             "create" => count($create),
@@ -772,6 +873,35 @@ class Yclients
         srand((float)microtime() * 1000000);
         shuffle($array_mix);
         return implode("", $array_mix);
+    }
+
+    /**
+     * Convert to inner format
+     * @param $api_schedule
+     * @return array
+     */
+    private function convertSchedules($api_schedule): array
+    {
+        $schedule = [];
+        foreach ($api_schedule as $item) {
+            if(count($item["slots"]) > 0) {
+                $times = [];
+                foreach ($item["slots"] as $time) {
+                    $from = Carbon::parse($item["date"] . " " . $time["from"]);
+                    $to = Carbon::parse($item["date"] . " " . $time["to"]);
+
+                    for($hour = $from->hour; $hour < $to->hour; $hour++) {
+                        $times[] = $hour. ":00";
+                    }
+
+                }
+                $schedule[] = json_encode($times);
+            } else {
+                $schedule[] = null;
+            }
+
+        }
+        return $schedule;
     }
 
 }

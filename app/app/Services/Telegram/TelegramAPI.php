@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram;
 
+use App\Facades\ConnectService;
 use App\Helpers\Beauty\BeautyPro;
 use App\Helpers\Yclients\Yclients;
 use App\Helpers\Yclients\YclientsException;
@@ -12,9 +13,11 @@ use App\Models\Payment;
 use App\Models\Record;
 use App\Models\Service;
 use App\Models\TelegramSession;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use \TelegramBot\Api\BotApi;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
@@ -345,19 +348,16 @@ class TelegramAPI
             'status' => $status
         ]);
 
-        $yclients = new Yclients();
-        $beauty = new BeautyPro();
-
         // Will upload this record to YClients CRM
-        if(!is_null($this->user->ycliets_id)) {
+
+        if(Yclients::isActive()) {
+            $yclients = new Yclients();
             $yclients->api->addRecords([$record]);
         }
 
         // Will upload this record to Beauty Pro CRM
-        if(!is_null($this->user->beauty_id)) {
-            $beauty->api->addRecords([$record]);
-        }
-
+//        $beauty = new BeautyPro();
+//        $beauty->api->addRecords([$record]);
 
         Payment::create([
             'online_pay' => $online_pay,

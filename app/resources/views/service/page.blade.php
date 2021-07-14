@@ -11,8 +11,8 @@
             <header class="flex align-items-center">
                 <a href="{{route('window.service', ['business' => $slug, 'modal' => 'create', 'load' => $load])}}" class="btn full-width text-decoration-none flex justify-content-around align-items-center">{!! file_get_contents(public_path('images/add-w.svg')) !!}{{__('создать услугу')}}</a>
                 <a href="{{route('service', ['business' => $slug, 'view' => 'services', 'load' => $load])}}" class="hashtag {{$view == 'services' ? 'active' : ''}}">{{__('Услуги')}}</a>
-                <a href="{{route('service', ['business' => $slug, 'view' => 'types', 'load_types' => $load_types])}}" class="hashtag {{$view == 'types' ? 'active' : ''}}">{{__('Типы услуг')}}</a>
-                <a href="{{route('service', ['business' => $slug, 'view' => 'addresses', 'load_addresses' => $load_addresses])}}" class="hashtag {{$view == 'addresses' ? 'active' : ''}}">{{__('Адреса')}}</a>
+                <a href="{{route('service', ['business' => $slug, 'view' => 'types', 'load_types' => $load_types??5])}}" class="hashtag {{$view == 'types' ? 'active' : ''}}">{{__('Типы услуг')}}</a>
+                <a href="{{route('service', ['business' => $slug, 'view' => 'addresses', 'load_addresses' => $load_addresses??5])}}" class="hashtag {{$view == 'addresses' ? 'active' : ''}}">{{__('Адреса')}}</a>
             </header>
         @endslot
 
@@ -41,7 +41,16 @@
             </div>
             @include('layouts.load', ['count' => $countService, 'view_type' => 'services', 'load' => $load, 'route' => 'service', 'route_params' => ['business' => $slug]])
         @elseif($view == 'types')
-            @php $ti = 1; @endphp
+            @php
+                $ti = 1;
+                if(!isset($load_types)) {
+                    $load_types = 5;
+                    $countTypes = 0;
+                }
+                if(!isset($countTypes)) {
+                    $countTypes = 0;
+                }
+            @endphp
             <div class="table grid" style="grid-template-columns: 10% 60% 15% 15%;">
             @foreach ($types as $type)
                 @if ($ti > $load_types) @break @endif
@@ -62,7 +71,15 @@
             </div>
             @include('layouts.load', ['count' => $countTypes, 'view_type' => 'types', 'load' => $load_types, 'route' => 'service', 'route_params' => ['business' => $slug]])
         @elseif($view == 'addresses')
-            @php $ai = 1; @endphp
+            @php
+                $ai = 1;
+                if(!isset($load_addresses)) {
+                    $load_addresses = 5;
+                }
+                if(!isset($countAddresses)) {
+                    $countAddresses = 0;
+                }
+            @endphp
             <div class="table grid" style="grid-template-columns: 10% 60% 15% 15%;">
             @foreach ($addresses as $address)
                 @if ($ai > $load_addresses) @break @endif

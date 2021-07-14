@@ -156,7 +156,7 @@ class YclientsApi
     }
 
     /**
-     * Получить список клиентов
+     * Получить список специалистов
      *
      * @return array
      * @throws YclientsException
@@ -164,6 +164,26 @@ class YclientsApi
     public function getStaff(): array
     {
         return $this->request("company/" . $this->getCompanyID() . '/staff',
+            [],
+            self::METHOD_GET,
+            $this->getUserToken()
+        );
+    }
+
+    /**
+     * Получить расписание специалиста
+     *
+     * @param int $staff_id
+     * @return array
+     * @throws YclientsException
+     */
+    public function getStaffSchedule(int $staff_id): array
+    {
+        $now = Carbon::now();
+        $from = $now->startOfWeek()->format('Y-m-d');
+        $to = $now->endOfWeek()->format('Y-m-d');
+
+        return $this->request("schedule/" . $this->getCompanyID() . '/' .$staff_id . '/' . $from . "/" . $to,
             [],
             self::METHOD_GET,
             $this->getUserToken()
