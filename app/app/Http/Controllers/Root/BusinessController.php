@@ -91,7 +91,7 @@ class BusinessController extends Controller
             'business_name' => 'required|string|min:1|max:255',
             'bot_name' => 'required|string|min:3|max:32',
             'package' => 'required|integer',
-            'slug' => 'required|string|min:3|max:32||regex:/^[a-z0-9]+$/i|',
+            'slug' => 'required|string|min:3|max:32||regex:/^[a-z0-9_]+$/i|',
             'tg_token' => 'required|string|max:255',
             'pay_token' => 'nullable|string|max:255',
             'logo' => 'nullable|file|image',

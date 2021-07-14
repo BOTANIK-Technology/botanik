@@ -3,6 +3,11 @@
 namespace App\Helpers\Beauty;
 
 use App\Models\Api;
+use App\Models\Record;
+use App\Models\Service;
+use App\Models\TelegramUser;
+use App\Models\TypeService;
+use App\Models\User;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -30,7 +35,6 @@ class BeautyProApi
 
         $this->guzzle = new Client($params);
         $response = $this->getBearer($config['application_id'], $config['application_secret'], $config['database_code']);
-
         if(isset($response['access_token'])) {
             $token = $response['access_token'];
 
@@ -81,12 +85,12 @@ class BeautyProApi
     {
         return $this->request(
             'auth/database',
-            [
-                'application_id' => $application_id,
-                'application_secret' => $application_secret,
-                'database_code' => $database_code
-            ],
-            'query'
+            ['query' => [
+                    'application_id' => $application_id,
+                    'application_secret' => $application_secret,
+                    'database_code' => $database_code
+                ]
+            ]
         );
     }
 
@@ -95,15 +99,100 @@ class BeautyProApi
      */
     public function getClients(): array
     {
-        return $this->request('clients?fields=name,firstname,lastname,phone,email');
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "name",
+                    "firstname",
+                    "lastname",
+                    "phone",
+                    "email"
+                ]),
+                "archive" => "false"
+            ]
+        ];
+        return $this->request('clients', $params);
     }
+
+    /**
+     * @return string|null
+     */
+    public function getOwnerPositionId():?string
+    {
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "name",
+                    "role",
+                    "permissions",
+                    "parent"
+                ])
+            ]
+        ];
+        $res = $this->request('positions', $params);
+        foreach ($res as $item) {
+            if($item["role"] == 'owner') {
+                return  $item["id"];
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getProfessionalPositionId():?string
+    {
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "name",
+                    "role",
+                    "permissions",
+                    "parent"
+                ])
+            ]
+        ];
+        $res = $this->request('positions', $params);
+        foreach ($res as $item) {
+            if($item["role"] == 'professional') {
+                return  $item["id"];
+            }
+        }
+        return null;
+    }
+
 
     /**
      * @return array
      */
     public function getStaff(): array
     {
-        return $this->request('employees?fields=name,phone,email');
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "name",
+                    "firstname",
+                    "phone",
+                    "email",
+                    "roles",
+                    "archive",
+                    "public",
+                    "permissions"
+                ])
+            ]
+        ];
+        return $this->request('employees', $params);
+    }
+
+    /**
+     * @return array
+     */
+    public function getStaffSchedule(): array
+    {
+
+
     }
 
     /**
@@ -111,7 +200,18 @@ class BeautyProApi
      */
     public function getServicesTypes(): array
     {
-        return $this->request('services/categories?fields=name');
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "name",
+                    "archive"
+                ])
+            ],
+            "body" => json_encode([
+                "archive" => "false"
+            ])
+        ];
+        return $this->request('services/categories', $params);
     }
 
     /**
@@ -119,7 +219,18 @@ class BeautyProApi
      */
     public function getServices(): array
     {
-        return $this->request('services?fields=name,category,price');
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "name",
+                    "category",
+                    "price",
+                    "archive"
+                ]),
+                "archive" => "false"
+            ]
+        ];
+        return $this->request('services', $params);
     }
 
     /**
@@ -127,7 +238,19 @@ class BeautyProApi
      */
     public function getRecords(): array
     {
-        return $this->request('services?fields=name,category,price');
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "start",
+                    "professional",
+                    "client",
+                    "service",
+                    "price",
+                    "state"
+                ])
+            ]
+        ];
+        return $this->request('appointments/services', $params);
     }
 
     /**
@@ -136,8 +259,35 @@ class BeautyProApi
      */
     public function addClients(array $clients): array
     {
-        // We not have access
-        return [];
+        $success = [];
+        foreach ($clients as $client) {
+            $params = [
+                'query' => [
+                    'fields' => implode(",", [
+                        "firstname",
+                        "lastname",
+                        "phone",
+                        "email"
+                    ])
+                ],
+                'body' => json_encode([
+                    'firstname' => $client['first_name'],
+                    'lastname' => "",
+                    'phone' => $client['phone'],
+                    'email' => $client['email'],
+                ])
+            ];
+            $res = $this->request("clients", $params, 'POST');
+            if(!isset($res["errors"])) {
+                $id = $res["id"];
+                TelegramUser::query()
+                    ->where('id', $client['id'])
+                    ->update(['beauty_id' => $id]);
+                $success[] = $client;
+            }
+        }
+
+        return $success;
     }
 
     /**
@@ -146,8 +296,46 @@ class BeautyProApi
      */
     public function addStaff(array $staffs): array
     {
-        // We not have access
-        return [];
+        $owner_position_id = $this->getOwnerPositionId();
+        $professional_position_id = $this->getProfessionalPositionId();
+
+        $success = [];
+        foreach ($staffs as $staff) {
+            $params = [
+                'query' => [
+                    'fields' => implode(",", [
+                        "firstname",
+                        "middlename",
+                        "lastname",
+                        "phone",
+                        "email",
+                        "roles",
+                    ]),
+                ],
+                'body' => json_encode([
+                    'firstname' => $staff['name'],
+                    'lastname' => "",
+                    'middlename' => "",
+                    'phone' => $staff['phone'],
+                    'email' => $staff['email'],
+                    'positions' => [
+                        $owner_position_id,
+                        $professional_position_id,
+                    ]
+                ])
+            ];
+            $res = $this->request("employees", $params, 'POST');
+
+            if(!isset($res["errors"])) {
+                $id = $res["id"];
+                User::query()
+                    ->where('id', $staff['id'])
+                    ->update(['beauty_id' => $id]);
+                $success[] = $staff;
+            }
+        }
+
+        return $success;
     }
 
     /**
@@ -156,8 +344,34 @@ class BeautyProApi
      */
     public function addTypes(array $types): array
     {
-        // We not have access
-        return [];
+        $success = [];
+        foreach ($types as $type) {
+            $params = [
+                "query" => [
+                    "fields" => implode(",", [
+                        "name",
+                        "parent",
+                        "picture"
+                    ])
+                ],
+                "body" => json_encode([
+                    "name"    => $type["type"],
+                    "parent"  => null,
+                    "picture" => null
+                ])
+            ];
+            $res = $this->request("services/categories", $params, "POST");
+
+            if(!isset($res["errors"])) {
+                $id = $res["id"];
+                TypeService::query()
+                    ->where('id', $type['id'])
+                    ->update(['beauty_id' => $id]);
+                $success[] = $type;
+            }
+        }
+
+        return $success;
     }
 
     /**
@@ -166,8 +380,113 @@ class BeautyProApi
      */
     public function addServices(array $services): array
     {
-        // We not have access
-        return [];
+        $success = [];
+        foreach ($services as $service) {
+
+            $beauty_type = TypeService::query()->
+                where('id', $service['type_service_id'])->
+                get('beauty_id')->
+                first()->
+                toArray();
+
+            $params = [
+                "query" => [
+                    "fields" => implode(",", [
+                        "name",
+                        "category",
+                        "price"
+                    ])
+                ],
+                "body" => json_encode([
+                    "name" => $service["name"],
+                    "category" => $beauty_type["beauty_id"],
+                    //TODO: How to send price ?
+                    //"price" => $service["price"]
+                ])
+            ];
+
+            $res = $this->request("services", $params, "POST");
+
+            if(!isset($res["errors"])) {
+                $id = $res["id"];
+                Service::query()
+                    ->where('id', $service['id'])
+                    ->update(['beauty_id' => $id]);
+                $success[] = $service;
+            } else {
+                Log::debug("Add service: ", $res);
+            }
+        }
+
+        return $success;
+    }
+
+    /**
+     * @param array $records
+     * @return array
+     */
+    public function addRecords(array $records): array
+    {
+        $success = [];
+        foreach ($records as $record) {
+            if(is_null($record["user_id"])) continue;
+
+            $beauty_staff = null;
+            $staff_id = null;
+            if(!is_null($record['user_id'])) {
+                $beauty_staff = User::query()->
+                    where('id', $record['user_id'])->
+                    get('beauty_id')->
+                    first()->
+                    toArray();
+                $staff_id = $beauty_staff['beauty_id'];
+            }
+
+            $service = Service::query()->
+                    where('id', $record['service_id'])->
+                    first()->
+                    toArray();
+
+            $telegram_user = TelegramUser::query()
+                ->where('id', $record['telegram_user_id'])
+                ->get()
+                ->first()
+                ->toArray();
+
+            $datetime = Carbon::parse($record['date'] . $record['time'])->format('Y-m-d\TH:i:00.000\Z');
+
+            $params = [
+                "query" => [
+                    "force" => "serviceTeeth"
+                ],
+                "body" => json_encode([
+                    "date"    => Carbon::parse($record['date'])->format('Y-m-d'),
+                    "services" => [(object)[
+                        "start"         => $datetime,
+                        "professional"  => $staff_id,
+                        "service"       => $service["beauty_id"],
+                        "duration"      => $service["price"]
+                    ]],
+                    "client"  => $telegram_user["beauty_id"],
+                    "clientsModule" => true,
+                    "state" => "planned",
+                ])
+            ];
+
+            $res = $this->request("appointments", $params, "POST");
+
+            if(!isset($res["errors"])) {
+                $id = $res["id"];
+                Record::query()
+                    ->where('id', $record['id'])
+                    ->update(['beauty_id' => $id]);
+                $success[] = $record;
+            } else {
+                Log::debug("Ошибка BeautyProApi (addRecord): ", $res);
+            }
+        }
+
+        return $success;
     }
 
     protected function exception (GuzzleException $e): array
@@ -184,20 +503,16 @@ class BeautyProApi
     /**
      * @param string $url
      * @param array $parameters
-     * @param string $params_type
      * @param string $method
      * @return array
      */
-    protected function request(string $url, array $parameters = [], string $params_type = 'form_params', string $method = 'GET'): array
+    protected function request(string $url, array $parameters = [], string $method = 'GET'): array
     {
         try {
-            Log::debug("Beauty URL: " . $url);
             $response = $this->guzzle->request(
                 $method,
                 $url,
-                [
-                    $params_type => $parameters
-                ]
+                $parameters
             );
 
             return json_decode($response->getBody()->getContents(), JSON_OBJECT_AS_ARRAY);

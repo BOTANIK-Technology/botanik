@@ -2,7 +2,9 @@
 
 namespace App\Helpers\Beauty;
 
+use App\Models\Address;
 use App\Models\Api;
+use App\Models\Record;
 use App\Models\Service;
 use App\Models\TelegramUser;
 use App\Models\TypeService;
@@ -10,6 +12,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -48,7 +51,7 @@ class BeautyPro
             $services = $this->servicesSync();
 
             // Синхронизация записей
-            //$records = $this->recordsSync();
+            $records = $this->recordsSync();
 
             // Синхронизация каталогов
             //$categories = $this->categoriesSync();
@@ -141,15 +144,13 @@ class BeautyPro
      */
     private function recordsSync(): array
     {
-
-        return [];
-//        $records = $this->api->getRecords();
-//        if(!isset($services["errors"]) {
-//            $actions = $this->compareRecords($records);
-//            return $this->doRecords($actions);
-//        } else {
-//            throw new BeautyProException("Ошибка доступа к API");
-//        }
+        $records = $this->api->getRecords();
+        if(!isset($services["errors"])) {
+            $actions = $this->compareRecords($records);
+            return $this->doRecords($actions);
+        } else {
+            throw new BeautyProException("Ошибка доступа к API");
+        }
     }
 
     /**
@@ -282,6 +283,40 @@ class BeautyPro
     }
 
     /**
+     * @param array $ext_records
+     * @return array
+     */
+    private function compareRecords(array $ext_records): array
+    {
+        $create = [];
+        $update = [];
+        $upload = Record::query()
+            ->whereNull('yclients_id')
+            ->whereNull('beauty_id')
+            ->get()
+            ->toArray();
+
+        foreach ($ext_records as $ext_record) {
+            $count = Record::query()
+                ->where('beauty_id', $ext_record['id'])
+                ->count();
+            if($count > 0) {
+                $update[] = $ext_record;
+            } else {
+                $create[] = $ext_record;
+            }
+        }
+
+        return [
+            "create" => $create,
+            "update" => $update,
+            "upload" => $upload
+        ];
+
+    }
+
+
+    /**
      * @param array $action
      * @return array
      */
@@ -320,9 +355,9 @@ class BeautyPro
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addClients($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addClients($action["upload"]);
+//        }
 
         return [
             "create" => count($create),
@@ -350,6 +385,12 @@ class BeautyPro
                 'password'      => Hash::make($pass)
             ]);
             $staff_entity->save();
+
+            DB::table('users_roles')->insert([
+                "user_id" => $staff_entity->id,
+                "role_id" => 3
+            ]);
+
             $create[] = $client;
         }
 
@@ -368,9 +409,9 @@ class BeautyPro
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addStaff($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addStaff($action["upload"]);
+//        }
 
         return [
             "create" => count($create),
@@ -410,9 +451,9 @@ class BeautyPro
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addTypes($action["upload"]);
-        }
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addTypes($action["upload"]);
+//        }
 
         return [
             "create" => count($create),
@@ -461,9 +502,79 @@ class BeautyPro
 
         // Upload
         $upload = [];
-        if(count($action["upload"]) > 0) {
-            $upload = $this->api->addServices($action["upload"]);
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addServices($action["upload"]);
+//        }
+
+
+        return [
+            "create" => count($create),
+            "update" => count($update),
+            "upload" => count($upload)
+        ];
+    }
+
+    /**
+     * @param array $action
+     * @return array
+     */
+    private function doRecords(array $action): array
+    {
+        // Insert
+        $create = [];
+        foreach ($action['create'] as $record) {
+
+            if(!isset($record["service"])) {
+                continue;
+            }
+
+            $telegram_user = TelegramUser::getByBeautyId($record["client"]);
+            $service = Service::getByBeautyId($record["service"]);
+            $staff = !is_null($record["professional"]) ? User::getByBeautyId($record["professional"]) : null;
+
+            if(!is_null($telegram_user) && !is_null($service)) {
+                $address_text = "Адрес услуги " . $service->name . " (импортпорт из BeautyPro)";
+                $address = Address::query()->where('address', $address_text)->first();
+                if(is_null($address)) {
+                    $address = new Address([
+                        "address" => $address_text
+                    ]);
+                    $address->save();
+                }
+
+                $record_entity = new Record([
+                    'beauty_id'        => $record["id"],
+                    'telegram_user_id' => $telegram_user->id,
+                    'service_id'       => $service->id,
+                    'address_id'       => $address->id,
+                    'user_id'          => !is_null($staff) ? $staff->id: null,
+                    'status'           => $record["state"] == "planned" ? 1 : 0,
+                    'date'             => Carbon::parse($record['start'])->format('Y-m-d'),
+                    'time'             => Carbon::parse($record['start'])->format('H:i'),
+                ]);
+                $record_entity->save();
+                $create[] = $record;
+            }
         }
+
+        // Update
+        $update = [];
+        foreach ($action['update'] as $record) {
+            Record::query()
+                ->where('beauty_id', $record['id'])
+                ->update([
+                    'status' => $record["state"] == "planned" ? 1 : 0,
+                    'date'   => Carbon::parse($record['start'])->format('Y-m-d'),
+                    'time'   => Carbon::parse($record['start'])->format('H:i'),
+                ]);
+            $update[] = $record;
+        }
+
+        // Upload
+        $upload = [];
+//        if(count($action["upload"]) > 0) {
+//            $upload = $this->api->addRecords($action["upload"]);
+//        }
 
 
         return [

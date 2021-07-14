@@ -304,4 +304,16 @@ class User extends Authenticatable
             ->where('yclients_id', '=', $id)
             ->first();
     }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function getByBeautyId($id)
+    {
+        return self::query()
+            ->where('beauty_id', '=', $id)
+            ->first();
+    }
+
 }

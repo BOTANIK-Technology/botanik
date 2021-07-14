@@ -226,4 +226,15 @@ class Service extends Model
             ->first();
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function getByBeautyId($id)
+    {
+        return self::query()
+            ->where('beauty_id', '=', $id)
+            ->first();
+    }
+
 }
