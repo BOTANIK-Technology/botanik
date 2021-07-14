@@ -4,6 +4,7 @@ beautyBtn.addEventListener('click', function () {
     let appId = document.querySelector('#beauty_application_id')
     let dbCode = document.querySelector('#beauty_database_code')
     let appSecret = document.querySelector('#beauty_application_secret')
+
     let send = {
         'params': {
             'application_id': appId.value ?? null,

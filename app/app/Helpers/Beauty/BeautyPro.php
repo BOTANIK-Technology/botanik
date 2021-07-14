@@ -32,6 +32,15 @@ class BeautyPro
         $this->api = new BeautyProApi($config);
     }
 
+    public static function isActive(): bool
+    {
+        $data = Api::where('slug', 'beauty')->firstOrFail();
+        $config = json_decode($data->config, true);
+        return isset($config['application_id']) &&
+            isset($config['application_secret']) &&
+            isset($config['database_code']);
+    }
+
     /**
      * @return string[]
      */
@@ -43,9 +52,6 @@ class BeautyPro
 
             // Синхронизация специалистов
             $staff = $this->staffSync();
-
-            // Синхронизация графиков специалистов
-            $schedules= $this->schedulesSync();
 
             // Синхронизация типов (категорий) услуг
             $services_types = $this->servicesTypesSync();
@@ -75,7 +81,7 @@ class BeautyPro
             "staff"             => $staff,
             "services_types"    => $services_types,
             "services"          => $services,
-            "records"           => ['create' => 0, 'update' => 0, 'upload' => 0], //$records,
+            "records"           => $records,
             "categories"        => ['create' => 0, 'update' => 0, 'upload' => 0], //$categories,
             "products"          => ['create' => 0, 'update' => 0, 'upload' => 0], //$products,
         ];
@@ -109,25 +115,6 @@ class BeautyPro
             return $this->doStaff($actions);
         } else {
             throw new BeautyProException("Ошибка получения сотрудников из Beauty Pro API");
-        }
-    }
-
-    /**
-     * @return array
-     * @throws BeautyProException
-     */
-    private function schedulesSync(): array
-    {
-        $ext_schedules = $this->api->getSchedules();
-        if(!isset($ext_schedules["errors"])) {
-            $ext_schedules = $this->convertScheidules($ext_schedules);
-
-            print_r($ext_schedules);die;
-
-            $actions = $this->compareSchedules($ext_schedules);
-            return $this->doScheduls($actions);
-        } else {
-            throw new BeautyProException("Ошибка получения графиков работы сотрудников из Beauty Pro API");
         }
     }
 
@@ -511,14 +498,18 @@ class BeautyPro
         // Insert
         $create = [];
         foreach ($action['create'] as $service) {
+            $price = 0;
+            foreach ($service["price"] as $p) {
+                if($p > $price) $price = $p;
+            }
+            if($price == 0) continue;
 
             $type = TypeService::getByBeautyProId($service['category']);
             $service_entity = new Service([
                 'beauty_id'       => $service["id"],
                 'type_service_id'   => $type->id,
-                'name'              => $service['name'] . " (импорт beauty pro)",
-                'price'             => (isset($service['price']) && count($service["price"]) > 0) ?
-                    $service["price"][array_key_first($service["price"])] : 0,
+                'name'              => $service['name'],
+                'price'             => $price,
                 'cash_pay'          => 1,
                 'bonus_pay'         => 1,
                 'online_pay'        => 1
@@ -530,15 +521,23 @@ class BeautyPro
         // Update
         $update = [];
         foreach ($action['update'] as $service) {
+            $price = 0;
+            foreach ($service["price"] as $p) {
+                if($p > $price) $price = $p;
+            }
+            if($price == 0) continue;
+
             Service::query()
                 ->where('yclients_id', $service['id'])
                 ->update([
-                    'name'          => $service['name'],
-                    'price'             => (isset($service['price']) && count($service["price"]) > 0) ?
-                        $service["price"][array_key_first($service["price"])] : 0,
+                    'name'  => $service['name'],
+                    'price' => $price,
                 ]);
             $update[] = $service;
         }
+
+        // Update all profesionals for all services
+        $this->updateProfessionals();
 
         // Upload
         $upload = [];
@@ -662,17 +661,38 @@ class BeautyPro
     }
 
     /**
+     * Update all professionals for all services
+     */
+    private function updateProfessionals(): void
+    {
+        $professionals = DB::table("users_roles")
+            ->where("role_id", 3)
+            ->get("user_id")
+            ->toArray();
+        if(!is_null($professionals)) {
+            foreach ($professionals as $professional) {
+                $prof = User::find($professional->user_id);
+                if(!is_null($prof)) {
+                    // Get all services for Professionals
+                    $services = Service::query()->whereNotNull("beauty_id")->get()->toArray();
+                    foreach ($services as $service) {
+
+                    }
+                    //print_r($beautyServices);die;
+
+                }
+            }
+        }
+    }
+
+
+    /**
      * Convert to inner format
      * @param $api_schedules
      * @return array
      */
     private function convertSchedules($api_schedules): array
     {
-        $schedules = [];
-        foreach ($api_schedules as $schedule) {
-            $schedules[] = [
-                "id" => $schedule["professional"]
-            ];
-        }
+        return [];
     }
 }

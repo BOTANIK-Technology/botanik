@@ -93,9 +93,9 @@ class Yclients
     }
 
      /**
-     * @return array
+     * @return null|array
      */
-    public static function getConfig (): array
+    public static function getConfig (): ?array
     {
         $data = self::getData();
         return json_decode($data->config, JSON_OBJECT_AS_ARRAY);

@@ -176,7 +176,8 @@ Route::group(
                     Route::get('/catalog/window/{modal}/{id?}', [App\Http\Controllers\CatalogController::class, 'window'])->name('window.catalog');
                     Route::post('/catalog/edit/{id}', [App\Http\Controllers\CatalogController::class, 'edit'])->name('catalog.edit');
                     Route::post('/catalog/create', [App\Http\Controllers\CatalogController::class, 'create'])->name('catalog.create');
-                    Route::post('/catalog/delete/{id}', [App\Http\Controllers\CatalogController::class, 'delete'])->name('catalog.delete');
+                    //Route::post('/catalog/delete/{id}', [App\Http\Controllers\CatalogController::class, 'delete'])->name('catalog.delete');
+                    Route::post('/catalog/delete/{id}', [App\Http\Controllers\CatalogController::class, 'deleteConfirm'])->name('catalog.delete');
                 });
 
                 /**

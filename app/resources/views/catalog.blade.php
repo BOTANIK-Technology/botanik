@@ -155,7 +155,7 @@
                 <b>“{{$product->title}}”</b>?
             </div>
             @slot('buttons')
-                <button type="button" id="delete" data-url="{{route('catalog.edit', ['business' => $slug, 'id' => $product->id])}}" data-id="{{$product->id}}" class="btn-primary">
+                <button type="button" id="delete" data-url="{{route('catalog.delete', ['business' => $slug, 'id' => $product->id])}}" data-id="{{$product->id}}" class="btn-primary">
                     {{ __('Удалить') }}
                 </button>
                 <a href="{{route('catalog', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>

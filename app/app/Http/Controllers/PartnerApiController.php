@@ -64,13 +64,17 @@ class PartnerApiController extends Controller
     {
         switch ($request->slug) {
             case 'beauty':
-                $api = new BeautyPro();
-                $res = $api->synchronize();
-                return view('api.page', ['apis' => Api::all(), 'modal' => 'beauty', 'result' => $res]);
+                if(BeautyPro::isActive()) {
+                    $api = new BeautyPro();
+                    $res = $api->synchronize();
+                    return view('api.page', ['apis' => Api::all(), 'modal' => 'beauty', 'result' => $res]);
+                }
             case 'yclients':
-                $api = new Yclients();
-                $res = $api->synchronize();
-                return view('api.page', ['apis' => Api::all(), 'modal' => 'yclients', 'result' => $res]);
+                if(Yclients::isActive()) {
+                    $api = new Yclients();
+                    $res = $api->synchronize();
+                    return view('api.page', ['apis' => Api::all(), 'modal' => 'yclients', 'result' => $res]);
+                }
         }
 
         return view('api.page', ['apis' => Api::all()]);

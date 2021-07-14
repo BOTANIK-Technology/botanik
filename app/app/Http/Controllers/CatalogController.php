@@ -73,6 +73,18 @@ class CatalogController extends Controller
 
     /**
      * @param Request $request
+     * @return JsonResponse
+     */
+    public function deleteConfirm (Request $request)
+    {
+
+        return response()->json(
+            ['destroyed' => Catalog::destroy($request->id)]
+        );
+    }
+
+    /**
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function create(Request $request)

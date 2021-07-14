@@ -20,6 +20,22 @@ function send() {
     }
 }
 
+function sendForm (href, image = false, send = true) {
+    let data = null;
+    if (send) {
+        data = getValues();
+        image === false ? data.img = null : data.img = image;
+    }
+    let xhr = postRequest(href, data);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            closeModal();
+        } else {
+            showErrors(xhr.response);
+        }
+    };
+}
+
 function design() {
     inputActive([
         document.getElementById('title'),
@@ -31,9 +47,14 @@ function design() {
     ]);
 }
 
-let delBtn = document.getElementById('delete-btn');
+/*let delBtn = document.getElementById('delete-btn');
 if (delBtn)
-    delBtn.addEventListener('click', function () {doReq({}, delBtn)});
+    delBtn.addEventListener('click', function () {doReq({}, delBtn)});*/
+let delBtn = document.getElementById('delete');
+if (delBtn)
+    delBtn.addEventListener('click', function () {
+        sendForm(this.dataset.url, false, false);
+    });
 
 let createBtn = document.getElementById('create-btn');
 if (createBtn) {

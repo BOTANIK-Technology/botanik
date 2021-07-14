@@ -28,6 +28,9 @@ use Exception;
 use Mail;
 use Storage;
 use URL;
+use Swift_Mailer;
+use Swift_Message;
+use Swift_SmtpTransport;
 
 /**
  * App\Models\Root\Business
@@ -262,9 +265,20 @@ class Business extends Model
         $owner->roles()->attach($role);
 
         try {
-            Mail::send('emails.user-create', ['login' => $email, 'password' => $password, 'slug' => $slug], function ($message) use ($name, $email, $business_name) {
+            /*Mail::send('emails.user-create', ['login' => $email, 'password' => $password, 'slug' => $slug], function ($message) use ($name, $email, $business_name) {
                 $message->to($email, $name)->subject(__('Доступ к BOTANIK - '.$business_name));
-            });
+            });*/
+
+            $url = URL::to('/').'/'.$slug.'/login';
+            $body = "Логин: <b>{$email}</b><br>Пароль: <b>{$password}</b><br>Ссылка на вход: {$url}";
+            $transport = new Swift_SmtpTransport('localhost', 25);
+            $mailer = new Swift_Mailer($transport);
+            $message = (new Swift_Message('Доступ к BOTANIK' . $business_name))
+                ->setFrom([env('MAIL_FROM_ADDRESS') => 'Some One'])
+                ->setTo($email)
+                ->setBody($body, 'text/html');
+
+            $mailer->send($message);
         } catch (Exception $e) {
             Log::warning($e->getMessage().' *** Cannot send auth data to owner. "'.$db_name.'" database');
         }

@@ -244,6 +244,26 @@ class BeautyProApi
     }
 
     /**
+     * @param string $prof_id
+     * @return array
+     */
+    public function getAppointmentServices(string $prof_id): array
+    {
+        $params = [
+            "query" => [
+                "fields" => implode(",", [
+                    "professional",
+                    "service",
+                    "price",
+                    "archive"
+                ]),
+                "archive" => "false"
+            ]
+        ];
+        return $this->request('appointments/services', $params);
+    }
+
+    /**
      * @return array
      */
     public function getRecords(): array

@@ -356,8 +356,10 @@ class TelegramAPI
         }
 
         // Will upload this record to Beauty Pro CRM
-//        $beauty = new BeautyPro();
-//        $beauty->api->addRecords([$record]);
+        if(BeautyPro::isActive()) {
+            $beauty = new BeautyPro();
+            $beauty->api->addRecords([$record]);
+        }
 
         Payment::create([
             'online_pay' => $online_pay,
