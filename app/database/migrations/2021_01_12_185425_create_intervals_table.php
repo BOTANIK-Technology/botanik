@@ -17,6 +17,7 @@ class CreateIntervalsTable extends Migration
             $table->id();
             $table->string('name', 30);
             $table->string('value', 50);
+            $table->integer('minutes');
             $table->timestamps();
         });
     }
