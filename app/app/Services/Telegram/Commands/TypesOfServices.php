@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram\Commands;
 
+use App\Services\Telegram\Callback\Service;
 use Illuminate\Http\Request;
 use App\Models\TypeService;
 
@@ -28,7 +29,9 @@ class TypesOfServices extends Command
         $types = TypeService::all();
         $array = [];
         foreach ($types as $type) {
-            $array[] = [['text' => $type->type, 'callback_data' => 'Service_'.$type->id]];
+            if(\App\Models\Service::where('type_service_id', $type->id)->count() > 0) {
+                $array[] = [['text' => $type->type, 'callback_data' => 'Service_'.$type->id]];
+            }
         }
         return parent::buildInlineKeyboard($array);
     }

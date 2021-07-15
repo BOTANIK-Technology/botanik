@@ -2,6 +2,9 @@
 
 namespace App\Services\Telegram;
 
+use App\Helpers\Beauty\BeautyPro;
+use App\Helpers\Yclients\Yclients;
+use App\Helpers\Yclients\YclientsException;
 use App\Models\Payment;
 use App\Models\Record;
 use App\Services\Telegram\Invoice\OnlinePayProduct;
@@ -62,6 +65,7 @@ class Telegram
 
     /**
      * @param Request $request
+     * @throws YclientsException
      */
     public function setSuccessPayment(Request $request) {
         /** @var TelegramUser $telegramUser */
@@ -72,6 +76,19 @@ class Telegram
             $query->update(["status" => 1]);
             $query = Payment::query()->where("record_id", $record_id);
             $query->update(["status" => 1]);
+
+            $record = Record::query()->where("id", $record_id)->first()->toArray();
+            if (Yclients::isActive()) {
+                // Todo: update record api call
+                //$yclients = new Yclients();
+                //$yclients->api->addRecords([$record]);
+            }
+
+            // Will upload this record to Beauty Pro CRM
+            if (BeautyPro::isActive()) {
+                $beauty = new BeautyPro();
+                $beauty->api->updateRecords($record["id"], "Онлайн оплата: Успешная оплата", "#49cc90");
+            }
         }
     }
 

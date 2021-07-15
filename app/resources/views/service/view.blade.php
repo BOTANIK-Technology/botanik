@@ -14,7 +14,11 @@
                         @endforeach
                     </span>
                     <span class="label">{{__('Длительность')}}</span>
-                    <span class="data"><b>{{isset($view_service->interval) ?? $view_service->interval->name}}</b></span>
+                    @if(isset($view_service->interval))
+                        <span class="data"><b>{{$view_service->interval->name}}</b></span>
+                    @else
+                        <span class="data"><b>{{__("Не выбрано")}}</b></span>
+                    @endif
                     <span class="label">{{__('Интервал')}}</span>
                     <span class="data"><b>{{$view_service->range}} {{__('мин.')}}</b></span>
                     <span class="label">{{__('Цена')}}</span>

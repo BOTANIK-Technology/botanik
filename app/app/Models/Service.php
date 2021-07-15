@@ -48,7 +48,8 @@ class Service extends Model
         'price',
         'cash_pay',
         'bonus_pay',
-        'online_pay'
+        'online_pay',
+        'interval_id'
     ];
 
     protected $guarded = ['id'];

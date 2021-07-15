@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\TelegramUser;
 use App\Models\TypeService;
 use App\Models\User;
+use App\Models\UserTimetable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -47,6 +48,7 @@ class BeautyPro
     public function synchronize(): array
     {
         try {
+
             // Синхронизация клиентов
             $clients = $this->clientsSync();
 
@@ -155,7 +157,7 @@ class BeautyPro
     private function recordsSync(): array
     {
         $records = $this->api->getRecords();
-        if(!isset($services["errors"])) {
+        if(!isset($records["errors"])) {
             $actions = $this->compareRecords($records);
             return $this->doRecords($actions);
         } else {
@@ -210,13 +212,17 @@ class BeautyPro
             ->toArray();
 
         foreach ($ext_staffs as $ext_staff) {
-            $count = User::query()
-                ->where('beauty_id', $ext_staff['id'])
-                ->count();
-            if($count > 0) {
-                $update[] = $ext_staff;
-            } else {
-                $create[] = $ext_staff;
+            if(isset($ext_staff["roles"]) && $ext_staff["roles"]) {
+                if(in_array("owner", $ext_staff["roles"])) continue;
+
+                $count = User::query()
+                    ->where('beauty_id', $ext_staff['id'])
+                    ->count();
+                if($count > 0) {
+                    $update[] = $ext_staff;
+                } else {
+                    $create[] = $ext_staff;
+                }
             }
         }
 
@@ -502,6 +508,16 @@ class BeautyPro
             foreach ($service["price"] as $p) {
                 if($p > $price) $price = $p;
             }
+
+            $interval_id = 3;
+
+            if(isset($service["duration"])) {
+                $res = DB::table("intervals")->where("minutes", $service["duration"])->first();
+                if(!is_null($res)) {
+                    $interval_id = $res->id;
+                }
+            }
+
             if($price == 0) continue;
 
             $type = TypeService::getByBeautyProId($service['category']);
@@ -512,10 +528,18 @@ class BeautyPro
                 'price'             => $price,
                 'cash_pay'          => 1,
                 'bonus_pay'         => 1,
-                'online_pay'        => 1
+                'online_pay'        => 1,
+                'interval_id'       => $interval_id, // 1 hour from intervals table
             ]);
             $service_entity->save();
             $create[] = $service;
+
+            // Адрес услуги
+            $address = $this->getBranchAddress();
+            DB::table("services_addresses")->insert([
+                "service_id" => $service_entity->id,
+                "address_id" => $address["id"]
+            ]);
         }
 
         // Update
@@ -527,11 +551,21 @@ class BeautyPro
             }
             if($price == 0) continue;
 
+            $interval_id = 3;
+
+            if(isset($service["duration"])) {
+                $res = DB::table("intervals")->where("minutes", $service["duration"])->first();
+                if(!is_null($res)) {
+                    $interval_id = $res->id;
+                }
+            }
+
             Service::query()
                 ->where('yclients_id', $service['id'])
                 ->update([
                     'name'  => $service['name'],
                     'price' => $price,
+                    'interval_id' => $interval_id
                 ]);
             $update[] = $service;
         }
@@ -572,20 +606,14 @@ class BeautyPro
             $staff = !is_null($record["professional"]) ? User::getByBeautyId($record["professional"]) : null;
 
             if(!is_null($telegram_user) && !is_null($service)) {
-                $address_text = "Адрес услуги " . $service->name . " (импортпорт из BeautyPro)";
-                $address = Address::query()->where('address', $address_text)->first();
-                if(is_null($address)) {
-                    $address = new Address([
-                        "address" => $address_text
-                    ]);
-                    $address->save();
-                }
+
+                $address = $this->getBranchAddress();
 
                 $record_entity = new Record([
                     'beauty_id'        => $record["id"],
                     'telegram_user_id' => $telegram_user->id,
                     'service_id'       => $service->id,
-                    'address_id'       => $address->id,
+                    'address_id'       => $address["id"],
                     'user_id'          => !is_null($staff) ? $staff->id: null,
                     'status'           => $record["state"] == "planned" ? 1 : 0,
                     'date'             => Carbon::parse($record['start'])->format('Y-m-d'),
@@ -676,23 +704,132 @@ class BeautyPro
                     // Get all services for Professionals
                     $services = Service::query()->whereNotNull("beauty_id")->get()->toArray();
                     foreach ($services as $service) {
-
+                        $this->setSpecialists($prof->id, $service["id"]);
                     }
-                    //print_r($beautyServices);die;
-
                 }
             }
         }
     }
 
+    private function setSpecialists(int $specialist_id, int $service_id): void
+    {
+
+        $specialist = User::find($specialist_id);
+
+        $service_entity = Service::find($service_id);
+
+        $address = $this->getBranchAddress();
+
+        $count = DB::table('users_services')
+            ->where('user_id', $specialist_id)
+            ->where('service_id', $service_id)
+            ->count();
+        if($count == 0) {
+            DB::table('users_services')->insert([
+                'user_id' => $specialist_id,
+                'service_id' => $service_id
+            ]);
+        }
+
+        $count = DB::table('services_addresses')
+            ->where('service_id', $service_id)
+            ->where('address_id', $address["id"])
+            ->count();
+        if($count == 0) {
+            DB::table('services_addresses')->insert([
+                'service_id' => $service_id,
+                'address_id' => $address["id"]
+            ]);
+        }
+
+        $count = DB::table('users_services')
+            ->where('user_id', $specialist_id)
+            ->where('service_id', $service_id)
+            ->count();
+        if($count == 0) {
+            DB::table('users_services')->insert([
+                'user_id' => $specialist_id,
+                'service_id' => $service_id
+            ]);
+        }
+
+        $count = DB::table('users_addresses')
+            ->where('user_id', $specialist_id)
+            ->where('address_id', $address["id"])
+            ->count();
+        if($count == 0) {
+            DB::table('users_addresses')->insert([
+                'user_id' => $specialist_id,
+                'address_id' => $address["id"]
+            ]);
+        }
+
+        // Расписание работы специалиста
+        $staff_schedule = $this->api->getStaffSchedule($specialist["beauty_id"]);
+        if(!isset($staff_schedule["errors"])) {
+            $schedule = $this->convertSchedules($staff_schedule);
+            if(!empty($schedule)) {
+                // Удаляем старое расписание
+                UserTimetable::where("user_id", $specialist_id)
+                    ->where("service_id", $service_id)
+                    ->where("address_id", $address["id"])
+                    ->delete();
+
+                // Добавляем новое расписание
+                $userTimetable = new UserTimetable([
+                    "user_id"       => $specialist_id,
+                    "address_id"    => $address["id"],
+                    "service_id"    => $service_id,
+                    "monday"        => $schedule[0],
+                    "tuesday"       => $schedule[1],
+                    "wednesday"     => $schedule[2],
+                    "thursday"      => $schedule[3],
+                    "friday"        => $schedule[4],
+                    "saturday"      => $schedule[5],
+                    "sunday"        => $schedule[6],
+                ]);
+                $userTimetable->save();
+            }
+        }
+    }
+
+    private function getBranchAddress(): array
+    {
+        $settings = $this->api->getBranchSettings();
+        $address_text = isset($settings["information"]["description"]["ru"]) ?
+            $settings["information"]["description"]["ru"] : "Адрес заведения по умолчанию";
+        $address = Address::query()->where('address', $address_text)->first();
+        if(is_null($address)) {
+            $address = new Address([
+                "address" => $address_text
+            ]);
+            $address->save();
+        }
+        return $address->toArray();
+    }
 
     /**
      * Convert to inner format
-     * @param $api_schedules
+     * @param array $api_schedule
      * @return array
      */
-    private function convertSchedules($api_schedules): array
+    private function convertSchedules(array $api_schedule): array
     {
-        return [];
+        $schedule = [];
+        foreach ($api_schedule as $day => $period) {
+            $now = Carbon::now();
+            $from = Carbon::parse($now->format('Y-m-d') . " " . $period["from"]);
+            $to = Carbon::parse($now->format('Y-m-d') . " " . $period["to"]);
+            if($from != $to) {
+                $times = [];
+                for($hour = $from->hour; $hour < $to->hour + 1; $hour++) {
+                    $times[] = $hour. ":00";
+                }
+                $schedule[] = json_encode($times);
+            } else {
+                $schedule[] = null;
+            }
+        }
+        return $schedule;
     }
 }

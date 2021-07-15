@@ -11,6 +11,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class BeautyProApi
@@ -19,13 +20,15 @@ class BeautyProApi
 
     private Client $guzzle;
     private ?string $token;
-
+    public array $config;
     /**
      * BeautyProApi constructor.
      * @param array $config
      */
     public function __construct(array $config)
     {
+        $this->config = $config;
+
         $this->token = null;
 
         $params = [
@@ -92,6 +95,19 @@ class BeautyProApi
                 ]
             ]
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function getBranchSettings(): array
+    {
+        $params = [
+            "query" => [
+                "fields" => "common(type,country,currency,client_feedback_ratings),information(description,web_site,instagram,facebook,viber,telegram),client_module(name,enabled,several_services,can_cancel_in_48_hours,services_gender_filter,nearest_booking_minutes,time_step,calendar,color,theme,language,supported_languages,button_text,button_color,element_id)"
+            ]
+        ];
+        return $this->request("settings", $params);
     }
 
     /**
@@ -187,23 +203,34 @@ class BeautyProApi
     }
 
     /**
+     * @param string $id
      * @return array
      */
-    public function getSchedules(): array
+    public function getStaffSchedule(string $id): array
     {
-        $now = Carbon::now();
-        $from = $now->startOfWeek()->format('Y-m-d\TH:i:00.000\Z');
-        $to = $now->endOfWeek()->format('Y-m-d\TH:i:00.000\Z');
-
         $params = [
             "query" => [
-                "from"  => $from,
-                "to"    => $to
+                "fields" => "schedules"
             ]
         ];
+        $res = $this->request("employees/" . $id, $params);
+        if(isset($res["schedules"]) && count($res["schedules"]) > 0) {
+            $schedule_id = $res["schedules"][0]["schedule"];
+            $params = [
+                "query" => [
+                    "fields" => "weekSchedule"
+                ]
+            ];
+            $res = $this->request("predefinedSchedules/" . $schedule_id, $params);
+            if(isset($res["weekSchedule"]) && count($res["weekSchedule"]) > 0) {
+                return $res["weekSchedule"];
+            }
+        }
 
-        return $this->request("schedule", $params);
+        return [];
     }
+
+
 
     /**
      * @return array
@@ -235,6 +262,7 @@ class BeautyProApi
                     "name",
                     "category",
                     "price",
+                    "duration",
                     "archive"
                 ]),
                 "archive" => "false"
@@ -276,7 +304,7 @@ class BeautyProApi
                     "client",
                     "service",
                     "price",
-                    "state"
+                    "state",
                 ])
             ]
         ];
@@ -472,9 +500,11 @@ class BeautyProApi
 
     /**
      * @param array $records
+     * @param string $comment
+     * @param string $color
      * @return array
      */
-    public function addRecords(array $records): array
+    public function addRecords(array $records, string $comment = "", string $color=""): array
     {
         $success = [];
         foreach ($records as $record) {
@@ -503,28 +533,41 @@ class BeautyProApi
                 ->toArray();
 
             $datetime = Carbon::parse($record['date'] . $record['time'])->format('Y-m-d\TH:i:00.000\Z');
+            $duration = DB::table("intervals")->where("id", $service["interval_id"])->first("minutes");
+            $duration = isset($duration->minutes) ? $duration->minutes : 60;
 
             $params = [
                 "query" => [
-                    "force" => "serviceTeeth"
+                    "force" => "true",
+                    "fields" => "date"
                 ],
-                "body" => json_encode([
+                "body" => [
                     "date"    => Carbon::parse($record['date'])->format('Y-m-d'),
                     "services" => [(object)[
                         "start"         => $datetime,
                         "professional"  => $staff_id,
                         "service"       => $service["beauty_id"],
-                        "duration"      => $service["price"]
+                        "duration"      => $duration
                     ]],
                     "client"  => $telegram_user["beauty_id"],
                     "clientsModule" => true,
                     "state" => "planned",
-                ])
+                ]
             ];
+
+            if($comment != "") {
+                $params["body"]["comments"] = $comment;
+            }
+
+            if($color != "") {
+                $params["body"]["color"] = $color;
+            }
+
+            $params["body"] = json_encode($params["body"]);
 
             $res = $this->request("appointments", $params, "POST");
 
-            if(!isset($res["errors"])) {
+            if(isset($res["id"])) {
                 $id = $res["id"];
                 Record::query()
                     ->where('id', $record['id'])
@@ -538,12 +581,45 @@ class BeautyProApi
         return $success;
     }
 
+    /**
+     * @param string $record_id
+     * @param string $comment
+     * @param string $color
+     * @return array
+     */
+    public function updateRecords(string $record_id, string $comment = "", string $color=""): array
+    {
+        $params = [
+            "query" => [
+                "force" => "true",
+                "fields" => "date"
+            ],
+            "body" => []
+        ];
+
+        if($comment != "") {
+            $params["body"]["comments"] = $comment;
+        }
+
+        if($color != "") {
+            $params["body"]["color"] = $color;
+        }
+
+        $params["body"] = json_encode($params["body"]);
+
+        $record = Record::find($record_id)->toArray();
+
+        $this->request("appointments/" . $record["beauty_id"], $params, "PUT");
+
+        return $record;
+    }
+
     protected function exception (GuzzleException $e): array
     {
         return [
             'errors' =>
                 json_decode(
-                    $e->getResponse()->getBody()->getContents(),
+                    $e->getMessage(),
                     JSON_OBJECT_AS_ARRAY
                 )
         ];

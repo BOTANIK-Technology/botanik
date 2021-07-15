@@ -350,15 +350,25 @@ class TelegramAPI
 
         // Will upload this record to YClients CRM
 
-        if(Yclients::isActive()) {
+        if (Yclients::isActive()) {
             $yclients = new Yclients();
-            $yclients->api->addRecords([$record]);
+            if($status === false) {
+                //TODO: add colors
+                $yclients->api->addRecords([$record]);
+            } else {
+                $yclients->api->addRecords([$record]);
+            }
+
         }
 
         // Will upload this record to Beauty Pro CRM
-        if(BeautyPro::isActive()) {
+        if (BeautyPro::isActive()) {
             $beauty = new BeautyPro();
-            $beauty->api->addRecords([$record]);
+            if($status === false) {
+                $beauty->api->addRecords([$record], "Онлайн оплата: Платеж не подтвержден", "#fea726");
+            } else {
+                $beauty->api->addRecords([$record]);
+            }
         }
 
         Payment::create([

@@ -314,7 +314,7 @@ class ServiceController extends Controller
      */
     private function validateService(Request $request): Validator
     {
-        return \Validator::make($request->all(), [
+        $arr = [
             'price'     => 'required|integer|min:1',
             'bonus'     => 'nullable|integer|min:1',
             'type'      => 'required|integer',
@@ -329,10 +329,16 @@ class ServiceController extends Controller
             'cashpay'   => 'required|boolean',
             'onlinepay' => 'required|boolean',
             'bonuspay'  => 'required|boolean',
-            'prepay_message' => 'nullable|string',
-            'prepay_card'    => 'nullable|string',
-
-        ]);
+        ];
+        $data = $request->all();
+        if($data['prepay'] == true){
+            $arr['prepay_message']='required|string';
+            $arr['prepay_card']='required|string';
+        }else{
+            $arr['prepay_message']='nullable|string';
+            $arr['prepay_card']='nullable|string';
+        }
+        return \Validator::make($data, $arr);
     }
 
     /**

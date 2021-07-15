@@ -26,7 +26,12 @@
             <button type="button" id="time-confirm" class="btn-primary">
                 {{ __('Подтвердить') }}
             </button>
-            <a href="{{route('window.service', ['business' => $slug, 'modal' => 'edit', 'id' => $service_id, 'load' => $load])}}" id="refresh-modal"></a>
+            @if (isset($type_id))
+                <a href="{{route('window.service', ['business' => $slug, 'modal' => 'edit', 'id' => $service_id, 'load' => $load])}}" id="refresh-modal"></a>
+            @else
+                <a href="{{route('window.service', ['business' => $slug, 'modal' => 'create', 'id' => $service_id, 'load' => $load])}}" id="refresh-modal"></a>
+            @endif
+
         @endslot
 
     @endcomponent

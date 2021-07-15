@@ -4,6 +4,7 @@ namespace App\Services\Telegram\Callback;
 
 
 use App\Models\TelegramSession;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -27,6 +28,7 @@ class Master extends CallbackQuery
     private function getMaster($service_id, $address_id) {
         $masters = [];
         $service = \App\Models\Service::find($service_id);
+        /** @var User $user */
         foreach ($service->users as $user) {
             foreach ($user->addresses as $user_address) {
                 if ($user_address->id == $address_id) {

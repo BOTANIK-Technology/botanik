@@ -105,10 +105,10 @@ class Mail extends Model
                         default: return $query->where('frequency', 0);
                     }
                 })
-                ->when(!empty($params['last_service']), function ($query, $params) {
+                ->when(!empty($params['last_service']), function ($query) use ($params) {
                     return $query->where('last_service', $params['last_service']);
                 })
-                ->when(!empty($params['favorite_service']), function ($query, $params) {
+                ->when(!empty($params['favorite_service']), function ($query) use ($params) {
                     return $query->where('favorite_service', $params['favorite_service']);
                 })
                 ->pluck('chat_id')

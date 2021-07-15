@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mail;
 use App\Models\TypeService;
+use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -44,7 +45,8 @@ class MailController extends Controller
             [
                 'sort'  => $this->sort,
                 'modal' => $this->modal,
-                'types' => TypeService::all(),
+                //'types' => TypeService::all(),
+                'types' => Service::all(),
                 'table' => Mail::orderBy('created_at', $this->sort)->take($this->load)->get(),
                 'load'  => $this->load,
                 'age'   => $mail->age,
@@ -72,7 +74,6 @@ class MailController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 405);
         }
-
         $mail = new Mail();
         $data = [
             'title'            => $request->input('title'),
@@ -93,7 +94,7 @@ class MailController extends Controller
             return response()->json(['ok' => true]);
         }
         catch (\Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+            return response()->json(['errors' => ['server' => $e->getMessage().", ".$e->getFile().", ".$e->getLine()], 'data'=>$data], 500);
         }
     }
 

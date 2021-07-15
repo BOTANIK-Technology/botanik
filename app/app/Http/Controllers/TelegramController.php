@@ -62,6 +62,7 @@ class TelegramController extends Controller
         }
 
         else if($request->has('message.successful_payment')) {
+            Log::debug("Успешная оплата");
             return $this->paymentStatus($request);
         }
         else {

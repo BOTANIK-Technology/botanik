@@ -28,6 +28,23 @@ class Product extends CallbackQuery
             $this->chat_id,
             $product->title,
             $product->text,
+            json_encode([
+                "handler" => 'OnlinePayProduct',
+                "product_id" => $product->id,
+            ]),
+            $this->pay_token,
+            $this->chat_id,
+            'UAH',
+            [
+                ['label' => $product->title, 'amount' => $product->price * 100],
+            ],
+            false
+        );
+
+        /*$this->bot->sendInvoice(
+            $this->chat_id,
+            $product->title,
+            $product->text,
             'OnlinePayProduct_'.$product->id,
             $this->pay_token,
             $this->chat_id,
@@ -42,6 +59,6 @@ class Product extends CallbackQuery
             null,
             true,
             true,
-        );
+        );*/
     }
 }
