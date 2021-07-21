@@ -54,13 +54,13 @@
             @for($i = 0; $i < $moreService; $i++)
                 <div id="service-types-{{$i}}" class="flex direction-column">
                     @if ($services)
-                        <select onchange="userWin.changeService({{$i}});" id="service-type-{{$i}}" data-id="{{$i}}" name="service-{{$i}}[]">
+                        <select class="master-service"  onchange="userWin.changeService({{$i}});" id="service-type-{{$i}}" data-id="{{$i}}" name="service-{{$i}}[]">
                             @foreach($services as $service)
                                 <option value="{{$service->id}}">{{$service->name}}</option>
                             @endforeach
                         </select>
                     @else
-                        <select id="service-type-{{$i}}" name="service-{{$i}}[]" class="none">
+                        <select class="master-service none"  id="service-type-{{$i}}" name="service-{{$i}}[]">
                             <option selected>
                                 {{__('Нет услуг для выбора')}}
                             </option>
@@ -70,13 +70,29 @@
 
                 <div id="addresses-{{$i}}" class="flex direction-column">
                     @if ($addresses)
-                        <select id="address-{{$i}}" name="address-{{$i}}[]" style="display:none;">
+                        <select class="master-address hide"  onchange="userWin.changeAddress({{$i}});" id="address-{{$i}}" name="address-{{$i}}[]">
                             @foreach($addresses as $addr)
                                 <option value="{{$addr->id}}">{{$addr->address}}</option>
                             @endforeach
                         </select>
                     @else
-                        <select id="address-{{$i}}" name="address-{{$i}}[]" class="none">
+                        <select class="master-address none"  id="address-{{$i}}" name="address-{{$i}}[]">
+                            <option selected>
+                                {{__('Нет адреса для выбора')}}
+                            </option>
+                        </select>
+                    @endif
+                </div>
+
+                <div id="admin-addresses-{{$i}}" class="flex direction-column">
+                    @if ($addresses)
+                        <select onchange="userWin.changeAdminAddress({{$i}});" id="admin-address-{{$i}}" class="admin-address hide" name="admin-address-{{$i}}[]">
+                            @foreach($addresses as $addr)
+                                <option value="{{$addr->id}}">{{$addr->address}}</option>
+                            @endforeach
+                        </select>
+                    @else
+                        <select id="admin-address-{{$i}}" class="admin-address none hide" name="admin-address-{{$i}}[]">
                             <option selected>
                                 {{__('Нет адреса для выбора')}}
                             </option>

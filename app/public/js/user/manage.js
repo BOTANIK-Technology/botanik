@@ -65,12 +65,41 @@ function getData() {
 }
 
 function toogleServices(serviceSelects, show) {
-    serviceSelects.forEach((selects) => {
-        Object.keys(selects).forEach((k) => {
-            if (show === true) addClass(selects[k], 'hide');
-            else removeClass(selects[k], 'hide');
-        });
-    });
+    // serviceSelects.forEach((selects) => {
+    //     Object.keys(selects).forEach((k) => {
+    //         if (show === true) addClass(selects[k], 'hide');
+    //         else removeClass(selects[k], 'hide');
+    //     });
+    // });
+
+    let adminAddressEls = document.getElementsByClassName('admin-address');
+    let masterAddressEls = document.getElementsByClassName('master-address');
+    let masterServicesEls = document.getElementsByClassName('master-service');
+    let addTypeBtn = document.getElementById('add-type');
+    if (master.checked) {
+        for(let i = 0; i < adminAddressEls.length; i++) {
+            addClass(adminAddressEls[i], 'hide');
+        }
+        for(let i = 0; i < masterAddressEls.length; i++) {
+            removeClass(masterAddressEls[i], 'hide');
+        }
+        for(let i = 0; i < masterServicesEls.length; i++) {
+            removeClass(masterServicesEls[i], 'hide');
+        }
+        addTypeBtn.innerHTML = "Добавить услугу к специалисту";
+    } else if (admin.checked) {
+        for(let i = 0; i < adminAddressEls.length; i++) {
+            removeClass(adminAddressEls[i], 'hide');
+        }
+        for(let i = 0; i < masterAddressEls.length; i++) {
+            addClass(masterAddressEls[i], 'hide');
+        }
+        for(let i = 0; i < masterServicesEls.length; i++) {
+            addClass(masterServicesEls[i], 'hide');
+        }
+        addTypeBtn.innerHTML = "Добавить адрес к администратору";
+    }
+
 }
 
 let admin = document.getElementById('admin');
@@ -100,9 +129,11 @@ if (addedServices) {
 
 let serviceSelects = [];
 let addressSelects = [];
+let adminAddressSelects = [];
 for (let i = 0; i < countService; i++) {
     serviceSelects.push(document.getElementsByName('service-'+i+'[]'));
     addressSelects.push(document.getElementsByName('address-'+i+'[]'));
+    adminAddressSelects.push(document.getElementsByName('admin-address-'+i+'[]'));
 }
 
 if (calendar.length) {
@@ -168,7 +199,7 @@ if (calendar.length) {
     }
 }
 
-if (admin.checked) toogleServices(serviceSelects, true);
+//if (admin.checked) toogleServices(serviceSelects, true);
 admin.addEventListener('change', function () {
     toogleServices(serviceSelects, true)
 });

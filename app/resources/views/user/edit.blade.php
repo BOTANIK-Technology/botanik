@@ -9,10 +9,13 @@
     <script src="{{asset('js/user/page.js')}}"></script>
     <script src="{{asset('js/user/manage.js')}}"></script>
     <script src="{{asset('js/user/edit.js')}}"></script>
+    <script src="{{asset('js/user/user_window.js')}}"></script>
 @endsection
 
 @section('modal')
     @component('modal')
+        <input id="url_slug" type="hidden" value="{{$slug}}" name="url_slug">
+        <input type="hidden" id="token_id" name="_token" value="{{ csrf_token() }}">
         @slot('class')
             modal-edit
         @endslot
@@ -51,14 +54,30 @@
             @foreach($user->timetables as $timetable)
                 <div>
                     @if ($addresses)
-                        <select id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
+                        <select class="master-address"  onchange="userWin.changeAddress({{$loop->index}});" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
                             @foreach($addresses as $addr)
                                 <option value="{{$addr->id}}" {{$timetable->address_id == $addr->id ? 'selected' : ''}}>{{$addr->address}}</option>
                             @endforeach
                         </select>
                     @else
-                        <select id="address-{{$loop->index}}" name="address-{{$loop->index}}[]" class="none">
+                        <select class="master-address none" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
                             <option>
+                                {{__('Нет адреса для выбора')}}
+                            </option>
+                        </select>
+                    @endif
+                </div>
+
+                <div id="admin-addresses-{{$loop->index}}" class="flex direction-column">
+                    @if ($addresses)
+                        <select onchange="userWin.changeAdminAddress({{$loop->index}});" id="admin-address-{{$loop->index}}" name="admin-address-{{$loop->index}}[]" class="admin-address hide">
+                            @foreach($addresses as $addr)
+                                <option value="{{$addr->id}}" {{$timetable->address_id == $addr->id ? 'selected' : ''}}>{{$addr->address}}</option>
+                            @endforeach
+                        </select>
+                    @else
+                        <select id="admin-address-{{$loop->index}}" name="admin-address-{{$loop->index}}[]" class="admin-address none hide">
+                            <option selected>
                                 {{__('Нет адреса для выбора')}}
                             </option>
                         </select>
@@ -67,7 +86,7 @@
 
                 <div id="service-services-{{$loop->index}}" class="flex direction-column">
                     @if ($services)
-                        <select id="service-type-{{$loop->index}}" data-id="{{$loop->index}}" name="service-{{$loop->index}}[]">
+                        <select class="master-service" id="service-type-{{$loop->index}}" data-id="{{$loop->index}}" name="service-{{$loop->index}}[]">
                             @foreach($services as $service)
                                 <option value="{{$service->id}}" {{$timetable->service_id == $service->id ? 'selected' : ''}}>
                                     {{$service->name}}
@@ -75,7 +94,7 @@
                             @endforeach
                         </select>
                     @else
-                        <select id="service-type-{{$loop->index}}" name="service-{{$loop->index}}[]" class="none">
+                        <select class="master-service none" id="service-type-{{$loop->index}}" name="service-{{$loop->index}}[]">
                             <option>
                                 {{__('Нет услуг для выбора')}}
                             </option>
@@ -122,6 +141,21 @@
                             </select>
                         @else
                             <select id="address-{{$i}}" name="address-{{$i}}[]" class="none">
+                                <option selected>
+                                    {{__('Нет адреса для выбора')}}
+                                </option>
+                            </select>
+                        @endif
+                    </div>
+                    <div id="admin-addresses-{{$i}}" class="flex direction-column">
+                        @if ($addresses)
+                            <select id="admin-address-{{$i}}" name="admin-address-{{$i}}[]" class="admin-address hide">
+                                @foreach($addresses as $addr)
+                                    <option value="{{$addr->id}}">{{$addr->address}}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <select id="admin-address-{{$i}}" name="admin-address-{{$i}}[]" class="admin-address none hide">
                                 <option selected>
                                     {{__('Нет адреса для выбора')}}
                                 </option>
