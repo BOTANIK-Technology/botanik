@@ -84,8 +84,8 @@ class ScheduleController extends Controller
             $this->params['schedule'] = $schedule['times'] ?? false;
             $this->params['address'] = $schedule['address'] ?? false;
         }
-
         $this->params['records'] = $records;
+
     }
 
     /**

@@ -199,7 +199,9 @@ class Service extends Model
             return false;
         $collection = collect();
         foreach ($services as $service) {
-            $collection->add($service);
+            if(is_null($service->timetable)) {
+                $collection->add($service);
+            }
         }
        return $collection;
     }

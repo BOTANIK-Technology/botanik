@@ -39,6 +39,7 @@
 
                 @else
 
+
                     @include('schedule.record', ['record' => $service->records->where('date', $date)->where('time', $time), 'main' => true, 'i' => $time_i, 'row' => $row])
 
                 @endif

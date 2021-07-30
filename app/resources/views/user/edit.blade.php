@@ -54,13 +54,13 @@
             @foreach($user->timetables as $timetable)
                 <div>
                     @if ($addresses)
-                        <select class="master-address"  onchange="userWin.changeAddress({{$loop->index}});" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
+                        <select class="master-address hide"  onchange="userWin.changeAddress({{$loop->index}});" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
                             @foreach($addresses as $addr)
                                 <option value="{{$addr->id}}" {{$timetable->address_id == $addr->id ? 'selected' : ''}}>{{$addr->address}}</option>
                             @endforeach
                         </select>
                     @else
-                        <select class="master-address none" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
+                        <select class="master-address none hide" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
                             <option>
                                 {{__('Нет адреса для выбора')}}
                             </option>
@@ -86,7 +86,7 @@
 
                 <div id="service-services-{{$loop->index}}" class="flex direction-column">
                     @if ($services)
-                        <select class="master-service" id="service-type-{{$loop->index}}" data-id="{{$loop->index}}" name="service-{{$loop->index}}[]">
+                        <select class="master-service hide" id="service-type-{{$loop->index}}" data-id="{{$loop->index}}" name="service-{{$loop->index}}[]">
                             @foreach($services as $service)
                                 <option value="{{$service->id}}" {{$timetable->service_id == $service->id ? 'selected' : ''}}>
                                     {{$service->name}}
@@ -94,7 +94,7 @@
                             @endforeach
                         </select>
                     @else
-                        <select class="master-service none" id="service-type-{{$loop->index}}" name="service-{{$loop->index}}[]">
+                        <select class="master-service  hide none" id="service-type-{{$loop->index}}" name="service-{{$loop->index}}[]">
                             <option>
                                 {{__('Нет услуг для выбора')}}
                             </option>
@@ -117,21 +117,6 @@
 
             @if ($moreService > count($user->addresses))
                 @for($i = count($user->addresses); $i < $moreService; $i++)
-                    <div id="service-services-{{$i}}" class="flex direction-column">
-                        @if ($services)
-                            <select id="service-type-{{$i}}" data-id="{{$i}}" name="service-{{$i}}[]">
-                                @foreach($services as $service)
-                                    <option value="{{$service->id}}">{{$service->name}}</option>
-                                @endforeach
-                            </select>
-                        @else
-                            <select id="service-type-{{$i}}" name="service-{{$loop->index}}[]" class="none">
-                                <option selected>
-                                    {{__('Нет услуг для выбора')}}
-                                </option>
-                            </select>
-                        @endif
-                    </div>
                     <div>
                         @if ($addresses)
                             <select id="address-{{$i}}" name="address-{{$i}}[]">
@@ -158,6 +143,21 @@
                             <select id="admin-address-{{$i}}" name="admin-address-{{$i}}[]" class="admin-address none hide">
                                 <option selected>
                                     {{__('Нет адреса для выбора')}}
+                                </option>
+                            </select>
+                        @endif
+                    </div>
+                    <div id="service-services-{{$i}}" class="flex direction-column">
+                        @if ($services)
+                            <select id="service-type-{{$i}}" data-id="{{$i}}" name="service-{{$i}}[]">
+                                @foreach($services as $service)
+                                    <option value="{{$service->id}}">{{$service->name}}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <select id="service-type-{{$i}}" name="service-{{$loop->index}}[]" class="none">
+                                <option selected>
+                                    {{__('Нет услуг для выбора')}}
                                 </option>
                             </select>
                         @endif
