@@ -7,6 +7,7 @@
     @foreach($window_records as $record)
         <div class="m20px-0">
             <div class="grid create">
+                <label>{{$record->getService()->name}}</label>
 
                 <label for="client-{{$record->id}}">
                     <input id="client-{{$record->id}}" class="inp active" value="{{$record->telegramUser->getFio()}}" disabled>
@@ -38,7 +39,7 @@
                 data-id="{{$record->id}}"
                 data-href="{{route('schedule.update', ['business' => $slug, 'id' => $record->id])}}"
                 class="btn-primary"
-                onclick="update()"
+                onclick="update({{$record->id}}, '{{route('schedule.update', ['business' => $slug, 'id' => $record->id])}}')"
             >
                 {{ __('Изменить') }}
             </button>

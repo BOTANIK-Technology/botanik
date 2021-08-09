@@ -18,7 +18,7 @@
                 id="delete-{{$record->id}}"
                 data-href="{{route('schedule.delete', ['business' => $slug, 'id' => $record->id])}}"
                 class="btn-primary text-align-center"
-                onclick="deleteSchedule()"
+                onclick="deleteSchedule('{{route('schedule.delete', ['business' => $slug, 'id' => $record->id])}}')"
             >
                 {{ __('Удалить') }}
             </button>

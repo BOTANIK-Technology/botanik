@@ -48,6 +48,11 @@ class Record extends Model
         return $this->belongsTo(Service::class);
     }
 
+    public function getService()
+    {
+        return Service::find($this->service_id);
+    }
+
     /**
      * @return BelongsTo
      */

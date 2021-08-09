@@ -8,6 +8,7 @@ use App\Models\CatalogReport;
 use App\Models\Report;
 use App\Models\TypeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ReportController extends Controller
 {
@@ -116,6 +117,8 @@ class ReportController extends Controller
         $this->params['end_date']   = $request->end_date ?? '';
 
         $file_path = $this->getReport($request->sort, $request->business, $catalog);
+
+        Log::debug("Закачка файлов: " . $file_path);
 
         if (file_exists($file_path)) {
             return \Response::download($file_path, $request->file, [
