@@ -249,9 +249,8 @@ class CallbackQuery extends TelegramAPI
 
     /**
      * @param array $buttons
-     * @return InlineKeyboardMarkup
      */
-    public function buildInlineKeyboard($buttons = []) : InlineKeyboardMarkup
+    public function buildInlineKeyboard($buttons = [])
     {
         if (!empty($this->back))
             $buttons[] = [['text' => '< НАЗАД', 'callback_data' => $this->back]];

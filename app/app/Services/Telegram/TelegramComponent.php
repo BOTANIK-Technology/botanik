@@ -3,8 +3,9 @@
 namespace App\Services\Telegram;
 
 
-use http\Client;
+use \GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 
 /**
@@ -60,10 +61,13 @@ class TelegramComponent
         ],
     ];
 
+    private $client;
+
     public function __construct(Request $request)
     {
         // set telegram token
         $this->botToken = $request->input('token');
+        $this->client = new Client();
 
     }
 
@@ -75,6 +79,8 @@ class TelegramComponent
             ]),
         ];
     }
+
+
 
 
     /**
@@ -114,10 +120,9 @@ class TelegramComponent
             ->send();
 
         if ($response->isOk) {
-//            Yii::info(print_r($response->data, true));
+
             return $response->data;
         }
-//        else Yii::info(print_r($response->content, true));
 
         return false;
     }
@@ -154,11 +159,9 @@ class TelegramComponent
         $response = $client->setUrl(self::ACTION_GET_WEBHOOK_INFO)
             ->send();
 
-        if ($response->isOk) {
-//            Yii::info(print_r($response->data, true));
+
             return $response->data;
-        }
-//        else Yii::info(print_r($response->content, true));
+
 
         return false;
     }
@@ -168,29 +171,24 @@ class TelegramComponent
      * @param $chat_id integer
      * @param $text string
      * @param $params array
-     * @return array|boolean
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function sendMessage($chat_id, $text, $params = [])
+    public function sendMessage($chat_id, $text, $menu): string
     {
-//        \Yii::info('sendMessage');
-//        \Yii::info('chat_id: '.$chat_id);
-        $client = $this->getRequest();
+        $data = array_merge([
+            'chat_id'    => $chat_id,
+            'text'       => $text,
+            'parse_mode' => 'html',
+        ], (array)$menu );
 
-        $response = $client->setUrl(self::ACTION_SEND_MESSAGE)
-            ->setData(array_merge([
-                'chat_id'    => $chat_id,
-                'text'       => $text,
-                'parse_mode' => 'html',
-            ], $params))
-            ->send();
+        $response = $this->client->request('post', $this->url . $this->botToken . '/' . self::ACTION_SEND_MESSAGE,
+            [
+                'form_params' => $data
+            ]);
 
-        if ($response->isOk) {
-//            Yii::info(print_r($response->data, true));
-            return $response->data;
-        }
-//        else Yii::info(print_r($response->content, true));
+        Log::debug($response->getBody()->getContents());
+        return $response->getBody()->getContents();
 
-        return false;
     }
 
     /**
@@ -200,25 +198,22 @@ class TelegramComponent
      * @param array $params
      * @return bool|mixed
      */
-    public function updateMessage($chat_id, $message_id, $text, $params = [])
+    public function updateMessage($chat_id, $message_id, $text)
     {
 
-        $response = $this->getRequest()->setUrl(self::ACTION_UPDATE_MESSAGE_TEXT)
-            ->setData(array_merge([
-                'chat_id'    => $chat_id,
-                'message_id' => $message_id,
-                'text'       => $text,
-                'parse_mode' => 'html',
-            ], $params))
-            ->send();
+        $data = [
+            'chat_id'    => $chat_id,
+            'text'       => $text,
+            'message_id' => $message_id,
+            'parse_mode' => 'html',
+        ];
 
-        if ($response->isOk) {
-//            Yii::info(print_r($response->data, true));
-            return $response->data;
-        }
-//        else Yii::info(print_r($response->content, true));
+        $response = $this->client->request('post', $this->url . $this->botToken . '/' . self::ACTION_UPDATE_MESSAGE_TEXT,
+            [
+                'form_params' => $data
+            ]);
 
-        return false;
+        Log::debug($response->getBody()->getContents());
     }
 
     /**
@@ -331,11 +326,12 @@ class TelegramComponent
     /**
      * Создание запроса
      */
-    private function getRequest()
+    private function getRequest(): Client
     {
 
-        return (new Client(['baseUrl' => $this->url . $this->botToken]))->createRequest()
-            ->setMethod('POST');
+        return new Client();
     }
 
 }
+
+

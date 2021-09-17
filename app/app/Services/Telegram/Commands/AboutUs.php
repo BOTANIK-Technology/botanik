@@ -27,7 +27,7 @@ class AboutUs extends Command
     /**
      * @return InlineKeyboardMarkup
      */
-    private function getInfo(): InlineKeyboardMarkup
+    private function getInfo()
     {
         $infos = Information::all();
         $array = [];

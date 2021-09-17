@@ -100,8 +100,8 @@ class TelegramAPI
      */
     public function sendMessage($text, $params = [], $replyTo = null, $parseMode = 'HTML', $disablePreview = false)
     {
-        if (!isset($params['keyboard'])) {
-            $params['keyboard'] = $this->bot->buildReplyKeyboard($this->menu);
+        if (empty($params)){
+            $params = $this->buildReplyKeyboard($this->menu);
         }
         return $this->bot->sendMessage($this->chat_id, $text, $params);
     }
@@ -153,9 +153,9 @@ class TelegramAPI
      * @param bool $disablePreview
      * @return Message
      */
-    public function editMessage($text, $keyboard = null, $parseMode = 'HTML', $disablePreview = false): Message
+    public function editMessage($text, $keyboard = null, $parseMode = 'HTML', $disablePreview = false)
     {
-        return $this->bot->editMessageText($this->chat_id, $this->message_id, $text, $parseMode, $disablePreview, $keyboard);
+        return $this->bot->updateMessage($this->chat_id, $this->message_id, $text, $parseMode, $disablePreview, $keyboard);
     }
 
     /**
@@ -166,23 +166,22 @@ class TelegramAPI
         return $this->bot->deleteMessage($this->chat_id, $this->message_id);
     }
 
-    /**
-     * @param array $buttons
-     * @param bool $oneTime
-     * @return ReplyKeyboardMarkup
-     */
-    public function buildReplyKeyboard($buttons = [], $oneTime = true): ReplyKeyboardMarkup
+    public function buildReplyKeyboard($keys)
     {
-        return $keyboard = new ReplyKeyboardMarkup($buttons, $oneTime);
+        return [
+            'reply_markup' => json_encode([
+                'keyboard' => $keys,
+            ]),
+        ];
     }
 
-    /**
-     * @param array $buttons
-     * @return InlineKeyboardMarkup
-     */
-    public function buildInlineKeyboard($buttons = []): InlineKeyboardMarkup
+    public function buildInlineKeyboard($keys)
     {
-        return $keyboard = new InlineKeyboardMarkup($buttons);
+        return [
+            'reply_markup' => json_encode([
+                'inline_keyboard' => $keys,
+            ]),
+        ];
     }
 
     /**
@@ -197,9 +196,9 @@ class TelegramAPI
     }
 
     /**
-     * @return InlineKeyboardMarkup
+
      */
-    public function buildStars(): InlineKeyboardMarkup
+    public function buildStars()
     {
         $star = hex2bin('E2AD90');
         return $this->buildInlineKeyboard(
