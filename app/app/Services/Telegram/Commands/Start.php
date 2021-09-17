@@ -24,6 +24,7 @@ class Start extends Command
     }
 
     private function redirect() {
-        return parent::getMenu(__('Вы авторизованы'));
+//        return parent::getMenu(__('Вы авторизованы'));
+        return parent::sendMessage(__('Вы авторизованы'));
     }
 }

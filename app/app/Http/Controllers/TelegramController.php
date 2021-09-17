@@ -27,6 +27,7 @@ class TelegramController extends Controller
         else if ($request->has('pre_checkout_query.from.id')) {
             $id = $request->input('pre_checkout_query.from.id');
         }
+
         if ($client = TelegramUser::where('chat_id', $id)->first()) {
             if ($client->status) {
                 $request->merge(['client' => $client]);

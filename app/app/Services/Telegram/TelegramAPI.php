@@ -21,9 +21,11 @@ use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 
+
 class TelegramAPI
 {
-    public BotApi $bot;
+//    public BotApi $bot;
+    public TelegramComponent $bot;
     public $user = false;
     public $package;
     public string $token;
@@ -55,7 +57,10 @@ class TelegramAPI
         // set telegram token
         $this->token = $request->input('token');
         // set object of telegram bot api
-        $this->bot = new BotApi($this->token);
+//        $this->bot = new BotApi($this->token);
+
+        $this->bot = new TelegramComponent($request);
+
         // set pay token
         $this->pay_token = $request->input('pay_token') ?? null;
         // set business database name
@@ -87,6 +92,23 @@ class TelegramAPI
 
     /**
      * @param $text
+     * @param array $params
+     * @param null $replyTo
+     * @param string $parseMode
+     * @param bool $disablePreview
+     * @return array|bool
+     */
+    public function sendMessage($text, $params = [], $replyTo = null, $parseMode = 'HTML', $disablePreview = false)
+    {
+        if (!isset($params['keyboard'])) {
+            $params['keyboard'] = $this->bot->buildReplyKeyboard($this->menu);
+        }
+        return $this->bot->sendMessage($this->chat_id, $text, $params);
+    }
+
+
+    /**
+     * @param $text
      * @param null $keyboard
      * @param null $replyTo
      * @param string $parseMode
@@ -95,10 +117,18 @@ class TelegramAPI
      * @throws Exception
      * @throws InvalidArgumentException
      */
+
+/*
     public function sendMessage($text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disablePreview = false): Message
     {
+        if (! $keyboard){
+            $keyboard = $this->buildReplyKeyboard($this->menu);
+        }
+//        return $this->bot->sendMessage($this->chat_id, $text, $parseMode, $disablePreview, $replyTo, $keyboard);
+
         return $this->bot->sendMessage($this->chat_id, $text, $parseMode, $disablePreview, $replyTo, $keyboard);
     }
+*/
 
     /**
      * @param $photo
