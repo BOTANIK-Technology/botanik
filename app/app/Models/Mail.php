@@ -6,6 +6,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
@@ -73,7 +74,7 @@ class Mail extends Model
 
         if ($all) {
 
-            $ids = TelegramUser::select('chat_id')->get()->toArray();
+            $ids = TelegramUser::select('chat_id', "<>", null)->get()->toArray();
 
         } else {
 
@@ -126,31 +127,36 @@ class Mail extends Model
         $bot = new BotApi($token);
         $mess = '<b>'.$params['title'].'</b>'."\n\n".$params['text'];
 
+        Log::debug("TelegramMessage", $params);
+
         if (is_null($params['img'])) {
 
             foreach ($ids as $id) {
-                $bot->sendMessage(
-                    $id,
-                    $mess,
-                    'HTML',
-                    false,
-                    null,
-                    $keyboard
-                );
+                if(!empty($id)) {
+                    $bot->sendMessage(
+                        $id,
+                        $mess,
+                        'HTML',
+                        false,
+                        null,
+                        $keyboard
+                    );
+                }
             }
 
         } else {
-
             foreach ($ids as $id) {
-                $bot->sendPhoto(
-                    $id,
-                    asset('public/storage/'.$params['img']),
-                    $mess,
-                    null,
-                    $keyboard,
-                    false,
-                    'HTML'
-                );
+                if(!empty($id)) {
+                    $bot->sendPhoto(
+                        $id,
+                        asset('public/storage/' . $params['img']),
+                        $mess,
+                        null,
+                        $keyboard,
+                        false,
+                        'HTML'
+                    );
+                }
             }
 
         }

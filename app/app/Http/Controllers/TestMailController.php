@@ -13,6 +13,7 @@ use App\Models\UserTimetable;
 use App\Models\Role;
 use App\Models\Address;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Validator;
 use Illuminate\View\View;
@@ -22,6 +23,13 @@ use Swift_SmtpTransport;
 
 class TestMailController extends Controller
 {
+
+    public function owner()
+    {
+        $owner = DB::table('users_roles')->where('role_id', 1)->first();
+        $owner = User::find($owner->user_id);
+        echo $owner->email;
+    }
 
     public function send(Request $request): string
     {

@@ -3,6 +3,7 @@
 namespace App\Services\Telegram\Callback;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class Product extends CallbackQuery
 {
@@ -18,12 +19,13 @@ class Product extends CallbackQuery
     }
 
     private function view() {
+
         $product = \App\Models\Catalog::find($this->getCallbackID());
         $product->writeToReport(true);
 
         if (!$product)
             return;
-
+        Log::debug("TelegramImgUrl: " . $product->img);
         $this->bot->sendInvoice(
             $this->chat_id,
             $product->title,
@@ -38,7 +40,11 @@ class Product extends CallbackQuery
             [
                 ['label' => $product->title, 'amount' => $product->price * 100],
             ],
-            false
+            false,
+            $product->img,
+            200,
+            200,
+            200
         );
 
         /*$this->bot->sendInvoice(

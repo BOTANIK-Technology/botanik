@@ -2,10 +2,6 @@
 
 namespace App\Services\Telegram;
 
-use App\Facades\ConnectService;
-use App\Helpers\Beauty\BeautyPro;
-use App\Helpers\Yclients\Yclients;
-use App\Helpers\Yclients\YclientsException;
 use App\Jobs\SendNotice;
 use App\Jobs\TelegramFeedBack;
 use App\Jobs\TelegramNotice;
@@ -13,8 +9,8 @@ use App\Models\Payment;
 use App\Models\Record;
 use App\Models\Service;
 use App\Models\TelegramSession;
-use App\Models\User;
 use Carbon\Carbon;
+use ConnectService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -101,6 +97,9 @@ class TelegramAPI
      */
     public function sendMessage($text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disablePreview = false): Message
     {
+        if (! $keyboard){
+            $keyboard = $this->buildReplyKeyboard($this->menu);
+        }
         return $this->bot->sendMessage($this->chat_id, $text, $parseMode, $disablePreview, $replyTo, $keyboard);
     }
 
@@ -260,14 +259,6 @@ class TelegramAPI
     }
 
     /**
-     * @return mixed
-     */
-    public function getSessionId ()
-    {
-        return $this->user->telegramSession->id;
-    }
-
-    /**
      * @return int
      */
     public function getAddressID (): int
@@ -276,9 +267,9 @@ class TelegramAPI
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getMasterID (): ?int
+    public function getMasterID (): int
     {
         return $this->user->telegramSession->master;
     }
@@ -304,8 +295,7 @@ class TelegramAPI
      */
     public function getRecordID (): int
     {
-        $record_id = $this->user->telegramSession->record;
-        return is_null($record_id) ? 0 : $record_id;
+        return $this->user->telegramSession->record;
     }
 
     /**
@@ -326,15 +316,9 @@ class TelegramAPI
      * @param bool $online_pay
      * @param int $bonus
      * @return Record|Model|bool
-     * @throws YclientsException
      */
     protected function createRecord ($status = true, $online_pay = false, $bonus = 0)
     {
-        $service_id = $this->getServiceID();
-        $master_id = $this->getMasterID();
-        $date = $this->getDate();
-        $time = $this->getTime();
-
         try {
             $service = Service::find( $this->getServiceID() );
         } catch (\Exception $e) {
@@ -343,40 +327,15 @@ class TelegramAPI
         $price = intval( $service->price );
         if ($bonus > 0) $price = $this->currentPrice($price, $bonus);
 
-        if($this->isRecordBusy($service_id, $master_id, $date, $time)) return false;
-
         $record = Record::create([
             'telegram_user_id' => $this->user->id,
-            'service_id' => $service_id,
+            'service_id' => $this->getServiceID(),
             'address_id' => $this->getAddressID(),
-            'user_id' => $master_id,
-            'time' => $time,
-            'date' => $date,
+            'user_id' => $this->getMasterID(),
+            'time' => $this->getTime(),
+            'date' => $this->getDate(),
             'status' => $status
         ]);
-
-        // Will upload this record to YClients CRM
-
-        if (Yclients::isActive()) {
-            $yclients = new Yclients();
-            if($status === false) {
-                //TODO: add colors
-                $yclients->api->addRecords([$record]);
-            } else {
-                $yclients->api->addRecords([$record]);
-            }
-
-        }
-
-        // Will upload this record to Beauty Pro CRM
-        if (BeautyPro::isActive()) {
-            $beauty = new BeautyPro();
-            if($status === false) {
-                $beauty->api->addRecords([$record], "Онлайн оплата: Платеж не подтвержден", "#fea726");
-            } else {
-                $beauty->api->addRecords([$record]);
-            }
-        }
 
         Payment::create([
             'online_pay' => $online_pay,
@@ -402,31 +361,12 @@ class TelegramAPI
             }
             if($bonus == 0 && $service->bonus)
                 $this->user->bonus += $service->bonus;
-            //$this->user->save();
-
+            $this->user->save();
             $this->createRecordNotice($service->name, $record->id);
             $this->groupMessage($service);
         }
 
         return $record;
-    }
-
-    /**
-     * @param $service_id
-     * @param $master_id
-     * @param $date
-     * @param $time
-     * @return bool
-     */
-    private function isRecordBusy($service_id, $master_id, $date, $time): bool
-    {
-        $count = Record::query()
-            ->where("service_id", $service_id)
-            ->where("user_id", $master_id)
-            ->where("date", $date)
-            ->where("time", $time)
-            ->count();
-        return $count > 0;
     }
 
     private function groupMessage (Service $service)
@@ -485,21 +425,21 @@ class TelegramAPI
             $this->business_db,
             $this->chat_id,
             $record_id,
-            __('Напоминание. Вы записаны на услугу').' "'.$service_name.'". Начало ' . Carbon::parse($this->getDate())->format("d.m.Y") . ' в '.$this->getTime(),
+            __('Напоминание. Сегодня Вы записаны на услугу').' "'.$service_name.'". Начало в '.$this->getTime(),
             $this->getDate(),
             $this->getTime(),
             $this->token
-        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->subHour());
+        )->delay(Carbon::parse($this->getDate().$this->getTime())->subHour());
 
         /*
          * Client feedback
          */
-//        TelegramFeedBack::dispatch(
-//            $this->business_db,
-//            $this->chat_id,
-//            $record_id,
-//            $this->token
-//        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->addDay());
+        TelegramFeedBack::dispatch(
+            $this->business_db,
+            $this->chat_id,
+            $record_id,
+            $this->token
+        )->delay(Carbon::parse($this->getDate().$this->getTime())->addDay());
 
         ConnectService::dbConnect($this->business_db);
     }

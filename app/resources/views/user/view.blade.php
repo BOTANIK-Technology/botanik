@@ -12,12 +12,12 @@
             <div class="line"></div>
             @if ($user->timetables && !$user->timetables->isEmpty())
                 @foreach($user->timetables as $timetable)
-                    <span>{{__('Адрес')}}</span>
-                    <div>{{$timetable->address->address}}</div>
                     @if($user->hasRole('master'))
                         <span>{{__('Услуга')}}</span>
                         <div>{{$timetable->service->name}}</div>
                     @endif
+                    <span>{{__('Адрес')}}</span>
+                    <div>{{$timetable->address->address}}</div>
                     <span>{{__('Расписание')}}</span>
                     <div>
                         @foreach($timetable->getDays() as $day => $ru)

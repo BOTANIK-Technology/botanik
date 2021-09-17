@@ -161,6 +161,7 @@ Route::group(
                 Route::post('/schedule/update/{id}', [App\Http\Controllers\ScheduleController::class, 'editSchedule'])->name('schedule.update');
                 Route::post('/schedule/create', [App\Http\Controllers\ScheduleController::class, 'createRecord'])->name('schedule.create');
                 Route::get('/testmail',[App\Http\Controllers\TestMailController::class, 'send'])->name('emails.user-create');
+                Route::get('/testowner',[App\Http\Controllers\TestMailController::class, 'owner'])->name('emails.owner');
                 /**
                  * Reports routes
                  */

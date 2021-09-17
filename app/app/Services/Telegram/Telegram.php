@@ -70,26 +70,32 @@ class Telegram
     public function setSuccessPayment(Request $request) {
         /** @var TelegramUser $telegramUser */
         $telegramUser = $request->input("client");
-        $record_id = $telegramUser->telegramSession->record;
-        if($record_id > 0) {
-            $query = Record::query()->where("id", $record_id);
-            $query->update(["status" => 1]);
-            $query = Payment::query()->where("record_id", $record_id);
-            $query->update(["status" => 1]);
+        if(!is_null($telegramUser)) {
+            $record_id = $telegramUser->telegramSession->record;
+            if($record_id > 0) {
+                $query = Record::query()->where("id", $record_id);
+                $query->update(["status" => 1]);
+                $query = Payment::query()->where("record_id", $record_id);
+                $query->update(["status" => 1]);
 
-            $record = Record::query()->where("id", $record_id)->first()->toArray();
-            if (Yclients::isActive()) {
-                // Todo: update record api call
-                //$yclients = new Yclients();
-                //$yclients->api->addRecords([$record]);
-            }
+                $record = Record::query()->where("id", $record_id)->first();
+                if(!is_null($record)) {
+                    if (Yclients::isActive()) {
+                        // Todo: update record api call
+                        //$yclients = new Yclients();
+                        //$yclients->api->addRecords([$record]);
+                    }
 
-            // Will upload this record to Beauty Pro CRM
-            if (BeautyPro::isActive()) {
-                $beauty = new BeautyPro();
-                $beauty->api->updateRecords($record["id"], "Онлайн оплата: Успешная оплата", "#49cc90");
+                    // Will upload this record to Beauty Pro CRM
+                    if (BeautyPro::isActive()) {
+                        $beauty = new BeautyPro();
+                        $beauty->api->updateRecords($record->id, "Онлайн оплата: Успешная оплата", "#49cc90");
+                    }
+                }
+
             }
         }
+
     }
 
     /**

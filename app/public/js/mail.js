@@ -17,6 +17,7 @@ function getValues () {
         'age_start': document.getElementById('age_start').value,
         'age_end': document.getElementById('age_end').value,
         'sex': document.getElementById('sex').value,
+        'img': document.getElementById('img').value,
         'frequency': document.getElementById('frequency').value,
         'button': document.getElementById('button').value,
         'last_service': document.getElementById('last_service').value,
