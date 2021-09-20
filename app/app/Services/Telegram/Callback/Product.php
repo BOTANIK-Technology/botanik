@@ -23,7 +23,6 @@ class Product extends CallbackQuery
 
         if (!$product)
             return;
-
         $this->bot->sendInvoice(
             $this->chat_id,
             $product->title,

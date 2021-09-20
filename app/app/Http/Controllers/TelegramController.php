@@ -37,7 +37,7 @@ class TelegramController extends Controller
             }
         }
         else {
-            Log::debug($id . ': Клиент не создан');
+            Log::debug($id . ': Клиент не создан: ' . var_export($request->input(), true) );
         }
 
 

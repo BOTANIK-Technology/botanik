@@ -25,6 +25,7 @@ class TelegramComponent
      */
     const ACTION_SEND_MESSAGE = 'sendMessage';
     const ACTION_SEND_PHOTO = 'sendPhoto';
+    const ACTION_SEND_INVOICE = 'sendInvoice';
     const DELETE_MESSAGE = 'deleteMessage';
 
     const ACTION_UPDATE_MESSAGE_TEXT = 'editMessageText';
@@ -269,11 +270,11 @@ class TelegramComponent
             'disable_web_page_preview' => $disablePreview,
             'reply_markup'             => json_encode($replyMarkup),
         ]);
-
+        Log::alert(self::ACTION_UPDATE_MESSAGE_TEXT, (array) $response);
         if ($response->ok) {
             return $response->result;
         }
-        Log::error(self::ACTION_UPDATE_MESSAGE_TEXT, $response->result);
+        Log::error(self::ACTION_UPDATE_MESSAGE_TEXT, (array) $response->result);
         return false;
     }
 
@@ -307,6 +308,91 @@ class TelegramComponent
                 'mess ID' => $messageId] );
         }
     }
+
+    /**
+     * Use this method to send invoices. On success, the sent Message is returned.
+     *
+     * @param int|string $chatId
+     * @param string $title
+     * @param string $description
+     * @param string $payload
+     * @param string $providerToken
+     * @param string $startParameter
+     * @param string $currency
+     * @param array $prices
+     * @param string|null $photoUrl
+     * @param int|null $photoSize
+     * @param int|null $photoWidth
+     * @param int|null $photoHeight
+     * @param bool $needName
+     * @param bool $needPhoneNumber
+     * @param bool $needEmail
+     * @param bool $needShippingAddress
+     * @param bool $isFlexible
+     * @param int|null $replyToMessageId
+     * @param bool $disableNotification
+     * @param string|null $providerData
+     * @param bool $sendPhoneNumberToProvider
+     * @param bool $sendEmailToProvider
+     *
+     * @throws GuzzleException
+     */
+    public function sendInvoice(
+        $chatId,
+        $title,
+        $description,
+        $payload,
+        $providerToken,
+        $startParameter,
+        $currency,
+        $prices,
+        $isFlexible = false,
+        $photoUrl = null,
+        $photoSize = null,
+        $photoWidth = null,
+        $photoHeight = null,
+        $needName = false,
+        $needPhoneNumber = false,
+        $needEmail = false,
+        $needShippingAddress = false,
+        $replyToMessageId = null,
+        $replyMarkup = null,
+        $disableNotification = false,
+        $providerData = null,
+        $sendPhoneNumberToProvider = false,
+        $sendEmailToProvider = false
+    ) {
+        $data = [
+            'chat_id' => $chatId,
+            'title' => $title,
+            'description' => $description,
+            'payload' => $payload,
+            'provider_token' => $providerToken,
+            'start_parameter' => $startParameter,
+            'currency' => $currency,
+            'prices' => json_encode($prices),
+            'is_flexible' => $isFlexible,
+            'photo_url' => $photoUrl,
+            'photo_size' => $photoSize,
+            'photo_width' => $photoWidth,
+            'photo_height' => $photoHeight,
+            'need_name' => $needName,
+            'need_phone_number' => $needPhoneNumber,
+            'need_email' => $needEmail,
+            'need_shipping_address' => $needShippingAddress,
+            'reply_to_message_id' => $replyToMessageId,
+            'disable_notification' => (bool)$disableNotification,
+            'provider_data' => $providerData,
+            'send_phone_number_to_provider' => (bool)$sendPhoneNumberToProvider,
+            'send_email_to_provider' => (bool)$sendEmailToProvider
+        ];
+        if ($replyMarkup){
+            $data['reply_markup'] = '';
+        }
+        return $this->sendRequest(self::ACTION_SEND_INVOICE, $data);
+    }
+
+
 
 
     /**
@@ -422,15 +508,28 @@ class TelegramComponent
      */
     private function sendRequest($method, $data)
     {
-        $res = $this->client->request('post', $this->url . $this->botToken . '/' . $method,
-            [
-                'form_params' => $data,
-            ]);
-
-        if ($res->getStatusCode() == 200) {
-            return json_decode($res->getBody()->getContents());
+        $response = new Response();
+        try {
+            $resp = $this->client->request('post', $this->url . $this->botToken . '/' . $method,
+                [
+                    'form_params' => $data,
+                ]);
+            $res =  json_decode($resp->getBody()->getContents() );
+            if ($resp->getStatusCode() == 200) {
+                $response->result = (array) $res->result;
+            }
+            else {
+                Log::error($method . ' Error: ' . $res->getBody()->getContents(), $data);
+                $response->ok = false;
+                $response->result = (array) $res;
+            }
         }
-        throw new \HttpException('HTTP ERROR', $res->getStatusCode());
+        catch (\Exception $e){
+            Log::error($method . ' ErrorExeption: ' . $e->getMessage(), $data);
+            $response->ok = false;
+            $response->result = $data ;
+        }
+        return $response;
     }
 
 }

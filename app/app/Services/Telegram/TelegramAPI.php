@@ -57,6 +57,7 @@ class TelegramAPI
     {
         // set telegram token
         $this->token = $request->input('token');
+
         // set object of telegram bot api
 //        $this->bot = new BotApi($this->token);
 
@@ -72,6 +73,9 @@ class TelegramAPI
         if ($request->has('client')) {
             $this->user = $request->input('client');
         }
+
+   //     Log::debug($request->input());
+
         // set catalog
         if (!is_null($this->pay_token) && $request->has('catalog') && $request->input('catalog') == true) {
             $this->menu = [
@@ -107,6 +111,7 @@ class TelegramAPI
 
     public function sendMessage($text, $keyboard = null, $replyTo = null, string $parseMode = 'HTML', bool $disablePreview = false)
     {
+        Log::alert('ChatId: '. $this->chat_id);
         if (! $keyboard){
             $keyboard = $this->buildReplyKeyboard($this->menu);
         }
