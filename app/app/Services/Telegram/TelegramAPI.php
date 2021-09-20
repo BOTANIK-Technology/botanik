@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\TelegramSession;
 use Carbon\Carbon;
 use ConnectService;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -59,7 +60,7 @@ class TelegramAPI
         // set object of telegram bot api
 //        $this->bot = new BotApi($this->token);
 
-        $this->bot = new TelegramComponent($request);
+        $this->bot = new TelegramComponent($this->token);
 
         // set pay token
         $this->pay_token = $request->input('pay_token') ?? null;
@@ -68,7 +69,9 @@ class TelegramAPI
         // set package of business
         $this->package = $request->input('package');
         // set client collection
-        if ($request->has('client')) $this->user = $request->input('client');
+        if ($request->has('client')) {
+            $this->user = $request->input('client');
+        }
         // set catalog
         if (!is_null($this->pay_token) && $request->has('catalog') && $request->input('catalog') == true) {
             $this->menu = [
@@ -90,22 +93,6 @@ class TelegramAPI
         }
     }
 
-    /**
-     * @param $text
-     * @param array $params
-     * @param null $replyTo
-     * @param string $parseMode
-     * @param bool $disablePreview
-     * @return array|bool
-     */
-    public function sendMessage($text, $params = [], $replyTo = null, $parseMode = 'HTML', $disablePreview = false)
-    {
-        if (empty($params)){
-            $params = $this->buildReplyKeyboard($this->menu);
-        }
-        return $this->bot->sendMessage($this->chat_id, $text, $params);
-    }
-
 
     /**
      * @param $text
@@ -113,22 +100,19 @@ class TelegramAPI
      * @param null $replyTo
      * @param string $parseMode
      * @param bool $disablePreview
-     * @return Message
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @return false|string
+     * @throws GuzzleException
      */
 
-/*
-    public function sendMessage($text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disablePreview = false): Message
+
+    public function sendMessage($text, $keyboard = null, $replyTo = null, string $parseMode = 'HTML', bool $disablePreview = false)
     {
         if (! $keyboard){
             $keyboard = $this->buildReplyKeyboard($this->menu);
         }
-//        return $this->bot->sendMessage($this->chat_id, $text, $parseMode, $disablePreview, $replyTo, $keyboard);
-
         return $this->bot->sendMessage($this->chat_id, $text, $parseMode, $disablePreview, $replyTo, $keyboard);
     }
-*/
+
 
     /**
      * @param $photo
@@ -137,11 +121,10 @@ class TelegramAPI
      * @param null $replyTo
      * @param string $parseMode
      * @param bool $disableNotification
-     * @return Message
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @return false|string
+     * @throws GuzzleException
      */
-    public function sendPhoto($photo, $text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disableNotification = false): Message
+    public function sendPhoto($photo, $text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disableNotification = false)
     {
         return $this->bot->sendPhoto($this->chat_id, $photo, $text, $replyTo, $keyboard, $disableNotification, $parseMode);
     }
@@ -151,37 +134,34 @@ class TelegramAPI
      * @param null $keyboard
      * @param string $parseMode
      * @param bool $disablePreview
-     * @return Message
+     * @return mixed
+     * @throws GuzzleException
      */
     public function editMessage($text, $keyboard = null, $parseMode = 'HTML', $disablePreview = false)
     {
-        return $this->bot->updateMessage($this->chat_id, $this->message_id, $text, $parseMode, $disablePreview, $keyboard);
+        if (! $keyboard){
+            $keyboard = $this->buildInlineKeyboard([]);
+        }
+        return $this->bot->editMessageText($this->chat_id, $this->message_id, $text, $parseMode, $disablePreview, $keyboard);
     }
 
     /**
      * @return bool
+     * @throws GuzzleException
      */
-    public function deleteMessage(): bool
+    public function deleteMessage()
     {
         return $this->bot->deleteMessage($this->chat_id, $this->message_id);
     }
 
     public function buildReplyKeyboard($keys)
     {
-        return [
-            'reply_markup' => json_encode([
-                'keyboard' => $keys,
-            ]),
-        ];
+        return ['keyboard' => $keys];
     }
 
     public function buildInlineKeyboard($keys)
     {
-        return [
-            'reply_markup' => json_encode([
-                'inline_keyboard' => $keys,
-            ]),
-        ];
+        return ['inline_keyboard' => $keys];
     }
 
     /**
@@ -214,11 +194,10 @@ class TelegramAPI
 
     /**
      * @param $text
-     * @return Message
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @return false|string
+     * @throws GuzzleException
      */
-    public function getMenu($text): Message
+    public function getMenu($text)
     {
         return $this->sendMessage(
             $text,
@@ -293,9 +272,8 @@ class TelegramAPI
     }
 
     /**
-     * @return int
      */
-    public function getMasterID (): int
+    public function getMasterID ()
     {
         return $this->user->telegramSession->master;
     }

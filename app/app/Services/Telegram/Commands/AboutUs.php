@@ -4,6 +4,7 @@ namespace App\Services\Telegram\Commands;
 
 
 use App\Models\Information;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
@@ -15,8 +16,7 @@ class AboutUs extends Command
      * AboutUs constructor.
      * @param Request $request
      * @param bool $back
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @throws GuzzleException
      */
     public function __construct(Request $request, bool $back = false)
     {
@@ -25,7 +25,6 @@ class AboutUs extends Command
     }
 
     /**
-     * @return InlineKeyboardMarkup
      */
     private function getInfo()
     {

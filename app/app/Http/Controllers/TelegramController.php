@@ -16,7 +16,6 @@ class TelegramController extends Controller
      */
     public function main(Request $request)
     {
-        Log::debug('Запрос прибыл');
         $id = null;
         if ($request->has('message.chat.id')) {
             $id = $request->input('message.chat.id');

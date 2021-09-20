@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * App\Models\TelegramUser
@@ -58,7 +60,7 @@ class TelegramUser extends Model
     public const titles = ['ID клиента', 'Фамилия', 'Имя', 'Очество', 'Ник Телеграма', 'Телефон', 'Почта', 'Возраст', 'Пол', 'Баланс баллов'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function telegramSession()
     {
@@ -66,7 +68,7 @@ class TelegramUser extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function records()
     {
@@ -74,7 +76,7 @@ class TelegramUser extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function visitHistories()
     {
@@ -82,7 +84,7 @@ class TelegramUser extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function feedBacks()
     {
@@ -90,7 +92,7 @@ class TelegramUser extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function reviews()
     {

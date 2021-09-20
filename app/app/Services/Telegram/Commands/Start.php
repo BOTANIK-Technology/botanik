@@ -9,7 +9,7 @@ class Start extends Command
 {
 
     public function __construct(Request $request) {
-        Log::debug('Start: ', $request);
+        Log::debug('Start: ', $request->toArray());
         parent::__construct($request);
         if ( parent::isUser() )
             return $this->redirect();
