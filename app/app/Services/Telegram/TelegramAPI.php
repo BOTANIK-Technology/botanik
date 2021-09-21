@@ -368,9 +368,10 @@ class TelegramAPI
             } else {
                 $this->user->favorite_service = $service->id;
             }
-            if($bonus == 0 && $service->bonus)
+            if($bonus == 0 && $service->bonus && $online_pay == true){
                 $this->user->bonus += $service->bonus;
-            $this->user->save();
+                $this->user->save();
+            }
             $this->createRecordNotice($service->name, $record->id);
             $this->groupMessage($service);
         }
