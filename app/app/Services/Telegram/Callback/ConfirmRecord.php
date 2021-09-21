@@ -40,9 +40,8 @@ class ConfirmRecord extends CallbackQuery
     }
 
     /**
-     * @return InlineKeyboardMarkup
      */
-    private function getButtons(): ?InlineKeyboardMarkup
+    private function getButtons()
     {
         $service = \App\Models\Service::find(parent::getServiceID());
 

@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram\Commands;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 
 class Catalog extends Command
@@ -10,8 +11,7 @@ class Catalog extends Command
      * Catalog constructor.
      * @param Request $request
      * @param bool $back
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws GuzzleException
      */
     public function __construct(Request $request, bool $back = false)
     {
@@ -24,7 +24,6 @@ class Catalog extends Command
     }
 
     /**
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
      */
     private function getCatalog() {
         $catalog = \App\Models\Catalog::all();

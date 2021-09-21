@@ -20,7 +20,7 @@ class Address extends CallbackQuery
      * @param $service_id
      * @return InlineKeyboardMarkup
      */
-    private function getAddress($service_id): InlineKeyboardMarkup
+    private function getAddress($service_id)
     {
         $service = \App\Models\Service::find($service_id);
         $addresses = [];

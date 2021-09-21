@@ -23,7 +23,7 @@ class Personal extends Command
     /**
      * @return InlineKeyboardMarkup
      */
-    private function getShares(): InlineKeyboardMarkup
+    private function getShares()
     {
         $array[] = [['text' => 'Мои записи', 'callback_data' => 'PersonalRecords_']];
 

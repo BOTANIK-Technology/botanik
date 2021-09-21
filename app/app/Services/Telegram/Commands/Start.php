@@ -9,7 +9,7 @@ class Start extends Command
 {
 
     public function __construct(Request $request) {
-        Log::debug($request);
+        Log::debug('Start: ' . var_export($request->toArray(), true ) );
         parent::__construct($request);
         if ( parent::isUser() )
             return $this->redirect();
@@ -24,6 +24,7 @@ class Start extends Command
     }
 
     private function redirect() {
-        return parent::getMenu(__('Вы авторизованы'));
+//        return parent::getMenu(__('Вы авторизованы'));
+        return parent::sendMessage(__('Вы авторизованы'));
     }
 }

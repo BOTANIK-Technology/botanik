@@ -3,13 +3,16 @@
 namespace App\Services\Telegram\Callback;
 
 
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class Service extends CallbackQuery
 {
     /**
      * Service constructor.
      * @param Request $request
+     * @throws GuzzleException
      */
     public function __construct(Request $request)
     {
@@ -21,7 +24,7 @@ class Service extends CallbackQuery
 
     /**
      * @param $type_id
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return array
      */
     public function getServices($type_id)
     {

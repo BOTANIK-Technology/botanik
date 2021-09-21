@@ -25,7 +25,7 @@ class Product extends CallbackQuery
 
         if (!$product)
             return;
-        Log::debug("TelegramImgUrl: " . $product->img);
+
         $this->bot->sendInvoice(
             $this->chat_id,
             $product->title,
@@ -65,6 +65,6 @@ class Product extends CallbackQuery
             null,
             true,
             true,
-        );*/
+        );
     }
 }

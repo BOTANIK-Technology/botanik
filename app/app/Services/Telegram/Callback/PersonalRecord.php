@@ -40,7 +40,7 @@ class PersonalRecord extends CallbackQuery
             '5. Стоимость: '.$record->service->price.' грн';
     }
 
-    private function getButtons ($record): InlineKeyboardMarkup
+    private function getButtons ($record)
     {
 
         if (Carbon::parse($record->date) < Carbon::now()->format('Y-m-d') || !Carbon::parse($record->date.' '.$record->time)->greaterThan(Carbon::now()))

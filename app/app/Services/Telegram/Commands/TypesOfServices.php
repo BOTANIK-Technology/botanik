@@ -3,8 +3,10 @@
 namespace App\Services\Telegram\Commands;
 
 use App\Services\Telegram\Callback\Service;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use App\Models\TypeService;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class TypesOfServices extends Command
 {
@@ -12,8 +14,7 @@ class TypesOfServices extends Command
      * TypesService constructor.
      * @param Request $request
      * @param bool $back
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws GuzzleException
      */
     public function __construct(Request $request, bool $back = false)
     {
@@ -22,7 +23,7 @@ class TypesOfServices extends Command
     }
 
     /**
-     * @return \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+     * @return array
      */
     public function getServices()
     {
