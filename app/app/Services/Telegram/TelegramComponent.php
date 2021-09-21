@@ -270,7 +270,6 @@ class TelegramComponent
             'disable_web_page_preview' => $disablePreview,
             'reply_markup'             => json_encode($replyMarkup),
         ]);
-        Log::alert(self::ACTION_UPDATE_MESSAGE_TEXT, (array) $response);
         if ($response->ok) {
             return $response->result;
         }
