@@ -15,7 +15,7 @@ class PersonalRecords extends CallbackQuery
         parent::editMessage(__('Мои записи'), $this->getRecords());
     }
 
-    private function getRecords (): InlineKeyboardMarkup
+    private function getRecords ()
     {
         if (!isset($this->user->records) || $this->user->records->isEmpty())
             return parent::buildInlineKeyboard();

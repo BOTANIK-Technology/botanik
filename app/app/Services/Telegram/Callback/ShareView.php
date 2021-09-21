@@ -26,20 +26,28 @@ class ShareView extends CallbackQuery
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    private function view() {
+    private function view()
+    {
         $share = Share::find($this->getCallbackID());
 
-        if (!$share)
+        if (!$share) {
             return;
+        }
 
-        if (!is_null($share->button))
+        if (!is_null($share->button)) {
             $keyboard = parent::buildInlineKeyboard([[['text' => 'Подробнее', 'url' => $share->button]]]);
-        else
+        }
+        else {
             $keyboard = parent::buildInlineKeyboard();
+        }
 
-        $mess = '<b>'.$share->title.'</b>'."\n\n".$share->text;
+        $mess = '<b>' . $share->title . '</b>' . "\n\n" . $share->text;
 
-        if (is_null($share->img)) parent::sendMessage($mess, $keyboard);
-        else  parent::sendPhoto(asset('public/storage/'.$share->img), $mess, $keyboard);
+        if (is_null($share->img)) {
+            parent::sendMessage($mess, $keyboard);
+        }
+        else {
+            parent::sendPhoto(asset('public/storage/' . $share->img), $mess, $keyboard);
+        }
     }
 }

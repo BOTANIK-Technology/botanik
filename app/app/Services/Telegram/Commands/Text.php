@@ -5,6 +5,7 @@ namespace App\Services\Telegram\Commands;
 
 use App\Models\Record;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class Text extends Command
 {
@@ -26,9 +27,8 @@ class Text extends Command
 
     /**
      * @param $data
-     * @return bool|\TelegramBot\Api\Types\Message
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @return false|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function getCallback($data)
     {
