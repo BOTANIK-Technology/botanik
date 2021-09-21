@@ -15,6 +15,8 @@ use App\Models\Service;
 use App\Models\TelegramSession;
 use App\Models\User;
 use Carbon\Carbon;
+use ConnectService;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -27,7 +29,8 @@ use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 
 class TelegramAPI
 {
-    public BotApi $bot;
+//    public BotApi $bot;
+    public TelegramComponent $bot;
     public $user = false;
     public $package;
     public string $token;
@@ -58,8 +61,12 @@ class TelegramAPI
     {
         // set telegram token
         $this->token = $request->input('token');
+
         // set object of telegram bot api
-        $this->bot = new BotApi($this->token);
+//        $this->bot = new BotApi($this->token);
+
+        $this->bot = new TelegramComponent($this->token);
+
         // set pay token
         $this->pay_token = $request->input('pay_token') ?? null;
         // set business database name
@@ -67,7 +74,12 @@ class TelegramAPI
         // set package of business
         $this->package = $request->input('package');
         // set client collection
-        if ($request->has('client')) $this->user = $request->input('client');
+        if ($request->has('client')) {
+            $this->user = $request->input('client');
+        }
+
+   //     Log::debug($request->input());
+
         // set catalog
         if (!is_null($this->pay_token) && $request->has('catalog') && $request->input('catalog') == true) {
             $this->menu = [
@@ -95,14 +107,20 @@ class TelegramAPI
      * @param null $replyTo
      * @param string $parseMode
      * @param bool $disablePreview
-     * @return Message
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @return false|string
+     * @throws GuzzleException
      */
-    public function sendMessage($text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disablePreview = false): Message
+
+
+    public function sendMessage($text, $keyboard = null, $replyTo = null, string $parseMode = 'HTML', bool $disablePreview = false)
     {
+        Log::alert('ChatId: '. $this->chat_id);
+        if (! $keyboard){
+            $keyboard = $this->buildReplyKeyboard($this->menu);
+        }
         return $this->bot->sendMessage($this->chat_id, $text, $parseMode, $disablePreview, $replyTo, $keyboard);
     }
+
 
     /**
      * @param $photo
@@ -111,11 +129,10 @@ class TelegramAPI
      * @param null $replyTo
      * @param string $parseMode
      * @param bool $disableNotification
-     * @return Message
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @return false|string
+     * @throws GuzzleException
      */
-    public function sendPhoto($photo, $text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disableNotification = false): Message
+    public function sendPhoto($photo, $text, $keyboard = null, $replyTo = null, $parseMode = 'HTML', $disableNotification = false)
     {
         return $this->bot->sendPhoto($this->chat_id, $photo, $text, $replyTo, $keyboard, $disableNotification, $parseMode);
     }
@@ -125,38 +142,34 @@ class TelegramAPI
      * @param null $keyboard
      * @param string $parseMode
      * @param bool $disablePreview
-     * @return Message
+     * @return mixed
+     * @throws GuzzleException
      */
-    public function editMessage($text, $keyboard = null, $parseMode = 'HTML', $disablePreview = false): Message
+    public function editMessage($text, $keyboard = null, $parseMode = 'HTML', $disablePreview = false)
     {
+        if (! $keyboard){
+            $keyboard = $this->buildInlineKeyboard([]);
+        }
         return $this->bot->editMessageText($this->chat_id, $this->message_id, $text, $parseMode, $disablePreview, $keyboard);
     }
 
     /**
      * @return bool
+     * @throws GuzzleException
      */
-    public function deleteMessage(): bool
+    public function deleteMessage()
     {
         return $this->bot->deleteMessage($this->chat_id, $this->message_id);
     }
 
-    /**
-     * @param array $buttons
-     * @param bool $oneTime
-     * @return ReplyKeyboardMarkup
-     */
-    public function buildReplyKeyboard($buttons = [], $oneTime = true): ReplyKeyboardMarkup
+    public function buildReplyKeyboard($keys)
     {
-        return $keyboard = new ReplyKeyboardMarkup($buttons, $oneTime);
+        return ['keyboard' => $keys];
     }
 
-    /**
-     * @param array $buttons
-     * @return InlineKeyboardMarkup
-     */
-    public function buildInlineKeyboard($buttons = []): InlineKeyboardMarkup
+    public function buildInlineKeyboard($keys)
     {
-        return $keyboard = new InlineKeyboardMarkup($buttons);
+        return ['inline_keyboard' => $keys];
     }
 
     /**
@@ -171,9 +184,9 @@ class TelegramAPI
     }
 
     /**
-     * @return InlineKeyboardMarkup
+
      */
-    public function buildStars(): InlineKeyboardMarkup
+    public function buildStars()
     {
         $star = hex2bin('E2AD90');
         return $this->buildInlineKeyboard(
@@ -189,11 +202,10 @@ class TelegramAPI
 
     /**
      * @param $text
-     * @return Message
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @return false|string
+     * @throws GuzzleException
      */
-    public function getMenu($text): Message
+    public function getMenu($text)
     {
         return $this->sendMessage(
             $text,
@@ -276,9 +288,8 @@ class TelegramAPI
     }
 
     /**
-     * @return int|null
      */
-    public function getMasterID (): ?int
+    public function getMasterID ()
     {
         return $this->user->telegramSession->master;
     }
@@ -400,9 +411,11 @@ class TelegramAPI
             } else {
                 $this->user->favorite_service = $service->id;
             }
-            if($bonus == 0 && $service->bonus)
+            if($bonus == 0 && $service->bonus && $online_pay == true){
                 $this->user->bonus += $service->bonus;
-            //$this->user->save();
+             //   $this->user->save();
+            }
+
 
             $this->createRecordNotice($service->name, $record->id);
             $this->groupMessage($service);
