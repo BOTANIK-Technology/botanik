@@ -412,7 +412,7 @@ class TelegramAPI
             }
             if($bonus == 0 && $service->bonus && $online_pay == true){
                 $this->user->bonus += $service->bonus;
-             //   $this->user->save();
+                $this->user->save();
             }
 
 
