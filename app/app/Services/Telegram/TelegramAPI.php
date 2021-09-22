@@ -344,16 +344,21 @@ class TelegramAPI
         $master_id = $this->getMasterID();
         $date = $this->getDate();
         $time = $this->getTime();
+        Log::alert("/n createRecord: ", ['service' => $service_id, 'master' => $master_id, 'date' => $date, 'time' => $time]);
 
         try {
             $service = Service::find( $this->getServiceID() );
         } catch (\Exception $e) {
+            Log::error('createRecord ERROR: ' . $e->getMessage(), (array) $this);
             return false;
         }
         $price = intval( $service->price );
         if ($bonus > 0) $price = $this->currentPrice($price, $bonus);
 
-        if($this->isRecordBusy($service_id, $master_id, $date, $time)) return false;
+        if($this->isRecordBusy($service_id, $master_id, $date, $time)) {
+            Log::error("/n createRecord ERROR: record busy", ['service' => $service_id, 'master' => $master_id, 'date' => $date, 'time' => $time]);
+            return false;
+        }
 
         $record = Record::create([
             'telegram_user_id' => $this->user->id,
@@ -432,13 +437,22 @@ class TelegramAPI
      */
     private function isRecordBusy($service_id, $master_id, $date, $time): bool
     {
+        $service = Service::findOrFail($service_id);
+        $max = 1; // для обычной услуги
+
+        //Если это групповая услуга
+        if ($service->group){
+            $max = $service->group->quantity;
+        }
+
         $count = Record::query()
             ->where("service_id", $service_id)
             ->where("user_id", $master_id)
             ->where("date", $date)
             ->where("time", $time)
             ->count();
-        return $count > 0;
+
+        return $count >= $max;
     }
 
     private function groupMessage (Service $service)
