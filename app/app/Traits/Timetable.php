@@ -2,11 +2,13 @@
 
 namespace App\Traits;
 
+use App\Models\Record;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use DatePeriod;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Jenssegers\Date\Date;
 
 trait Timetable
@@ -313,6 +315,7 @@ trait Timetable
      */
     public static function getBookedTimes ($model, string $Y_m_d)
     {
+        /** @var Record $records */
         $records = $model->records->where('date', $Y_m_d);
 
         if ($records->isEmpty())
@@ -321,17 +324,18 @@ trait Timetable
         $times = [];
         $first = $records->first();
 
+
         if (isset($first->service->group)) {
 
             $needle = $first->service->group->quantity;
-            $duplicates = $records->toBase()->duplicates('time');
+            $duplicates = $records->toBase()->countBy('time')->all();
 
-            foreach ($duplicates as $count => $time)
+            foreach ($duplicates as $time => $count)
+
                 if ($count >= $needle)
                     $times[] = $time;
 
         } else {
-
             foreach ($records as $record)
                 $times[] = $record->time;
 
