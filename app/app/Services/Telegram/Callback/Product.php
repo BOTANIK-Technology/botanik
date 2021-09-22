@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram\Callback;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -18,6 +19,9 @@ class Product extends CallbackQuery
         $this->view();
     }
 
+    /**
+     * @throws GuzzleException
+     */
     private function view() {
 
         $product = \App\Models\Catalog::find($this->getCallbackID());
@@ -45,26 +49,6 @@ class Product extends CallbackQuery
             200,
             200,
             200
-        );
-
-        /*$this->bot->sendInvoice(
-            $this->chat_id,
-            $product->title,
-            $product->text,
-            'OnlinePayProduct_'.$product->id,
-            $this->pay_token,
-            $this->chat_id,
-            'UAH',
-            [
-                ['label' => $product->title, 'amount' => $product->price * 100],
-            ],
-            false,
-            $product->img ?? null,
-            null,
-            null,
-            null,
-            true,
-            true,
         );
     }
 }

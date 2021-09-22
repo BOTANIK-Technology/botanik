@@ -82,7 +82,7 @@ class TelegramComponent
      * @param $token string
      * @return $this
      */
-    public function setBotToken($token)
+    public function setBotToken(string $token): TelegramComponent
     {
 
         $this->botToken = $token;
@@ -102,62 +102,50 @@ class TelegramComponent
      * Установка веб хука
      * @param $url
      * @return bool|mixed
+     * @throws GuzzleException
      */
     public function setWebHook($url)
     {
-
-        $client = $this->getRequest();
-        $response = $client->setUrl(self::ACTION_SET_WEBHOOK)
-            ->setData([
-                'url' => $url,
-            ])
-            ->send();
-
-        if ($response->isOk) {
-
-            return $response->data;
+        $response = $this->sendRequest(self::ACTION_SET_WEBHOOK, ['url' => $url]);
+        if ($response->ok) {
+            return $response->result['data'] ?? $response->result;
         }
-
+        Log::error(self::ACTION_SEND_MESSAGE, $response->result);
         return false;
     }
 
     /**
      * Получение информации о боте
-     * @return bool|mixed
+     * @return mixed
+     * @throws GuzzleException
      */
     public function getMe()
     {
+        $response = $this->sendRequest(self::ACTION_GET_ME);
 
-        $client = $this->getRequest();
-        $response = $client->setUrl(self::ACTION_GET_ME)
-            ->send();
-
-        if ($response->isOk) {
-            //    Yii::info(print_r($response->data, true));
-            return $response->data;
+        if ($response->ok) {
+            return $response->result['data'] ?? $response->result;
         }
-        //else Yii::info(print_r($response->content, true));
-
+        Log::error(self::ACTION_SEND_MESSAGE, $response->result);
         return false;
     }
 
     /**
      * Получение информации о веб хуке
-     * @return bool|mixed
+     * @return mixed
+     * @throws GuzzleException
      */
     public function getWebhookInfo()
     {
 
-        $client = $this->getRequest();
-
-        $response = $client->setUrl(self::ACTION_GET_WEBHOOK_INFO)
-            ->send();
-
-
-        return $response->data;
-
-
+        $response = $this->sendRequest(self::ACTION_GET_WEBHOOK_INFO);
+        if ($response->ok) {
+            return $response->result['data'] ?? $response->result;
+        }
+        Log::error(self::ACTION_SEND_MESSAGE, $response->result);
         return false;
+
+
     }
 
     /**
@@ -169,7 +157,7 @@ class TelegramComponent
      * @param null $replyToMessageId
      * @param null $replyMarkup
      * @param bool $disableNotification
-     * @return string
+     * @return mixed
      * @throws GuzzleException
      */
     public function sendMessage(
@@ -210,7 +198,7 @@ class TelegramComponent
      * @param null $replyMarkup
      * @param bool $disableNotification
      * @param null $parseMode
-     * @return string
+     * @return mixed
      * @throws GuzzleException
      */
     public function sendPhoto(
@@ -261,7 +249,7 @@ class TelegramComponent
         $inlineMessageId = null
     )
     {
-        $response =  $this->sendRequest(self::ACTION_UPDATE_MESSAGE_TEXT, [
+        $response = $this->sendRequest(self::ACTION_UPDATE_MESSAGE_TEXT, [
             'chat_id'                  => $chatId,
             'message_id'               => $messageId,
             'text'                     => $text,
@@ -273,7 +261,7 @@ class TelegramComponent
         if ($response->ok) {
             return $response->result;
         }
-        Log::error(self::ACTION_UPDATE_MESSAGE_TEXT, (array) $response->result);
+        Log::error(self::ACTION_UPDATE_MESSAGE_TEXT, (array)$response->result);
         return false;
     }
 
@@ -289,7 +277,6 @@ class TelegramComponent
      * @param int|string $chatId
      * @param int $messageId
      *
-     * @return bool
      * @throws GuzzleException
      */
     public function deleteMessage($chatId, int $messageId)
@@ -300,16 +287,17 @@ class TelegramComponent
                 'message_id' => $messageId,
             ]);
         }
-        catch (Exception $e){
-            Log::error($e->getMessage(),[
-                'method' => self::DELETE_MESSAGE,
+        catch (Exception $e) {
+            Log::error($e->getMessage(), [
+                'method'  => self::DELETE_MESSAGE,
                 'chat ID' => $chatId,
-                'mess ID' => $messageId] );
+                'mess ID' => $messageId,
+            ]);
         }
     }
 
     /**
-     * Use this method to send invoices. On success, the sent Message is returned.
+     * Use this method to send invoices.
      *
      * @param int|string $chatId
      * @param string $title
@@ -360,38 +348,37 @@ class TelegramComponent
         $providerData = null,
         $sendPhoneNumberToProvider = false,
         $sendEmailToProvider = false
-    ) {
+    )
+    {
         $data = [
-            'chat_id' => $chatId,
-            'title' => $title,
-            'description' => $description,
-            'payload' => $payload,
-            'provider_token' => $providerToken,
-            'start_parameter' => $startParameter,
-            'currency' => $currency,
-            'prices' => json_encode($prices),
-            'is_flexible' => $isFlexible,
-            'photo_url' => $photoUrl,
-            'photo_size' => $photoSize,
-            'photo_width' => $photoWidth,
-            'photo_height' => $photoHeight,
-            'need_name' => $needName,
-            'need_phone_number' => $needPhoneNumber,
-            'need_email' => $needEmail,
-            'need_shipping_address' => $needShippingAddress,
-            'reply_to_message_id' => $replyToMessageId,
-            'disable_notification' => (bool)$disableNotification,
-            'provider_data' => $providerData,
+            'chat_id'                       => $chatId,
+            'title'                         => $title,
+            'description'                   => $description,
+            'payload'                       => $payload,
+            'provider_token'                => $providerToken,
+            'start_parameter'               => $startParameter,
+            'currency'                      => $currency,
+            'prices'                        => json_encode($prices),
+            'is_flexible'                   => $isFlexible,
+            'photo_url'                     => $photoUrl,
+            'photo_size'                    => $photoSize,
+            'photo_width'                   => $photoWidth,
+            'photo_height'                  => $photoHeight,
+            'need_name'                     => $needName,
+            'need_phone_number'             => $needPhoneNumber,
+            'need_email'                    => $needEmail,
+            'need_shipping_address'         => $needShippingAddress,
+            'reply_to_message_id'           => $replyToMessageId,
+            'disable_notification'          => (bool)$disableNotification,
+            'provider_data'                 => $providerData,
             'send_phone_number_to_provider' => (bool)$sendPhoneNumberToProvider,
-            'send_email_to_provider' => (bool)$sendEmailToProvider
+            'send_email_to_provider'        => (bool)$sendEmailToProvider,
         ];
-        if ($replyMarkup){
+        if ($replyMarkup) {
             $data['reply_markup'] = '';
         }
         return $this->sendRequest(self::ACTION_SEND_INVOICE, $data);
     }
-
-
 
 
     /**
@@ -406,22 +393,17 @@ class TelegramComponent
      *      ],
      * ]
      * ```
-     * @return bool|mixed
+     * @return mixed
+     * @throws GuzzleException
      */
     public function setMyCommands($commands)
     {
-        $response = $this->getRequest()->setUrl(self::ACTION_SET_MY_COMMANDS)
-            ->setData([
-                'commands' => json_encode($commands),
-            ])
-            ->send();
+        $response = $this->sendRequest(self::ACTION_SET_MY_COMMANDS, ['commands' => json_encode($commands)]);
 
-        if ($response->isOk) {
-//            Yii::info(print_r($response->data, true));
-            return $response->data;
+        if ($response->ok) {
+            return $response->result;
         }
-//        else Yii::info(print_r($response->content, true));
-
+        Log::error(self::ACTION_SET_MY_COMMANDS, (array)$response->result);
         return false;
     }
 
@@ -430,25 +412,22 @@ class TelegramComponent
      * @param $callback_query_id integer
      * @param null|string $text
      * @param array $params
-     * @return bool|mixed
+     * @return mixed
+     * @throws GuzzleException
      */
     public function answerCallbackQuery($callback_query_id, $text = null, $params = [])
     {
 
 
-        $response = $this->getRequest()->setUrl(self::ACTION_ANSWER_CALLBACK_QUERY)
-            ->setData(array_merge([
-                'callback_query_id' => $callback_query_id,
-                'text'              => $text,
-            ], $params))
-            ->send();
+        $response = $this->sendRequest(self::ACTION_ANSWER_CALLBACK_QUERY, array_merge([
+            'callback_query_id' => $callback_query_id,
+            'text'              => $text,
+        ], $params));
 
-        if ($response->isOk) {
-//            Yii::info(print_r($response->data, true));
-            return $response->data;
+        if ($response->ok) {
+            return $response->result['data'] ?? $response->result;
         }
-//        else Yii::info(print_r($response->content, true));
-
+        Log::error(self::ACTION_SEND_MESSAGE, $response->result);
         return false;
     }
 
@@ -465,15 +444,22 @@ class TelegramComponent
      *      ],
      * ]
      * ```
+     * @return mixed
+     * @throws GuzzleException
      */
     public function sendInlineKeyboard($chat_id, $text, $buttons)
     {
 
-        $this->sendMessage($chat_id, $text, [
+        $response = $this->sendMessage($chat_id, $text, [
             'reply_markup' => json_encode([
                 'inline_keyboard' => $buttons,
             ]),
         ]);
+        if ($response->ok) {
+            return $response->result;
+        }
+        Log::error(self::ACTION_SEND_MESSAGE, $response->result);
+        return false;
     }
 
     /**
@@ -490,11 +476,13 @@ class TelegramComponent
      *      ],
      * ]
      * ```
+     * @return mixed
+     * @throws GuzzleException
      */
     public function updateInlineKeyboard($chat_id, $message_id, $text, $buttons = [])
     {
 
-        $this->updateMessage($chat_id, $message_id, $text, [
+        $this->editMessageText($chat_id, $message_id, $text, [
             'reply_markup' => json_encode([
                 'inline_keyboard' => $buttons,
             ]),
@@ -505,7 +493,7 @@ class TelegramComponent
      * Отправка запроса
      * @throws GuzzleException
      */
-    private function sendRequest($method, $data)
+    private function sendRequest($method, $data = []): Response
     {
         $response = new Response();
         try {
@@ -513,20 +501,20 @@ class TelegramComponent
                 [
                     'form_params' => $data,
                 ]);
-            $res =  json_decode($resp->getBody()->getContents() );
+            $res = json_decode($resp->getBody()->getContents());
             if ($resp->getStatusCode() == 200) {
-                $response->result = (array) $res->result;
+                $response->result = (array)$res->result;
             }
             else {
                 Log::error($method . ' Error: ' . $res->getBody()->getContents(), $data);
                 $response->ok = false;
-                $response->result = (array) $res;
+                $response->result = (array)$res;
             }
         }
-        catch (\Exception $e){
+        catch (\Exception $e) {
             Log::error($method . ' ErrorExeption: ' . $e->getMessage(), $data);
             $response->ok = false;
-            $response->result = $data ;
+            $response->result = $data;
         }
         return $response;
     }
