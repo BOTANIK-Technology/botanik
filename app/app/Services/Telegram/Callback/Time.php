@@ -49,7 +49,6 @@ class Time extends CallbackQuery
 
     private function getButtons ($times)
     {
-        Log::debug("times:", $times);
         $buttons = [];
         if (empty($times))
             $buttons[] = [['text' => __('Нет свободных ячеек.'), 'callback_data' => '-']];
