@@ -90,7 +90,10 @@ class ServiceTimetable extends Model
             }
 
             if ($comparison === false || Carbon::parse($time)->greaterThanOrEqualTo($comparison))
+            {
                 $free[] = $time;
+            }
+
         }
 
         return $free;
