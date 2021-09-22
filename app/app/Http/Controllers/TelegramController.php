@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TelegramUser;
 use App\Services\Telegram\Commands\Command;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Facades\TelegramService;
@@ -13,9 +14,11 @@ class TelegramController extends Controller
     /**
      * @param Request $request
      * @return mixed
+     * @throws \HttpException
      */
     public function main(Request $request)
     {
+        Log::alert("/n income", $request->toArray());
         $id = null;
         if ($request->has('message.chat.id')) {
             $id = $request->input('message.chat.id');
@@ -32,12 +35,12 @@ class TelegramController extends Controller
                 $request->merge(['client' => $client]);
             }
             else {
-               Log::info($id . ': Клиент неактивный');
+                Log::info($id . ': Клиент неактивный');
                 abort(404);
             }
         }
         else {
-            Log::debug($id . ': Клиент не создан: ' . var_export($request->input(), true) );
+            Log::debug($id . ': Клиент не создан: ' . var_export($request->input(), true));
         }
 
 
@@ -67,7 +70,7 @@ class TelegramController extends Controller
                 return $this->text($request);
             }
 
-            return abort(404);
+            throw new \HttpException('Not found', 404);
 
         }
     }
@@ -79,12 +82,14 @@ class TelegramController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws \HttpException
      */
     public function admin(Request $request)
     {
-        if (!$request->has('gess_key') || ($request->input('gess_key') !== env('APP_KEY')))
-            return abort('404');
+        if (!$request->has('gess_key') || ($request->input('gess_key') !== env('APP_KEY'))) {
+            throw new \HttpException('Not found', 404);
+        }
         return TelegramService::rpcAdmin($request);
     }
 

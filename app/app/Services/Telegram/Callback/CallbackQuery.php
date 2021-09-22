@@ -216,10 +216,10 @@ class CallbackQuery extends TelegramAPI
 
     /**
      * @param int $bonus
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function sendServiceInvoice($bonus = 0)
     {
-        $record_id = 0;
         try {
             $service = \App\Models\Service::find( $this->getServiceID() );
         } catch (\Exception $e) {

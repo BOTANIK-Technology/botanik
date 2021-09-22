@@ -2,17 +2,18 @@
 
 namespace App\Services\Telegram\Callback;
 
+use App\Helpers\Yclients\YclientsException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
-use TelegramBot\Api\Exception;
-use TelegramBot\Api\InvalidArgumentException;
+use Illuminate\Support\Facades\Log;
+
 
 class CashPay extends CallbackQuery
 {
     /**
      * CashPay constructor.
      * @param Request $request
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @throws YclientsException|GuzzleException
      */
     public function __construct(Request $request)
     {
@@ -22,5 +23,6 @@ class CashPay extends CallbackQuery
             parent::deleteMessage();
             parent::getMenu(__('Спасибо! Активные записи доступны в <b>личном кабинете</b>.'));
         }
+
     }
 }
