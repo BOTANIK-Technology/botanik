@@ -115,14 +115,14 @@
                             class="background-none calendar-a"
                             data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $loop->index, 'moreService' => $moreService, 'id' => $id])}}"
                     >
-                        <div class="calendar cover"></div>
+                        <div class="calendar cover" style="min-height: 15px; min-width: 15px"></div>
                     </button>
                 </div>
 
             @endforeach
 
-            @if ($moreService > count($user->addresses))
-                @for($i = count($user->addresses); $i < $moreService; $i++)
+            @if ($moreService > count($user->services))
+                @for($i = count($user->services); $i < $moreService; $i++)
 
                     <div id="service-services-{{$i}}" class="flex direction-column">
                         @if ($services)
@@ -168,6 +168,16 @@
                                 </option>
                             </select>
                         @endif
+                    </div>
+                    <div class="flex justify-content-between align-items-center">
+                        <span class="calendar">{{__('Расписание')}}</span>
+                        <button
+                            id="calendar-{{$i}}"
+                            class="background-none calendar-a"
+                            data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $i, 'moreService' => $moreService, 'id' => $id])}}"
+                        >
+                            <div class="calendar cover" style="min-height: 15px; min-width: 25px; background-color: #71A3D6" title="Выбрать расписание">Выбрать</div>
+                        </button>
                     </div>
                 @endfor
             @endif

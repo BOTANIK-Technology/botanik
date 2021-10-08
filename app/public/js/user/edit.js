@@ -6,7 +6,7 @@ if (editUserBtn) {
             'phone': phone.value,
             'email': email.value,
             'password': password.value,
-            //'addresses': getValues(addressSelects),
+            'addresses': getValues(addressSelects),
             'timetables': getTimetables(),
         };
 

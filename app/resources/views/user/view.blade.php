@@ -11,6 +11,7 @@
             @endforeach
             <div class="line"></div>
             @if ($user->timetables && !$user->timetables->isEmpty())
+
                 @foreach($user->timetables as $timetable)
                     @if($user->hasRole('master'))
                         <span>{{__('Услуга')}}</span>

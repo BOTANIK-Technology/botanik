@@ -1,12 +1,18 @@
 @section('scripts')
+    <script src="{{asset('js/cookie.min.js')}}"></script>
     <script>
         let note = '{{Auth::user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';
         let createRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'create'])}}";
+        let timeTables = @json($timetables);
+        console.log('timeTables: ', timeTables);
+        for (let item in timeTables) {
+            setCookie(item, JSON.stringify(timeTables[item]) );
+        }
     </script>
     <script src="{{asset('js/user/page.js')}}"></script>
     <script src="{{asset('js/requests.js')}}"></script>
-    <script src="{{asset('js/cookie.min.js')}}"></script>
+
     <script src="{{asset('js/user/manage.js')}}"></script>
     <script src="{{asset('js/user/create.js')}}"></script>
     <script src="{{asset('js/user/user_window.js')}}"></script>

@@ -90,8 +90,11 @@ class UserController extends Controller
                 $this->setTimetableCookies($this->params['user'], $request->business);
 
                 $this->params['services'] = Service::withoutTimetable();
+
                 $this->params['addresses'] = Address::all();
-                $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
+
+//                $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
+                $this->params['moreService'] = count($this->params['user']->services);
                 break;
             case 'timetable':
                 $time = new UserTimetable();
