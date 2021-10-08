@@ -6,6 +6,7 @@
 /app/public/css/app.css
 /app/public/js/app.js
 /app/public/storage
+/app/public/adm.php
 /app/storage/*.key
 /app/vendor
 /app/.env

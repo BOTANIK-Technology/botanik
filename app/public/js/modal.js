@@ -86,6 +86,9 @@ function selectActive() {
 if(modal.length)addClass(app, 'bg-blur');
 else removeClass(app, 'bg-blur');
 
+if(document.getElementById('modal-empty'))removeClass(app, 'bg-blur');
+
+
 let loadMore = document.querySelector('.load-block');
 if (loadMore !== null) {
 

@@ -281,6 +281,19 @@ class UserController extends Controller
         }
     }
 
+    public function modalEditUser(Request $request)
+    {
+        $this->params['id'] = $request->id;
+        $this->params['user'] = User::find($this->params['id']);
+        $this->setTimetableCookies($this->params['user'], $request->business);
+        $this->params['services'] = Service::withoutTimetable();
+        $this->params['addresses'] = Address::all();
+        $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
+
+        $this->setParams($request);
+        return view($this->view, $this->params);
+    }
+
     /**
      * @param Request $request
      * @return Factory|View

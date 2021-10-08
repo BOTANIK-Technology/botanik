@@ -218,6 +218,9 @@ Route::group(
                      * Users routes
                      */
                     Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('user');
+
+                    Route::get('/users/modal-edit/{id}', [App\Http\Controllers\UserController::class, 'modalEditUser'])->name('modalEdit.user');
+
                     Route::get('/users/window/{modal}/{id?}', [App\Http\Controllers\UserController::class, 'window'])->name('window.user');
                     Route::get('/users/window/{modal}/{id?}/{moreService?}', [App\Http\Controllers\UserController::class, 'addService'])->name('addService');
                     Route::post('/users/window/create/add-user', [App\Http\Controllers\UserController::class, 'addUser']);

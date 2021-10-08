@@ -54,7 +54,7 @@
             @foreach($user->timetables as $timetable)
                 <div id="service-services-{{$loop->index}}" class="flex direction-column">
                     @if ($services)
-                        <select class="master-service hide" id="service-type-{{$loop->index}}" data-id="{{$loop->index}}" name="service-{{$loop->index}}[]">
+                        <select class="master-service hide" onchange="userWin.changeService({{$loop->index}});"  id="service-type-{{$loop->index}}" data-id="{{$loop->index}}" name="service-{{$loop->index}}[]">
                             @foreach($services as $service)
                                 <option value="{{$service->id}}" {{$timetable->service_id == $service->id ? 'selected' : ''}}>
                                     {{$service->name}}
@@ -120,7 +120,7 @@
 
                     <div id="service-services-{{$i}}" class="flex direction-column">
                         @if ($services)
-                            <select id="service-type-{{$i}}" data-id="{{$i}}" name="service-{{$i}}[]">
+                            <select id="service-type-{{$i}}" onchange="userWin.changeService({{$i}});" data-id="{{$i}}" name="service-{{$i}}[]">
                                 @foreach($services as $service)
                                     <option value="{{$service->id}}">{{$service->name}}</option>
                                 @endforeach

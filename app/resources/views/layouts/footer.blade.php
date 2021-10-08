@@ -7,6 +7,6 @@
         <span>All rights reserved.</span>
     </div>
     <div class="author-link">
-        <a href="https://botanik-technology.com">{{__('botanik-technology.com')}}</a>
+        <a href="https://botanik-technology.com.ua">{{__('botanik-technology.com.ua')}}</a>
     </div>
 </footer>

@@ -18,6 +18,9 @@
                 @endif
             </header>
         @endslot
+        @slot('popup')
+            <div id="user-popup"></div>
+        @endslot
         <div class="table grid" @if(Auth::user()->hasRole('admin')) style="grid-template-columns: 10% 30% 30% 10% 20% !important;" @endif >
             @if (isset($table) && $table)
                 @phone
