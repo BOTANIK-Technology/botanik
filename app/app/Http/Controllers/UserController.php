@@ -45,12 +45,13 @@ class UserController extends Controller
         if ($this->params['sort'] == 'moder' && \Auth::user()->hasRole('owner')) {
             $this->params['table'] = User::where('status', 0)->take($this->params['load'])->get();
             $this->params['countUsers'] = $this->params['table']->count();
-        } else {
+        }
+        else {
             $role = Role::where('slug', $this->params['sort'])->first();
             $this->params['countUsers'] = $role->users->count();
             $this->params['table'] = $role->users->take($this->params['load']);
         }
-        if ( $this->params['table']->isEmpty() ) $this->params['table'] = 0;
+        if ($this->params['table']->isEmpty()) $this->params['table'] = 0;
         if (isset($request->modal)) $this->params['modal'] = $request->modal;
     }
 
@@ -67,7 +68,7 @@ class UserController extends Controller
      * @param Request $request
      * @return Factory|View
      */
-    public function window (Request $request)
+    public function window(Request $request)
     {
         $this->setParams($request);
         $modal = $request->modal;
@@ -76,7 +77,7 @@ class UserController extends Controller
             case 'create':
                 $this->params['services'] = Service::withoutTimetable() ?? 0;
                 $this->params['addresses'] = Address::all() ?? 0;
-                $this->params['roles'] = [Role::where('slug','admin')->first(), Role::where('slug','master')->first()];
+                $this->params['roles'] = [Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()];
                 $this->params['moreService'] = $request->moreService ?? 1;
                 break;
             case 'delete':
@@ -87,6 +88,7 @@ class UserController extends Controller
                 $this->params['id'] = $request->id;
                 $this->params['user'] = User::find($this->params['id']);
                 $this->setTimetableCookies($this->params['user'], $request->business);
+
                 $this->params['services'] = Service::withoutTimetable();
                 $this->params['addresses'] = Address::all();
                 $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
@@ -118,25 +120,31 @@ class UserController extends Controller
      */
     private function setTimetableCookies($user, $slug, $checked = false)
     {
+        $this->params['timetables'] = [];
         if (empty($user->timetables))
             return;
 
         $days = UserTimetable::getDaysEn();
         foreach ($user->timetables as $k => $timetable) {
 
-            if ( isset($_COOKIE['timetable-'.$k]) )
+//            if (isset($_COOKIE['timetable-' . $k]))
+//                continue;
+
+            if (isset($this->params['timetables']['timetable-' . $k]) )
                 continue;
 
             $cookie = [];
             foreach ($days as $day)
-                if(!is_null($timetable->$day))
+                if (!is_null($timetable->$day))
                     $cookie[$day] = json_decode($timetable->$day);
 
-            switch ($checked) {
-                case false:
-                    setcookie('timetable-'.$k, json_encode($cookie), ['path' => '/'.$slug.'/users/', 'samesite' => 'Lax']);
-                case true:
-                    setcookie('checked-'.$k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/users/']);
+            if (!$checked) {
+                $this->params['timetables']['timetable-' . $k] = $cookie;
+                setcookie('timetable-' . $k, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
+            }
+            else {
+                $this->params['timetables']['checked-' . $k] = UserTimetable::getChecked($cookie);
+                setcookie('checked-' . $k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/' . $slug . '/users/']);
             }
         }
     }
@@ -145,7 +153,7 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function addUser (Request $request): JsonResponse
+    public function addUser(Request $request): JsonResponse
     {
         $validator = $this->validateUser($request);
 
@@ -154,7 +162,8 @@ class UserController extends Controller
 
         try {
             $role = Role::where('slug', $request->role)->first();
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['admin' => __('Выбранная роль не доступна.'), 'message' => $e->getMessage()]], 405);
         }
 
@@ -170,10 +179,10 @@ class UserController extends Controller
             $root = \Auth::user();
 
             $array = [
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'phone'    => $request->phone,
-                'password' => bcrypt($request->password),
+                'name'       => $request->name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
+                'password'   => bcrypt($request->password),
                 'created_by' => $root->id,
                 'updated_by' => $root->id,
             ];
@@ -184,9 +193,9 @@ class UserController extends Controller
                     $request->input('business_db'),
                     [
                         [
-                            'role_slug'  => 'owner',
-                            'message'    => __('Администратор').' '.'<b>'.$root->name.'</b>'.' '. __('хочет добавить') .' '.$role->name.'а <b>'.$array['name'].'</b>'
-                        ]
+                            'role_slug' => 'owner',
+                            'message'   => __('Администратор') . ' ' . '<b>' . $root->name . '</b>' . ' ' . __('хочет добавить') . ' ' . $role->name . 'а <b>' . $array['name'] . '</b>',
+                        ],
                     ]
                 );
             }
@@ -200,7 +209,7 @@ class UserController extends Controller
             $user->attachTimetables($request->timetables, $request->addresses, $services);
             $user->attachCustom('addresses', $request->addresses);
 
-            if(!isset($array['status']) && \ConnectService::prepareJob()) {
+            if (!isset($array['status']) && \ConnectService::prepareJob()) {
                 SendMail::dispatch(
                     $request->business,
                     $request->email,
@@ -223,7 +232,7 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function editUser (Request $request): JsonResponse
+    public function editUser(Request $request): JsonResponse
     {
         $validator = $this->validateUser($request, false);
 
@@ -232,7 +241,8 @@ class UserController extends Controller
 
         try {
             $role = Role::where('slug', $request->role)->first();
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['admin' => __('Выбранная роль не доступна.')]], 405);
         }
 
@@ -249,9 +259,9 @@ class UserController extends Controller
             $root = \Auth::user();
 
             $array = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
+                'name'       => $request->name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
                 'updated_by' => $root->id,
             ];
 
@@ -291,14 +301,15 @@ class UserController extends Controller
         $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
 
         $this->setParams($request);
-        return view($this->view, $this->params);
+        $html = view($this->view, $this->params)->render();
+        return response()->json(['html' => $html]);
     }
 
     /**
      * @param Request $request
      * @return Factory|View
      */
-    public function addService (Request $request)
+    public function addService(Request $request)
     {
 
         $this->params['services'] = Service::withoutTimetable();
@@ -312,7 +323,7 @@ class UserController extends Controller
             return $this->getView($request);
         }
         else
-            $this->params['roles'] = [Role::where('slug','admin')->first(), Role::where('slug','master')->first()];
+            $this->params['roles'] = [Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()];
 
         return $this->getView($request);
     }
@@ -339,18 +350,19 @@ class UserController extends Controller
                     [
                         [
                             'role_slug' => 'owner',
-                            'message' => __('Администратор') . ' ' . '<b>' . $root->name . '</b>' . ' ' . __('хочет удалить') . ' ' . $user->roles[0]->name . 'а <b>' . $user->name . '</b>'
-                        ]
+                            'message'   => __('Администратор') . ' ' . '<b>' . $root->name . '</b>' . ' ' . __('хочет удалить') . ' ' . $user->roles[0]->name . 'а <b>' . $user->name . '</b>',
+                        ],
                     ]
                 );
-            } else {
+            }
+            else {
                 Notice::sendNotice(
                     $request->input('business_db'),
                     [
                         [
                             'user_id' => $user->updated_by,
-                            'message' => __('Владелец сохранил') . ' ' . $user->roles[0]->name . 'а <b>' . $user->name . '</b>' . ' ' . __('в системе.')
-                        ]
+                            'message' => __('Владелец сохранил') . ' ' . $user->roles[0]->name . 'а <b>' . $user->name . '</b>' . ' ' . __('в системе.'),
+                        ],
                     ]
                 );
 
@@ -369,7 +381,7 @@ class UserController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function manageConfirm (Request $request)
+    public function manageConfirm(Request $request)
     {
         $user = User::find($request->id);
         $user->status = 1;
@@ -379,9 +391,9 @@ class UserController extends Controller
             $request->input('business_db'),
             [
                 [
-                    'user_id'    => $user->updated_by,
-                    'message'    => __('Владелец сохранил ').$user->roles[0]->name.'а <b>'.$user->name.'</b>' .__('в системе.')
-                ]
+                    'user_id' => $user->updated_by,
+                    'message' => __('Владелец сохранил ') . $user->roles[0]->name . 'а <b>' . $user->name . '</b>' . __('в системе.'),
+                ],
             ]
         );
 
@@ -402,7 +414,7 @@ class UserController extends Controller
      * @param Request $request
      * @return Factory|View
      */
-    public function manageReject (Request $request)
+    public function manageReject(Request $request)
     {
         $this->deleteUser($request);
         return $this->index($request);
@@ -414,6 +426,9 @@ class UserController extends Controller
      */
     public function getView(Request $request)
     {
+        if (! isset($this->params['timetables'])) {
+            $this->params['timetables'] = [];
+        }
         $this->setParams($request);
         return view($this->view, $this->params);
     }
@@ -423,7 +438,7 @@ class UserController extends Controller
      * @param bool $create
      * @return Validator
      */
-    private function validateUser (Request $request, $create = true): Validator
+    private function validateUser(Request $request, $create = true): Validator
     {
         $rules = [
             'name'       => 'required|string|min:1',
