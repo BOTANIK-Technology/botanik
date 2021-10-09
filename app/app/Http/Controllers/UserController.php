@@ -94,7 +94,8 @@ class UserController extends Controller
                 $this->params['addresses'] = Address::all();
 
 //                $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
-                $this->params['moreService'] = count($this->params['user']->services);
+                $this->params['moreService'] = $request->moreService ?? count($this->params['user']->services);
+//                $this->params['moreService'] = count($this->params['user']->services);
                 break;
             case 'timetable':
                 $time = new UserTimetable();
@@ -133,8 +134,6 @@ class UserController extends Controller
 //            if (isset($_COOKIE['timetable-' . $k]))
 //                continue;
 
-            if (isset($this->params['timetables']['timetable-' . $k]) )
-                continue;
 
             $cookie = [];
             foreach ($days as $day)
