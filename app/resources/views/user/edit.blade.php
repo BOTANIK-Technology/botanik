@@ -115,7 +115,7 @@
                             class="background-none calendar-a"
                             data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $loop->index, 'moreService' => $moreService, 'id' => $id])}}"
                     >
-                        <div class="calendar cover" style="min-height: 15px; min-width: 15px"></div>
+                        <div class="calendar cover" style="min-height: 15px; min-width: 25px; background-color: #71A3D6" title="Выбрать расписание">Выбрать</div>
                     </button>
                 </div>
 
