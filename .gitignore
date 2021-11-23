@@ -21,3 +21,7 @@
 /app/composer.lock
 base
 data/dev
+/.env
+/composer.lock
+/vendor/
+/storage/

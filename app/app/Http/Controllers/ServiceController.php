@@ -12,8 +12,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 
@@ -312,9 +311,9 @@ class ServiceController extends Controller
      * @param Request $request
      * @return Validator
      */
-    private function validateService(Request $request): Validator
+    private function validateService(Request $request)
     {
-        $arr = [
+        $rules = [
             'price'     => 'required|integer|min:1',
             'bonus'     => 'nullable|integer|min:1',
             'type'      => 'required|integer',
@@ -332,13 +331,21 @@ class ServiceController extends Controller
         ];
         $data = $request->all();
         if($data['prepay'] == true){
-            $arr['prepay_message']='required|string';
-            $arr['prepay_card']='required|string';
+            $rules['prepay_message']='required|string';
+            $rules['prepay_card']='required|string';
         }else{
-            $arr['prepay_message']='nullable|string';
-            $arr['prepay_card']='nullable|string';
+            $rules['prepay_message']='nullable|string';
+            $rules['prepay_card']='nullable|string';
         }
-        return \Validator::make($data, $arr);
+        $validator =  \Validator::make($data, $rules);
+
+        //Проверяем на уникальность сочетания именя услуги и типа
+        $validator->after(function($validator) use ($data) {
+            if (Service::where('type_service_id', $data['type'])->where('name', $data['name'])->exists() ) {
+                $validator->errors()->add('name', 'Такая услуга в выбранной категории уже есть');
+            }
+        });
+        return $validator;
     }
 
     /**
