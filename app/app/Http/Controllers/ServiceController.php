@@ -48,9 +48,9 @@ class ServiceController extends Controller
         $this->params['services'] = Service::all();
         $this->params['addresses'] = Address::all();
         $this->params['view'] = $request->get('view') ?? 'services';
-        $this->params['load'] = $request->get('load') ?? 5;
-        $this->params['load_types'] = $request->get('load_types') ?? 5;
-        $this->params['load_addresses'] = $request->get('load_addresses') ?? 5;
+        $this->params['load'] = $request->get('load') ?? 10;
+        $this->params['load_types'] = $request->get('load_types') ?? 10;
+        $this->params['load_addresses'] = $request->get('load_addresses') ?? 10;
     }
 
     /**

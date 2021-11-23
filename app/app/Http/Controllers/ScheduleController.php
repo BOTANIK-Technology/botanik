@@ -339,6 +339,25 @@ class ScheduleController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
+    public function getServices(Request $request): JsonResponse
+    {
+        $service_type_id = $request->service_type_id;
+        $services = [];
+        if($service_type_id) {
+            $services = Service::query()
+                ->where('type_service_id', $service_type_id)
+                ->select('id', 'name')
+                ->get()
+                ->toArray();
+
+        }
+        return response()->json(["result" => "OK", "services" => $services]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getMasters(Request $request): JsonResponse
     {
         $masters = [];

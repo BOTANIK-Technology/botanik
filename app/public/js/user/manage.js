@@ -1,22 +1,22 @@
 function getTimetables() {
     let array = [];
     for (let i = 0; i < countService; i++) {
-        if(typeof(getCookie('timetable-' + i)) !== 'undefined') {
+        if (typeof (getCookie('timetable-' + i)) !== 'undefined') {
             array.push(JSON.parse(getCookie('timetable-' + i)));
         }
     }
     return array;
 }
 
-function unsetCookies (count) {
+function unsetCookies(count) {
     if (!count) return;
     for (let i = 0; i < count; i++) {
-        deleteCookie('timetable-'+i, COOKIE_URL);
-        deleteCookie('checked-'+i, COOKIE_URL);
+        deleteCookie('timetable-' + i, COOKIE_URL);
+        deleteCookie('checked-' + i, COOKIE_URL);
     }
 }
 
-function addressServices (array) {
+function addressServices(array) {
     let returned = [];
     array.forEach((select) => {
         Object.keys(select).forEach((value) => {
@@ -26,7 +26,7 @@ function addressServices (array) {
     return returned;
 }
 
-function getValues (array) {
+function getValues(array) {
     let returned = [];
     array.forEach((select) => {
         Object.keys(select).forEach((value) => {
@@ -36,7 +36,7 @@ function getValues (array) {
     return returned;
 }
 
-function setValues (selects, values) {
+function setValues(selects, values) {
     let j = 0;
     selects.forEach((select) => {
         Object.keys(select).forEach((k) => {
@@ -64,43 +64,33 @@ function getData() {
     return data;
 }
 
-function toogleServices(serviceSelects, show) {
-    // serviceSelects.forEach((selects) => {
-    //     Object.keys(selects).forEach((k) => {
-    //         if (show === true) addClass(selects[k], 'hide');
-    //         else removeClass(selects[k], 'hide');
-    //     });
-    // });
-
-    let adminAddressEls = document.getElementsByClassName('admin-address');
-    let masterAddressEls = document.getElementsByClassName('master-address');
-    let masterServicesEls = document.getElementsByClassName('master-service');
+function toggleServices() {
     let addTypeBtn = document.getElementById('add-type');
     if (master.checked) {
-        for(let i = 0; i < adminAddressEls.length; i++) {
-            addClass(adminAddressEls[i], 'hide');
-        }
-        for(let i = 0; i < masterAddressEls.length; i++) {
-            removeClass(masterAddressEls[i], 'hide');
-        }
-        for(let i = 0; i < masterServicesEls.length; i++) {
-            removeClass(masterServicesEls[i], 'hide');
-        }
         addTypeBtn.innerHTML = "Добавить услугу к специалисту";
-    } else if (admin.checked) {
-        for(let i = 0; i < adminAddressEls.length; i++) {
-            removeClass(adminAddressEls[i], 'hide');
-        }
-        for(let i = 0; i < masterAddressEls.length; i++) {
-            addClass(masterAddressEls[i], 'hide');
-        }
-        for(let i = 0; i < masterServicesEls.length; i++) {
-            addClass(masterServicesEls[i], 'hide');
-        }
+        showAll('master-only');
+        hideAll('admin-only');
+    } else {
         addTypeBtn.innerHTML = "Добавить адрес к администратору";
+        hideAll('master-only');
+        showAll('admin-only');
     }
-
 }
+
+function hideAll(className) {
+    let elems = document.getElementsByClassName(className);
+    for (let i = 0; i < elems.length; i++) {
+        elems[i].classList.add('hide');
+    }
+}
+
+function showAll(className) {
+    let elems = document.getElementsByClassName(className);
+    for (let i = 0; i < elems.length; i++) {
+        elems[i].classList.remove('hide');
+    }
+}
+
 
 let admin = document.getElementById('admin');
 let master = document.getElementById('master');
@@ -109,8 +99,8 @@ let password = document.getElementById('password');
 let phone = document.getElementById('phone');
 let email = document.getElementById('email');
 let calendar = document.getElementsByClassName('calendar-a');
-let serviceOptions = document.getElementById('service-type').innerHTML;
-let addedServices = getCookie('services');
+let serviceOptions = document.getElementById('service-type-0').innerHTML;
+let addedServices = getCookie('service-type');
 
 inputActive([fio, password, phone, email]);
 selectActive();
@@ -118,28 +108,30 @@ selectActive();
 if (addedServices) {
     addedServices = JSON.parse(addedServices);
     addedServices.forEach((id) => {
-        document.getElementById('service-types-'+id).insertAdjacentHTML(
+        document.getElementById('service-' + id).insertAdjacentHTML(
             'beforeEnd',
-            '<select name="service-'+ id +'[]" data-id="'+ id +'" class="margin-top">' +
+            '<select name="service-' + id + '[]" data-id="' + id + '" class="margin-top">' +
             serviceOptions +
             '</select>'
         );
     });
 }
 
+let serviceTypeSelects = [];
 let serviceSelects = [];
 let addressSelects = [];
 let adminAddressSelects = [];
 for (let i = 0; i < countService; i++) {
-    serviceSelects.push(document.getElementsByName('service-'+i+'[]'));
-    addressSelects.push(document.getElementsByName('address-'+i+'[]'));
-    adminAddressSelects.push(document.getElementsByName('admin-address-'+i+'[]'));
+    serviceTypeSelects.push(document.getElementsByName('service-type-' + i + '[]'));
+    serviceSelects.push(document.getElementsByName('service-' + i + '[]'));
+    addressSelects.push(document.getElementsByName('address-' + i + '[]'));
+    adminAddressSelects.push(document.getElementsByName('admin-address-' + i + '[]'));
 }
 
 if (calendar.length) {
     Object.keys(calendar).forEach((k) => {
         calendar[k].addEventListener('click', function () {
-            setCookie('input', JSON.stringify(getData()), {'path':COOKIE_URL});
+            setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
             window.location.href = this.dataset.href;
         });
     });
@@ -156,6 +148,7 @@ if (input) {
     password.value = input.password;
     addresses = setValues(addressSelects, input.addresses);
     services = setValues(serviceSelects, input.services);
+    services_types = setValues(serviceTypeSelects, input.service_types);
     master.checked = input.master;
     admin.checked = input.admin;
 }
@@ -163,7 +156,7 @@ if (input) {
 if (calendar.length) {
     for (let i = 0; i < countService; i++) {
         if (calendar[i] !== undefined && calendar[i] && calendar[i] !== 'undefined') {
-            let timetable = getCookie('timetable-'+i);
+            let timetable = getCookie('timetable-' + i);
             if (timetable) {
                 timetable = JSON.parse(timetable);
                 let html = '';
@@ -191,7 +184,7 @@ if (calendar.length) {
                         case 'sunday':
                             day = 'ВС';
                     }
-                    html += '<span>' + day + '. ' + timetable[time][0] + ' - ' + timetable[time][timetable[time].length-1] + '</span>';
+                    html += '<span>' + day + '. ' + timetable[time][0] + ' - ' + timetable[time][timetable[time].length - 1] + '</span>';
                 });
                 calendar[i].innerHTML = '<div class="abbr-tt color flex direction-column">' + html + '</div>';
             }
@@ -199,16 +192,15 @@ if (calendar.length) {
     }
 }
 
-//if (admin.checked) toogleServices(serviceSelects, true);
 admin.addEventListener('change', function () {
-    toogleServices(serviceSelects, true)
+    toggleServices()
 });
 master.addEventListener('change', function () {
-    toogleServices(serviceSelects, false)
+    toggleServices()
 });
 
 document.getElementById('add-type').addEventListener('click', function () {
-    setCookie('input', JSON.stringify(getData()), {'path':COOKIE_URL});
+    setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
     window.location.href = this.dataset.href;
 });
 
@@ -218,9 +210,12 @@ if (close.length > 0) {
         close[k].addEventListener('click', function () {
             deleteCookie('input', COOKIE_URL);
             for (let i = 0; i < countService; i++) {
-                deleteCookie('timetable-'+i, COOKIE_URL);
-                deleteCookie('checked-'+i, COOKIE_URL);
+                deleteCookie('timetable-' + i, COOKIE_URL);
+                deleteCookie('checked-' + i, COOKIE_URL);
             }
         })
     });
 }
+
+
+

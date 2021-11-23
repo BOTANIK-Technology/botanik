@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\SendMail;
 use App\Models\Notice;
 use App\Models\Service;
+use App\Models\TypeService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,7 @@ class UserController extends Controller
         $this->params['slug'] = $request->route()->parameter('business');
         isset($request->sort) ? $this->params['sort'] = $request->sort : $this->params['sort'] = 'master';
         isset($request->load) ? $this->params['load'] = $request->load : $this->params['load'] = 5;
+        $this->params['types'] = TypeService::all();
         if ($this->params['sort'] == 'moder' && \Auth::user()->hasRole('owner')) {
             $this->params['table'] = User::where('status', 0)->take($this->params['load'])->get();
             $this->params['countUsers'] = $this->params['table']->count();
@@ -75,6 +77,7 @@ class UserController extends Controller
 
         switch ($modal) {
             case 'create':
+                $this->params['types_select'] = TypeService::all();
                 $this->params['services'] = Service::withoutTimetable() ?? 0;
                 $this->params['addresses'] = Address::all() ?? 0;
                 $this->params['roles'] = [Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()];
@@ -85,6 +88,7 @@ class UserController extends Controller
                 $this->params['user'] = User::find($request->id);
                 break;
             case 'edit':
+                $this->params['types_select'] = TypeService::all();
                 $this->params['id'] = $request->id;
                 $this->params['user'] = User::find($this->params['id']);
                 $this->setTimetableCookies($this->params['user'], $request->business);
