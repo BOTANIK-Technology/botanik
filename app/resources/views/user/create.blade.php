@@ -18,7 +18,7 @@
     <script src="{{asset('js/user/user_window.js')}}"></script>
 @endsection
 
-
+<div id="service-count" data-count="{{$moreService}}"></div>
 @section('modal')
     @component('modal')
         <input id="url_slug" type="hidden" value="{{$slug}}" name="url_slug">
@@ -63,14 +63,14 @@
                 </div>
 
 
-                <div id="service-container-{{$i}}" class="flex direction-column master-only hide">
+                <div id="service-container-{{$i}}" class="flex direction-column master-only">
                     <label class="list-label" for="service-{{$i}}">Услуга</label>
                     <select class="master-service hide" onchange="userWin.changeService({{$i}});" id="service-{{$i}}"
                             data-id="{{$i}}" name="service-{{$i}}[]">
                     </select>
                 </div>
 
-                <div id="addresses-container-{{$i}}" class="flex direction-column master-only hide">
+                <div id="addresses-container-{{$i}}" class="flex direction-column master-only">
                     <label class="list-label" for="service-type-{{$i}}">Адрес</label>
                     <select class="master-address hide" onchange="userWin.changeAddress({{$i}});" id="address-{{$i}}"
                             name="address-{{$i}}[]">

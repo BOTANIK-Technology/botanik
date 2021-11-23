@@ -193,9 +193,11 @@ if (calendar.length) {
 }
 
 admin.addEventListener('change', function () {
+    setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
     toggleServices()
 });
 master.addEventListener('change', function () {
+    setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
     toggleServices()
 });
 

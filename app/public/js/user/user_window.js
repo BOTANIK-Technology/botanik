@@ -1,5 +1,5 @@
 let CreateUserWindow = function () {
-
+    let isInit = true;
     this.token = null;
 
     this.slug = null;
@@ -11,50 +11,54 @@ let CreateUserWindow = function () {
     this.init = function () {
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
-        // this.initAllServices();
-        window.setTimeout(toogleServices, 1000);
+        this.initAllServices();
+        // document.querySelector('input[name="role"]);
+
+        window.setTimeout(toggleServices, 1000);
 
     }
 
     this.initAllServices = function () {
-        for (let i = 0; i < 256; i++) {
-            let data = getCookie('user_data-' + i);
-            if (data) {
-                data = JSON.parse(data);
-                this.changeService(i);
-            } else {
-                break;
-            }
-        }
-        for (let i = 0; i < 256; i++) {
-            let data = getCookie('admin_data-' + i);
-            if (data) {
-                data = JSON.parse(data);
-                let address = document.querySelector('#admin-address-' + i);
-                address.value = data.address_id;
-            } else {
-                break;
-            }
+        let serviceCount = document.getElementById('service-count').getAttribute('data-count');
+        console.log('count: ', serviceCount);
+        for (let i = 0; i < serviceCount; i++) {
+            this.setCurrentData(i);
+            this.satAdminCurrentData(i)
         }
     }
 
 
     this.changeServiceType = function (num) {
         let serviceType = document.querySelector('#service-type-' + num);
-        if (serviceType) {
-            serviceType.removeChild(serviceType.querySelector('option.placeholder'));
+        if (serviceType && serviceType.value) {
+            let option = serviceType.querySelector('option.placeholder');
+            if (option) {
+                serviceType.removeChild(option);
+            }
             let service_type_id = Number(serviceType.value);
             this.loadServices(num, service_type_id);
-            this.saveCurrentData(num);
+            if (!isInit) {
+                this.saveCurrentData(num);
+            }
         }
     }
 
-    this.changeService = function (num) {
+    this.changeService = function (num, value= null) {
         let service = document.querySelector('#service-' + num);
-        if (service) {
-            service.removeChild(service.querySelector('option.placeholder'));
+        if (service.value || value) {
+            let option = service.querySelector('option.placeholder');
+            if (option) {
+                service.removeChild(option);
+            }
+            if (value) {
+                service.value = value;
+            }
             let service_id = Number(service.value);
+            console.log(service);
             this.loadAddresses(num, service_id);
+            if (!isInit) {
+                this.saveCurrentData(num);
+            }
         }
     }
 
@@ -66,7 +70,7 @@ let CreateUserWindow = function () {
         this.saveAdminCurrentData(num);
     }
 
-    this.loadServices = function (num, service_type_id) {
+    this.loadServices = function (num, service_type_id, value=null) {
         this.post({
             url: '/api/services_list',
             data: {
@@ -81,12 +85,15 @@ let CreateUserWindow = function () {
                     let services = document.querySelector('#service-' + num);
                     services.innerHTML = cnt;
                     document.querySelector('#service-' + num).classList.remove('hide');
+                    if(value) {
+                        services.value = value;
+                    }
                 }
             }
         });
     }
 
-    this.loadAddresses = function (num, service_id) {
+    this.loadAddresses = function (num, service_id, value=null) {
         let _this = this;
         this.post({
             url: '/api/services_addresses',
@@ -102,19 +109,25 @@ let CreateUserWindow = function () {
                     let address = document.querySelector('#address-' + num);
                     address.innerHTML = cnt;
                     document.querySelector('#address-' + num).classList.remove('hide');
+                    if(value) {
+                        address.value = value;
+                    }
                 }
             }
         });
     }
 
     this.saveCurrentData = function (num) {
-        let service = document.querySelector('#service-type-' + num);
+        let serviceType = document.querySelector('#service-type-' + num);
+        let service = document.querySelector('#service-' + num);
         let address = document.querySelector('#address-' + num);
+        let service_type_id = Number(serviceType.value);
         let service_id = Number(service.value);
         let address_id = Number(address.value);
         let data = {
+            service_type_id: service_type_id,
             service_id: service_id,
-            address_id: address_id
+            address_id: address_id,
         };
         setCookie('user_data-' + num, JSON.stringify(data));
     }
@@ -129,12 +142,27 @@ let CreateUserWindow = function () {
     }
 
     this.setCurrentData = function (num) {
-        let service = document.querySelector('#service-type-' + num);
-        let address = document.querySelector('#address-' + num);
+        let serviceType = document.getElementById('service-type-' + num);
         let data = getCookie('user_data-' + num);
+        console.log(data);
         if (data) {
             data = JSON.parse(data);
-            service.value = data.service_id;
+                serviceType.value = data.service_type_id;
+                if(data.service_type_id) {
+                    this.loadServices(num, data.service_type_id, data.service_id)
+                }
+                if(data.service_id) {
+                    this.loadAddresses(num, data.service_id, data.address_id)
+                }
+        }
+        isInit = false;
+    }
+
+    this.satAdminCurrentData = function (num) {
+        let address = document.querySelector('#admin-address-' + num);
+        let data = getCookie('admin_data-' + num);
+        if (data) {
+            data = JSON.parse(data);
             address.value = data.address_id;
         }
     }
