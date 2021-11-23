@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('styles')
     <link href="{{ asset('css/user.css') }}" rel="stylesheet">
 @endsection
@@ -8,7 +7,7 @@
     @component('layouts.content')
         @slot('header')
             <header class="flex align-items-center">
-                <a href="{{route('window.user', ['business' => $slug, 'modal' => 'create', 'sort' => $sort, 'load' => $load])}}" class="btn full-width text-decoration-none flex justify-content-around align-items-center">{!! file_get_contents(public_path('images/add-w.svg')) !!}{{__('добавить специалиста')}}</a>
+                <a  href="{{route('window.user', ['business' => $slug, 'modal' => 'create', 'sort' => $sort, 'load' => $load])}}" class="btn full-width text-decoration-none flex justify-content-around align-items-center">{!! file_get_contents(public_path('images/add-w.svg')) !!}{{__('добавить специалиста')}}</a>
                 @if ($package == 'pro')
                     <a href="{{route('user', ['business' => $slug, 'sort' => 'admin', 'load' => $load])}}" class="hashtag {{$sort == 'admin' ? 'active' : ''}}">{{__('Администраторы')}}</a>
                 @endif

@@ -14,7 +14,7 @@ let CreateUserWindow = function () {
         this.initAllServices();
         // document.querySelector('input[name="role"]);
 
-        window.setTimeout(toggleServices, 1000);
+        window.setTimeout(toggleServices, 10);
 
     }
 
