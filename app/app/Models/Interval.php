@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\Interval
@@ -19,10 +20,18 @@ class Interval extends Model
 {
     use HasFactory;
 
+//    public function __construct(string $baseName = null)
+//    {
+//        if ($baseName){
+//            $this->table = $baseName . '.intervals';
+//        }
+//        parent::__construct();
+//    }
+
     protected $guarded = ['id'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function services ()
     {

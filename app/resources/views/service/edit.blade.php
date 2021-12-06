@@ -33,16 +33,19 @@
         @if ($view_service)
             <div class="grid add-service">
 
-                <label class="row-1 col-1 align-self-start" for="service-name-{{$view_service->id}}">{{__('Название *')}}</label>
-                <label class="row-2 col-1 align-self-center" for="service-type-{{$view_service->id}}">{{__('Тип *')}}</label>
-                <label class="row-3 col-1 align-self-center" for="address-{{$view_service->id}}">{{__('Адрес *')}}</label>
-                <label class="row-4 col-1 align-self-center" for="interval-1-{{$view_service->id}}">{{__('Длительность *')}}</label>
-                <label class="row-5 col-1 align-self-start" for="range-{{$view_service->id}}">{{__('Интервал *')}}</label>
-                <label class="row-6 col-1 align-self-start" for="price-{{$view_service->id}}">{{__('Стоимость *')}}</label>
-                <label class="row-7 col-1 align-self-start" for="bonus-{{$view_service->id}}">{{__('Бонусы')}}</label>
-                <label class="row-8 col-1 align-self-center" for="calendar-{{$view_service->id}}">{{__('Расписание')}}</label>
-                <label class="row-9 col-1 align-self-center" for="group-1-{{$view_service->id}}">{{__('Групповая услуга *')}}</label>
-                <label class="row-10 col-1 align-self-center" for="prepay-1-{{$view_service->id}}">{{__('Оплата *')}}</label>
+                <label class="row-1 col-1 align-self-start" for="service-name">{{__('Название *')}}</label>
+                <label class="row-2 col-1 align-self-start" for="service-type">{{__('Тип *')}}</label>
+                <label class="row-3 col-1 align-self-start" for="address">{{__('Адрес *')}}</label>
+                <label class="row-4 col-1 align-self-start" for="interval-hours-0">{{__('Длительность')}}<br>{{__('(часы) *')}}</label>
+                <label class="row-5 col-1 align-self-start" for="interval-minutes-0">{{__('Длительность')}}<br>{{__('(минуты) *')}}</label>
+                <label class="row-6 col-1 align-self-start" for="interval-hours-0">{{__('Интервал')}}<br>{{__('(часы) *')}}</label>
+                <label class="row-7 col-1 align-self-start" for="interval-minutes-0">{{__('Интервал')}}<br>{{__('(минуты) *')}}</label>
+                {{--            <label class="row-8 col-1 align-self-start" for="range">{{__('Интервал *')}}</label>--}}
+                <label class="row-8 col-1 align-self-start" for="price">{{__('Стоимость *')}}</label>
+                <label class="row-9 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
+                <label class="row-10 col-1 align-self-start" for="calendar">{{__('Расписание')}}</label>
+                <label class="row-11 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
+                <label class="row-12 col-1 align-self-start" for="prepay-1">{{__('Оплата *')}}</label>
 
                 <div class="row-1 col-2">
                     <input id="service-name-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->name}}" placeholder="{{__('Введите название')}}">
@@ -71,26 +74,64 @@
                     </div>
                 </div>
 
-                <div class="checkboxes grid intervals row-4 col-2">
-                    @foreach($intervals as $interval)
-                        <input id="interval-{{$interval->id}}-{{$view_service->id}}" type="radio" name="interval-{{$view_service->id}}" value="{{$interval->id}}" {{$view_service->interval_id == $interval->id ? 'checked' : ''}}>
-                        <label for="interval-{{$interval->id}}-{{$view_service->id}}" class="user-select-none">{{$interval->name}}</label>
-                    @endforeach
-                </div>
+{{--                <div class="checkboxes grid intervals row-4 col-2">--}}
+{{--                    @foreach($intervals as $interval)--}}
+{{--                        <input id="interval-{{$interval->id}}-{{$view_service->id}}" type="radio" name="interval-{{$view_service->id}}" value="{{$interval->id}}" {{$view_service->interval_id == $interval->id ? 'checked' : ''}}>--}}
+{{--                        <label for="interval-{{$interval->id}}-{{$view_service->id}}" class="user-select-none">{{$interval->name}}</label>--}}
+{{--                    @endforeach--}}
+{{--                </div>--}}
 
-                <div class="row-5 col-2">
-                    <input id="range-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->range}}" placeholder="{{__('Введите интервал посещений в минутах')}}">
-                </div>
+{{--                <div class="row-5 col-2">--}}
+{{--                    <input id="range-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->range}}" placeholder="{{__('Введите интервал посещений в минутах')}}">--}}
+{{--                </div>--}}
 
-                <div class="row-6 col-2">
+                {{-- Длительность --}}
+                <div class="checkboxes grid hours row-4 col-2"  >
+                    @php($hours = 0)
+                    @while($hours <= 24)
+                        <input id="duration-hours-{{$hours}}" type="radio" name="durationHours" value="{{$hours}}" {{$view_service->intervalFields['hours'] == $hours ? 'checked' : ''}}>
+                        <label for="duration-hours-{{$hours}}" class="user-select-none" >{{$hours}}</label>
+                        @php($hours ++)
+                    @endwhile
+                </div>
+                <div class="checkboxes grid minutes row-5 col-2"  >
+                    @php($minutes = 0)
+                    @while($minutes <= 55)
+                        <input id="duration-minutes-{{$minutes}}" type="radio" name="durationMinutes" value="{{$minutes}}" {{$view_service->intervalFields['minutes'] == $minutes ? 'checked' : ''}}>
+                        <label for="duration-minutes-{{$minutes}}" class="user-select-none" >{{$minutes}}</label>
+                        @php($minutes += 5)
+                    @endwhile
+                </div>
+                {{-- /Длительность --}}
+
+                {{-- Интервал --}}
+                <div class="checkboxes grid hours row-6 col-2"  >
+                    @php($hours = 0)
+                    @while($hours <= 24)
+                        <input id="interval-hours-{{$hours}}" type="radio" name="intervalHours" value="{{$hours}}" {{$view_service->rangeFields['hours'] == $hours ? 'checked' : ''}}>
+                        <label for="interval-hours-{{$hours}}" class="user-select-none" >{{$hours}}</label>
+                        @php($hours ++)
+                    @endwhile
+                </div>
+                <div class="checkboxes grid minutes row-7 col-2"  >
+                    @php($minutes = 0)
+                    @while($minutes <= 55)
+                        <input id="interval-minutes-{{$minutes}}" type="radio" name="intervalMinutes" value="{{$minutes}}" {{$view_service->rangeFields['minutes'] == $minutes ? 'checked' : ''}}>
+                        <label for="interval-minutes-{{$minutes}}" class="user-select-none" >{{$minutes}}</label>
+                        @php($minutes += 5)
+                    @endwhile
+                </div>
+                {{-- /Интервал --}}
+
+                <div class="row-8 col-2">
                     <input id="price-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->price}}" placeholder="{{__('Введите сумму')}}">
                 </div>
 
-                <div class="row-7 col-2">
+                <div class="row-9 col-2">
                     <input id="bonus-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->bonus}}" placeholder="{{__('Введите количество')}}">
                 </div>
 
-                <div class="row-8 col-2 align-self-center">
+                <div class="row-10 col-2 align-self-center">
                     <button
                             id="calendar-{{$view_service->id}}"
                             class="background-none calendar-a"
@@ -100,14 +141,14 @@
                     </button>
                 </div>
 
-                <div class="row-9 col-2 grid intervals">
+                <div class="row-11 col-2 grid intervals">
                     <input id="group-1-{{$view_service->id}}" type="radio" name="group-{{$view_service->id}}" value="1" {{isset($view_service->group) ? 'checked' : ''}}>
                     <label for="group-1-{{$view_service->id}}" class="user-select-none">{{__('Да')}}</label>
                     <input id="group-0-{{$view_service->id}}" type="radio" name="group-{{$view_service->id}}" value="0" {{!isset($view_service->group) ? 'checked' : ''}}>
                     <label for="group-0-{{$view_service->id}}" class="user-select-none">{{__('Нет')}}</label>
                 </div>
 
-                <div class="row-10 col-2 grid intervals">
+                <div class="row-12 col-2 grid intervals">
                     <input id="prepay-{{$view_service->id}}" type="checkbox" name="pre-{{$view_service->id}}" value="1" {{isset($view_service->prepayment) ? 'checked' : ''}}>
                     <label for="prepay-{{$view_service->id}}" class="user-select-none">{{__('Предоплата')}}</label>
                     <input id="cashpay-{{$view_service->id}}" type="checkbox" name="cash-{{$view_service->id}}" value="1" {{$view_service->cash_pay ? 'checked' : ''}}>
@@ -164,4 +205,19 @@
         <a href="{{route('service', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
 
     @endcomponent
+    <style>
+        div.add-service {
+            grid-template-columns: 20% 36% 1fr;
+            grid-template-rows: 30px 30px 200px 160px 60px 160px 60px 30px 30px 30px minmax(30px, 1fr) 30px;
+            grid-gap: 29px 20px;
+            width: 762px;
+            padding-left: 43px;
+        }
+        .hours {
+            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
+        }
+        .minutes {
+            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
+        }
+    </style>
 @endsection

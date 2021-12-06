@@ -109,7 +109,7 @@ class ServiceController extends Controller
                 break;
             case 'create':
             case 'edit':
-                $this->params['intervals'] = Interval::all();
+//                $this->params['intervals'] = Interval::all();
                 $this->params['types_select'] = TypeService::all();
                 $this->params['addresses'] = Address::all();
                 if ($this->params['addresses']->isEmpty()) $this->params['addresses'] = 0;
@@ -221,13 +221,17 @@ class ServiceController extends Controller
             $service = new Service();
             $type = TypeService::find( $request->input('type') );
             $service->name = $request->input('name');
-            $service->interval_id = $request->input('interval');
-            $service->range = $request->input('range');
+
+
             $service->price = $request->input('price');
             $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
             $service->cash_pay = $request->input('cashpay');
             $service->online_pay = $request->input('onlinepay');
             $service->bonus_pay = $request->input('bonuspay');
+
+            $service->interval_id = $this->getIntervalId($request, 'duration');
+            $service->range =$this->getIntervalRange($request, 'interval');
+
             $type->services()->save($service);
             $service->attachAddresses($request->input('addresses'));
 
@@ -245,6 +249,19 @@ class ServiceController extends Controller
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
+    }
+
+    public function getIntervalId($request, $type)
+    {
+        $intervalLength = $this->getIntervalRange($request, $type);
+        $item =  Interval::where('minutes', $intervalLength)->first();
+        return $item ? $item->id : 1;
+
+    }
+
+    public function getIntervalRange($request, $type)
+    {
+        return $request->input($type . 'Minutes') + $request->input($type . 'Hours') * 60;
     }
 
     /**
@@ -319,7 +336,7 @@ class ServiceController extends Controller
             'type'      => 'required|integer',
             'addresses' => 'required|array',
             'name'      => 'required|string',
-            'interval'  => 'required|integer|min:0|max:24',
+//            'interval'  => 'required|integer|min:0|max:24',
             'range'     => 'integer|min:0',
             'message'   => 'nullable|required_with:quantity|string',
             'quantity'  => 'nullable|required_with:message|integer|min:2',
