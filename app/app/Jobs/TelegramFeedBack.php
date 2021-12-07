@@ -89,6 +89,5 @@ class TelegramFeedBack implements ShouldQueue
                 $keyboard
             );
         }
-        ConnectService::dbConnect('botanik');
     }
 }

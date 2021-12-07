@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Facades\ConnectService;
 use App\Models\Notice;
 use App\Models\Role;
 use Illuminate\Bus\Queueable;
@@ -10,7 +11,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Exception;
-use ConnectService;
+use Illuminate\Support\Facades\Log;
+
 
 class SendNotice implements ShouldQueue
 {
@@ -60,15 +62,14 @@ class SendNotice implements ShouldQueue
     {
         if (!ConnectService::dbConnect($this->db))
             return;
-
         foreach ($this->notices as $notice) {
 
             if (isset($notice['role_slug'])) {
                 $notice['role_id'] = Role::where('slug', $notice['role_slug'])->first()->id;
                 unset($notice['role_slug']);
             }
-
-            Notice::create($notice);
+            /** @var Notice $res */
+            $res = Notice::create($notice);
         }
     }
 
@@ -78,8 +79,8 @@ class SendNotice implements ShouldQueue
      * @param Exception $exception
      * @return void
      */
-    public function failed (Exception $exception)
+    public function failed(Exception $exception)
     {
-        \Log::error($exception->getMessage().' * File: '.$exception->getFile().' Line: '.$exception->getLine().' * Database: '.$this->db);
+        Log::error($exception->getMessage() . ' * File: ' . $exception->getFile() . ' Line: ' . $exception->getLine() . ' * Database: ' . $this->db);
     }
 }

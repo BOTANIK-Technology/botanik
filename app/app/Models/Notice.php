@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Facades\ConnectService;
+use App\Jobs\SendNotice;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Collection\Collection;
@@ -74,14 +76,15 @@ class Notice extends Model
     }
 
     /**
-     * @param $notices
-     *
-     * @return Collection|false
+     * @param array $notices
+     * @return array|false
      */
-    public static function makeSeen($notices)
+    public static function makeSeen( array $notices)
     {
         if ($notices->isEmpty())
+        {
             return false;
+        }
         foreach ($notices as $notice) {
             if ($notice->seen == false) {
                 $notice->seen = true;
@@ -98,15 +101,14 @@ class Notice extends Model
      */
     public static function sendNotice(string $business_db, array $params, $minutes = 1) : void
     {
-        if (\ConnectService::prepareJob()) {
+        if (ConnectService::prepareJob()) {
 
-            \App\Jobs\SendNotice::dispatch(
+            SendNotice::dispatch(
                 $business_db,
                 $params
             )->delay(now()->addMinutes($minutes));
 
-            \ConnectService::dbConnect($business_db);
-
+            ConnectService::dbConnect($business_db);
         }
     }
 }

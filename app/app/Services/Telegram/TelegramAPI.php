@@ -229,8 +229,7 @@ class TelegramAPI
         if ($this->user->telegramSession) {
             $this->user->telegramSession->data = json_encode($data);
             $this->user->telegramSession->save();
-        }
-        else {
+        } else {
             $session = new TelegramSession();
             $session->data = json_encode($data);
             $this->user->telegramSession()->save($session);
@@ -348,8 +347,7 @@ class TelegramAPI
 
         try {
             $service = Service::find($this->getServiceID());
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error('createRecord ERROR: ' . $e->getMessage(), (array)$this);
             return false;
         }
@@ -363,12 +361,12 @@ class TelegramAPI
 
         $record = Record::create([
             'telegram_user_id' => $this->user->id,
-            'service_id'       => $service_id,
-            'address_id'       => $this->getAddressID(),
-            'user_id'          => $master_id,
-            'time'             => $time,
-            'date'             => $date,
-            'status'           => $status,
+            'service_id' => $service_id,
+            'address_id' => $this->getAddressID(),
+            'user_id' => $master_id,
+            'time' => $time,
+            'date' => $date,
+            'status' => $status,
         ]);
 
         // Will upload this record to YClients CRM
@@ -378,8 +376,7 @@ class TelegramAPI
             if ($status === false) {
                 //TODO: add colors
                 $yclients->api->addRecords([$record]);
-            }
-            else {
+            } else {
                 $yclients->api->addRecords([$record]);
             }
 
@@ -390,19 +387,18 @@ class TelegramAPI
             $beauty = new BeautyPro();
             if ($status === false) {
                 $beauty->api->addRecords([$record], "Онлайн оплата: Платеж не подтвержден", "#fea726");
-            }
-            else {
+            } else {
                 $beauty->api->addRecords([$record]);
             }
         }
 
         Payment::create([
             'online_pay' => $online_pay,
-            'money'      => $price,
-            'bonuses'    => $bonus,
-            'status'     => $status,
-            'refund'     => Carbon::now()->addHours(3),
-            'record_id'  => $record->id,
+            'money' => $price,
+            'bonuses' => $bonus,
+            'status' => $status,
+            'refund' => Carbon::now()->addHours(3),
+            'record_id' => $record->id,
         ]);
 
         if ($record && $status) {
@@ -415,8 +411,7 @@ class TelegramAPI
                     if ($current > $max['count']) $max = ['count' => $current, 'id' => $service_id];
                 }
                 $this->user->favorite_service = $max['id'];
-            }
-            else {
+            } else {
                 $this->user->favorite_service = $service->id;
             }
             if ($bonus == 0 && $service->bonus && $online_pay == true) {
@@ -475,8 +470,7 @@ class TelegramAPI
                     $record->telegramUser->chat_id,
                     $service->group->message
                 );
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 continue;
             }
         }
@@ -500,14 +494,19 @@ class TelegramAPI
             [
                 [
                     'address_id' => $this->getAddressID(),
-                    'message'    => $notice_mess,
-                ],
-                [
-                    'user_id' => $this->getMasterID(),
                     'message' => $notice_mess,
                 ],
             ],
-        )->delay(now()->addMinutes(2));
+        )->delay(now()->addMinutes(0));
+
+        SendNotice::dispatch(
+            $this->business_db, [
+            [
+                'user_id' => $this->getMasterID(),
+                'message' => $notice_mess,
+            ],
+        ],
+        )->delay(now()->addMinutes(1));
 
         /*
          * Client notice
@@ -547,8 +546,7 @@ class TelegramAPI
             $this->user->bonus -= $price;
             $this->user->save();
             return 0;
-        }
-        else {
+        } else {
             $this->user->bonus = 0;
             $this->user->save();
             return $price - $bonus;

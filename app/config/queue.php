@@ -38,10 +38,11 @@ return [
             'driver' => 'database',
             'table' => 'jobs',
             'queue' => 'default',
-            'retry_after' => 90,
+            'retry_after' => 60,
         ],
 
         'beanstalkd' => [
+            'connection' => env('DB_CONNECTION'),
             'driver' => 'beanstalkd',
             'host' => 'localhost',
             'queue' => 'default',
