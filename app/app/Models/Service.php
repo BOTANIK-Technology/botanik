@@ -67,8 +67,8 @@ class Service extends Model
     {
         $range = $this->getRangeInterval();
         return [
-            'hours' => $range->hoursField,
-            'minutes' => $range->minutesField,
+            'hours' => $range ? $range->hoursField : 0,
+            'minutes' => $range ? $range->minutesField : 0,
         ];
     }
 

@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Models\Root\Business;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Config;
-use Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DataBaseConnect
 {
@@ -24,7 +24,9 @@ class DataBaseConnect
                 $business = Business::where('slug', $slug)->first();
                 if ($business) {
                     if (Auth::check())
+                    {
                         session()->put(['business' => $business]);
+                    }
                     return $business;
                 }
                 return false;

@@ -109,6 +109,9 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
             'prepay_card': document.getElementById('card-'+id).value,
         }
     }
+    function checkedByNameVal (name) {
+        return getCheckedVal(document.getElementsByName(name));
+    }
 
     function getCheckedVal(objects) {
         let val = '';

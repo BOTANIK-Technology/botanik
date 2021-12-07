@@ -282,8 +282,10 @@ class ServiceController extends Controller
             $service = Service::find($request->id);
             $service->type_service_id = $request->input('type');
             $service->name = $request->input('name');
-            $service->interval_id = $request->input('interval');
-            $service->range = $request->input('range');
+
+            $service->interval_id = $this->getIntervalId($request, 'duration');
+            $service->range =$this->getIntervalRange($request, 'interval');
+
             $service->price = $request->input('price');
             $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
             $service->cash_pay = $request->input('cashpay');
@@ -356,12 +358,14 @@ class ServiceController extends Controller
         }
         $validator =  \Validator::make($data, $rules);
 
-        //Проверяем на уникальность сочетания именя услуги и типа
-        $validator->after(function($validator) use ($data) {
-            if (Service::where('type_service_id', $data['type'])->where('name', $data['name'])->exists() ) {
-                $validator->errors()->add('name', 'Такая услуга в выбранной категории уже есть');
-            }
-        });
+        //Проверяем на уникальность сочетания имени услуги и типа
+        if ($request->is('*/add-service')) {
+            $validator->after(function ($validator) use ($data) {
+                if (Service::where('type_service_id', $data['type'])->where('name', $data['name'])->exists()) {
+                    $validator->errors()->add('name', 'Такая услуга в выбранной категории уже есть');
+                }
+            });
+        }
         return $validator;
     }
 
