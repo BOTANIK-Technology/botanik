@@ -211,7 +211,7 @@ class ScheduleController extends Controller
                         'user_id' => $request->user_id,
                         'message' => $notice_mess
                     ]
-                ],
+                ]
             )->delay(now()->addMinutes(2));
 
             TelegramNotice::dispatch(
