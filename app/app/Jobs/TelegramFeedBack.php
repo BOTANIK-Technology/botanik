@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 
@@ -78,15 +79,16 @@ class TelegramFeedBack implements ShouldQueue
                 $user->telegramSession->save();
             }
 
-            $bot = new \TelegramBot\Api\BotApi($this->token);
+            $bot = new BotApi($this->token);
             $bot->sendMessage(
                 $this->chat_id,
-                __(Carbon::parse(now()) . ' / ' . Carbon::parse(now())->addMinutes(2) . ' Оцените услугу "'.$record->service->name.'"'),
+                __('Оцените услугу "'.$record->service->name.'"'),
                 null,
                 false,
                 null,
                 $keyboard
             );
         }
+        ConnectService::dbConnect('botanik');
     }
 }

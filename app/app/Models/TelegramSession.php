@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\TelegramSession
@@ -21,7 +22,7 @@ class TelegramSession extends Model
     protected $fillable = ['telegram_user_id', 'type', 'service', 'address', 'master', 'record', 'date', 'time', 'stars', 'data'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function telegramUser()
     {
