@@ -13,7 +13,8 @@ if (addUserBtn) {
 
         if (master.checked) {
             send.role = master.value;
-            send.services = addressServices(serviceSelects);
+            send.services_type = getValues(serviceSelects);
+            send.services = getValues(serviceSelects);
             send.addresses = getValues(addressSelects);
         } else {
             send.role = admin.value;

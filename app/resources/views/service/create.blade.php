@@ -22,15 +22,18 @@
         <div class="grid add-service">
 
             <label class="row-1 col-1 align-self-start" for="service-name">{{__('Название *')}}</label>
-            <label class="row-2 col-1 align-self-center" for="service-type">{{__('Тип *')}}</label>
-            <label class="row-3 col-1 align-self-center" for="address">{{__('Адрес *')}}</label>
-            <label class="row-4 col-1 align-self-center" for="interval-1">{{__('Длительность *')}}</label>
-            <label class="row-5 col-1 align-self-start" for="range">{{__('Интервал *')}}</label>
-            <label class="row-6 col-1 align-self-start" for="price">{{__('Стоимость *')}}</label>
-            <label class="row-7 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
-            <label class="row-8 col-1 align-self-center" for="calendar">{{__('Расписание')}}</label>
-            <label class="row-9 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
-            <label class="row-10 col-1 align-self-center" for="prepay-1">{{__('Оплата *')}}</label>
+            <label class="row-2 col-1 align-self-start" for="service-type">{{__('Тип *')}}</label>
+            <label class="row-3 col-1 align-self-start" for="address">{{__('Адрес *')}}</label>
+            <label class="row-4 col-1 align-self-start" for="interval-hours-0">{{__('Длительность')}}<br>{{__('(часы) *')}}</label>
+            <label class="row-5 col-1 align-self-start" for="interval-minutes-0">{{__('Длительность')}}<br>{{__('(минуты) *')}}</label>
+            <label class="row-6 col-1 align-self-start" for="interval-hours-0">{{__('Интервал')}}<br>{{__('(часы) *')}}</label>
+            <label class="row-7 col-1 align-self-start" for="interval-minutes-0">{{__('Интервал')}}<br>{{__('(минуты) *')}}</label>
+{{--            <label class="row-8 col-1 align-self-start" for="range">{{__('Интервал *')}}</label>--}}
+            <label class="row-8 col-1 align-self-start" for="price">{{__('Стоимость *')}}</label>
+            <label class="row-9 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
+            <label class="row-10 col-1 align-self-start" for="calendar">{{__('Расписание')}}</label>
+            <label class="row-11 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
+            <label class="row-12 col-1 align-self-start" for="prepay-1">{{__('Оплата *')}}</label>
 
             <div class="row-1 col-2">
                 <input id="service-name" class="inp" type="text" placeholder="{{__('Введите название')}}">
@@ -62,7 +65,8 @@
                         </select>
                     </div>
                     <div id="more-address" class="row-2 col-3 flex">
-                        <button id="include-address" class="color"><div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес к услуге')}}</button>
+                        <button id="include-address" class="color">
+                            <div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес к услуге')}}</button>
                     </div>
                 @else
                     <select id="address" class="none">
@@ -73,59 +77,102 @@
                 @endif
             </div>
 
-            <div class="checkboxes grid intervals row-4 col-2">
-                @foreach($intervals as $interval)
-                    <input id="interval-{{$interval->id}}" type="radio" name="interval" value="{{$interval->id}}">
-                    <label for="interval-{{$interval->id}}" class="user-select-none">{{$interval->name}}</label>
-                @endforeach
-            </div>
+{{--            <div class="checkboxes grid intervals row-4 col-2">--}}
+{{--                @foreach($intervals as $interval)--}}
+{{--                    <input id="interval-{{$interval->id}}" type="radio" name="interval" value="{{$interval->id}}">--}}
+{{--                    <label for="interval-{{$interval->id}}" class="user-select-none">{{$interval->name}}</label>--}}
+{{--                @endforeach--}}
+{{--            </div>--}}
 
-            <div class="row-5 col-2">
-                <input id="range" class="inp" type="text" placeholder="{{__('Введите интервал посещений в минутах')}}">
+            {{-- Длительность --}}
+            <div class="checkboxes grid hours row-4 col-2"  >
+                @php($hours = 0)
+                @while($hours <= 24)
+                    <input id="duration-hours-{{$hours}}" type="radio" name="durationHours" value="{{$hours}}">
+                    <label for="duration-hours-{{$hours}}" class="user-select-none" >{{$hours}}</label>
+                    @php($hours ++)
+                @endwhile
             </div>
+            <div class="checkboxes grid minutes row-5 col-2"  >
+                @php($minutes = 0)
+                @while($minutes <= 55)
+                    <input id="duration-minutes-{{$minutes}}" type="radio" name="durationMinutes" value="{{$minutes}}">
+                    <label for="duration-minutes-{{$minutes}}" class="user-select-none" >{{$minutes}}</label>
+                    @php($minutes += 5)
+                @endwhile
+            </div>
+            {{-- /Длительность --}}
 
-            <div class="row-6 col-2">
+            {{-- Интервал --}}
+            <div class="checkboxes grid hours row-6 col-2"  >
+                @php($hours = 0)
+                @while($hours <= 24)
+                    <input id="interval-hours-{{$hours}}" type="radio" name="intervalHours" value="{{$hours}}">
+                    <label for="interval-hours-{{$hours}}" class="user-select-none" >{{$hours}}</label>
+                    @php($hours ++)
+                @endwhile
+            </div>
+            <div class="checkboxes grid minutes row-7 col-2"  >
+                @php($minutes = 0)
+                @while($minutes <= 55)
+                    <input id="interval-minutes-{{$minutes}}" type="radio" name="intervalMinutes" value="{{$minutes}}">
+                    <label for="interval-minutes-{{$minutes}}" class="user-select-none" >{{$minutes}}</label>
+                    @php($minutes += 5)
+                @endwhile
+            </div>
+            {{-- /Интервал --}}
+
+{{--            <div class="row-8 col-2">--}}
+{{--                <input id="range" class="inp" type="text" placeholder="{{__('Введите интервал посещений в минутах')}}">--}}
+{{--            </div>--}}
+
+            <div class="row-8 col-2">
                 <input id="price" class="inp" type="text" placeholder="{{__('Введите сумму')}}">
             </div>
 
-            <div class="row-7 col-2">
+            <div class="row-9 col-2">
                 <input id="bonus" class="inp" type="text" placeholder="{{__('Введите количество')}}">
             </div>
 
-            <div class="row-8 col-2 align-self-center">
+            <div class="row-10 col-2 align-self-center">
                 <button
-                        id="calendar"
-                        class="background-none calendar-a"
-                        data-href="{{route('window.service', ['business' => $slug, 'load' => $load, 'modal' => 'timetable', 'url' => url()->current()])}}"
-                >
+                    id="calendar"
+                    class="background-none calendar-a"
+                    data-href="{{route('window.service', ['business' => $slug, 'load' => $load, 'modal' => 'timetable', 'url' => url()->current()])}}" >
                     <div class="calendar-icon"></div>
                 </button>
             </div>
 
-            <div class="row-9 col-2 grid intervals">
+            <div class="row-11 col-2 grid intervals ">
                 <input id="group-1" type="radio" name="group" value="1">
                 <label for="group-1" class="user-select-none">{{__('Да')}}</label>
                 <input id="group-0" type="radio" name="group" value="0" checked>
                 <label for="group-0" class="user-select-none">{{__('Нет')}}</label>
             </div>
 
-            <div class="row-10 col-2 grid intervals">
-                <input id="prepay" type="checkbox" name="pre" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+            <div class="row-12 col-2 grid intervals">
+                <input id="prepay" type="checkbox" name="pre"
+                       value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
                 <label for="prepay" class="user-select-none">{{__('Предоплата')}}</label>
-                <input id="cashpay" type="checkbox" name="cas" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+                <input id="cashpay" type="checkbox" name="cas"
+                       value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
                 <label for="cashpay" class="user-select-none">{{__('На месте')}}</label>
-                <input id="onlinepay" type="checkbox" name="online" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+                <input id="onlinepay" type="checkbox" name="online"
+                       value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
                 <label for="onlinepay" class="user-select-none">{{__('Онлайн')}}</label>
-                <input id="bonuspay" type="checkbox" name="bonuspay" value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
+                <input id="bonuspay" type="checkbox" name="bonuspay"
+                       value="1" {{!empty($service->prepayment) ? 'checked' : ''}}>
                 <label for="bonuspay" class="user-select-none">{{__('Бонусами')}}</label>
             </div>
 
             <div id="type-block" class="row-2 col-3 flex align-items-center">
-                <button id="add-type"><div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить тип в список')}}</button>
+                <button id="add-type">
+                    <div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить тип в список')}}</button>
             </div>
 
             <div id="address-block" class="row-3 col-3 flex align-items-center align-self-start">
-                <button id="add-address"><div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес в список')}}</button>
+                <button id="add-address">
+                    <div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес в список')}}</button>
             </div>
 
         </div>
@@ -150,7 +197,8 @@
                 <input id="card" class="inp align-self-center" type="text" placeholder="{{__('Введите номер карты')}}">
             </div>
             <div class="row-2 col-2 align-self-center">
-                <textarea id="prepay-message" class="inp" type="text" placeholder="{{__('Введите сообщение')}}"></textarea>
+                <textarea id="prepay-message" class="inp" type="text"
+                          placeholder="{{__('Введите сообщение')}}"></textarea>
             </div>
         </div>
 
@@ -161,6 +209,22 @@
             </button>
             <a href="{{route('service', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
         @endslot
-
     @endcomponent
+    <style>
+        div.add-service {
+            grid-template-columns: 20% 36% 1fr;
+            grid-template-rows: 30px 30px 200px 160px 60px 160px 60px 30px 30px 30px minmax(30px, 1fr) 30px;
+            grid-gap: 29px 20px;
+            width: 762px;
+            padding-left: 43px;
+        }
+        .hours {
+            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
+        }
+        .minutes {
+            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
+        }
+    </style>
 @endsection
+
+

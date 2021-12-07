@@ -17,34 +17,24 @@ RUN apt-get update && apt-get install -y \
     unzip \
     wget \
     libpng-dev
-RUN pecl install xdebug-3.1.1;
-RUN docker-php-ext-enable xdebug;
 
-RUN docker-php-ext-install  soap zip pdo_mysql bcmath exif sockets gd
+RUN docker-php-ext-install  gd soap zip mysqli pdo_mysql bcmath exif sockets
 
-
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php
-RUN php -r "unlink('composer-setup.php');"
+ADD ./php.ini /usr/local/etc/php/php.ini
 
 RUN a2enmod rewrite
+
 RUN service apache2 restart
 
-ENV TZ=Europe/Kiev
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-RUN echo 'root:root' | chpasswd
+RUN wget https://getcomposer.org/installer -O - -q \
+    | php -- --install-dir=/bin --filename=composer --quiet
 
 RUN groupadd --gid 1001 dev \
   && useradd --uid 1000 --gid dev --shell /bin/bash --create-home dev
 RUN usermod -aG www-data dev
-
-RUN chown -R dev:www-data /home/dev
-RUN chmod -R 777 /home/dev
-
-USER dev
 RUN echo "export TERM=xterm-256color" > /home/dev/.profile
+RUN chown -R dev:www-data /home/dev
+RUN chmod -R 775 /home/dev
 
-
-
+USER root
 

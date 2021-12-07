@@ -5,9 +5,16 @@
         let countService = '{{$moreService}}';
         let editRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $id])}}";
         let timeTables = @json($timetables);
-        console.log('timeTables: ', timeTables);
+        let services = @json($services);
+        let addresses = @json($addresses);
         for (let item in timeTables) {
             setCookie(item, JSON.stringify(timeTables[item]) );
+        }
+        let userData = @json($userData ?? null);
+        if(userData && Object.keys(userData).length){
+            for (let item in userData) {
+                setCookie(item, JSON.stringify(userData[item]));
+            }
         }
 
     </script>
@@ -18,29 +25,11 @@
     <script src="{{asset('js/user/user_window.js')}}"></script>
 @endsection
 
+<div id="service-count" data-count="{{$moreService}}"></div>
 @section('modal')
     @component('modal')
         <input id="url_slug" type="hidden" value="{{$slug}}" name="url_slug">
         <input type="hidden" id="token_id" name="_token" value="{{ csrf_token() }}">
-        @slot('class')
-            modal-edit
-        @endslot
-
-        <div class="hide">
-            @if ($services)
-                <select id="service-type">
-                    @foreach($services as $service)
-                        <option value="{{$service->id}}">{{$service->name}}</option>
-                    @endforeach
-                </select>
-            @else
-                <select id="service-type" class="none">
-                    <option>
-                        {{__('Нет услуг для выбора')}}
-                    </option>
-                </select>
-            @endif
-        </div>
 
         <div class="flex direction-column add-user">
             <div><input type="text"  value="{{$user->name}}" placeholder="{{__('Название / ФИО')}}" id="fio"></div>
@@ -57,130 +46,69 @@
 
             <div class="line full-width"></div>
 
-            @foreach($user->timetables as $timetable)
-                <div id="service-services-{{$loop->index}}" class="flex direction-column">
-                    @if ($services)
-                        <select class="master-service hide" onchange="userWin.changeService({{$loop->index}});"  id="service-type-{{$loop->index}}" data-id="{{$loop->index}}" name="service-{{$loop->index}}[]">
-                            @foreach($services as $service)
-                                <option value="{{$service->id}}" {{$timetable->service_id == $service->id ? 'selected' : ''}}>
-                                    {{$service->name}}
-                                </option>
+
+            @foreach($user->timetables as $i => $timetable)
+                <div class="flex direction-column master-only">
+                    <label class="list-label" for="service-type-{{$i}}">Тип услуги</label>
+                    @if ($types)
+                        <select id="service-type-{{$i}}" onchange="userWin.changeServiceType({{$i}})"
+                                name="service-type">
+                            <option class="placeholder" value="0" selected>{{__('Выберите тип услуги')}}</option>
+                            @foreach($types as $type)
+                                <option value="{{$type->id}}">{{$type->type}}</option>
                             @endforeach
                         </select>
                     @else
-                        <select class="master-service  hide none" id="service-type-{{$loop->index}}" name="service-{{$loop->index}}[]">
-                            <option>
-                                {{__('Нет услуг для выбора')}}
+                        <select id="service-type" class="none">
+                            <option value="">
+                                {{__('Нет типов услуг для выбора')}}
                             </option>
                         </select>
                     @endif
                 </div>
 
-                <div>
-                    @if ($addresses)
-                        <select class="master-address hide"  onchange="userWin.changeAddress({{$loop->index}});" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
-                            @foreach($addresses as $addr)
-                                <option value="{{$addr->id}}" {{$timetable->address_id == $addr->id ? 'selected' : ''}}>{{$addr->address}}</option>
-                            @endforeach
-                        </select>
-                    @else
-                        <select class="master-address none hide" id="address-{{$loop->index}}" name="address-{{$loop->index}}[]">
-                            <option>
-                                {{__('Нет адреса для выбора')}}
-                            </option>
-                        </select>
-                    @endif
+                <div id="service-container-{{$i}}" class="flex direction-column master-only">
+                    <label class="list-label" for="service-{{$i}}">Услуга</label>
+                    <select class="master-service hide" onchange="userWin.changeService({{$i}});" id="service-{{$i}}"
+                            data-id="{{$i}}" name="service-{{$i}}[]">
+                    </select>
                 </div>
 
-                <div id="admin-addresses-{{$loop->index}}" class="flex direction-column">
+                <div id="addresses-container-{{$i}}" class="flex direction-column master-only">
+                    <label class="list-label" for="service-type-{{$i}}">Адрес</label>
+                    <select class="master-address hide" onchange="userWin.changeAddress({{$i}});" id="address-{{$i}}"
+                            name="address-{{$i}}[]">
+                    </select>
+                </div>
+
+
+                <div id="admin-addresses-{{$i}}" class="flex direction-column admin-only">
                     @if ($addresses)
-                        <select onchange="userWin.changeAdminAddress({{$loop->index}});" id="admin-address-{{$loop->index}}" name="admin-address-{{$loop->index}}[]" class="admin-address hide">
+                        <select onchange="userWin.changeAdminAddress({{$i}});" id="admin-address-{{$i}}"
+                                class="admin-address" name="admin-address-{{$i}}[]">
                             @foreach($addresses as $addr)
-                                <option value="{{$addr->id}}" {{$timetable->address_id == $addr->id ? 'selected' : ''}}>{{$addr->address}}</option>
+                                <option value="{{$addr->id}}">{{$addr->address}}</option>
                             @endforeach
                         </select>
                     @else
-                        <select id="admin-address-{{$loop->index}}" name="admin-address-{{$loop->index}}[]" class="admin-address none hide">
+                        <select id="admin-address-{{$i}}" class="admin-address none" name="admin-address-{{$i}}[]">
                             <option selected>
                                 {{__('Нет адреса для выбора')}}
                             </option>
                         </select>
                     @endif
                 </div>
-
                 <div class="flex justify-content-between align-items-center">
                     <span class="calendar">{{__('Расписание')}}</span>
                     <button
-                            id="calendar-{{$loop->index}}"
-                            class="background-none calendar-a"
-                            data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $loop->index, 'moreService' => $moreService, 'id' => $id])}}"
+                        id="calendar-{{$loop->index}}"
+                        class="background-none calendar-a"
+                        data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $loop->index, 'moreService' => $moreService, 'id' => $id])}}"
                     >
                         <div class="calendar cover" style="min-height: 15px; min-width: 25px; background-color: #71A3D6" title="Выбрать расписание">Выбрать</div>
                     </button>
                 </div>
-
             @endforeach
-
-            @if ($moreService > count($user->services))
-                @for($i = count($user->services); $i < $moreService; $i++)
-
-                    <div id="service-services-{{$i}}" class="flex direction-column">
-                        @if ($services)
-                            <select id="service-type-{{$i}}" onchange="userWin.changeService({{$i}});" data-id="{{$i}}" name="service-{{$i}}[]">
-                                @foreach($services as $service)
-                                    <option value="{{$service->id}}">{{$service->name}}</option>
-                                @endforeach
-                            </select>
-                        @else
-                            <select id="service-type-{{$i}}" name="service-{{$loop->index}}[]" class="none">
-                                <option selected>
-                                    {{__('Нет услуг для выбора')}}
-                                </option>
-                            </select>
-                        @endif
-                    </div>
-                    <div>
-                        @if ($addresses)
-                            <select id="address-{{$i}}" name="address-{{$i}}[]">
-                                @foreach($addresses as $addr)
-                                    <option value="{{$addr->id}}">{{$addr->address}}</option>
-                                @endforeach
-                            </select>
-                        @else
-                            <select id="address-{{$i}}" name="address-{{$i}}[]" class="none">
-                                <option selected>
-                                    {{__('Нет адреса для выбора')}}
-                                </option>
-                            </select>
-                        @endif
-                    </div>
-                    <div id="admin-addresses-{{$i}}" class="flex direction-column">
-                        @if ($addresses)
-                            <select id="admin-address-{{$i}}" name="admin-address-{{$i}}[]" class="admin-address hide">
-                                @foreach($addresses as $addr)
-                                    <option value="{{$addr->id}}">{{$addr->address}}</option>
-                                @endforeach
-                            </select>
-                        @else
-                            <select id="admin-address-{{$i}}" name="admin-address-{{$i}}[]" class="admin-address none hide">
-                                <option selected>
-                                    {{__('Нет адреса для выбора')}}
-                                </option>
-                            </select>
-                        @endif
-                    </div>
-                    <div class="flex justify-content-between align-items-center">
-                        <span class="calendar">{{__('Расписание')}}</span>
-                        <button
-                            id="calendar-{{$i}}"
-                            class="background-none calendar-a"
-                            data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $i, 'moreService' => $moreService, 'id' => $id])}}"
-                        >
-                            <div class="calendar cover" style="min-height: 15px; min-width: 25px; background-color: #71A3D6" title="Выбрать расписание">Выбрать</div>
-                        </button>
-                    </div>
-                @endfor
-            @endif
         </div>
         <div class="line"></div>
         @slot('buttons')

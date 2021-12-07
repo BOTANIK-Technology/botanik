@@ -90,8 +90,12 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
             'name': document.getElementById('service-name-'+id).value,
             'type': document.getElementById('service-type-'+id).value,
             'addresses': addressesVal(id),
-            'interval': intervalVal(id),
-            'range': document.getElementById('range-'+id).value,
+
+            'durationHours': checkedByNameVal('durationHours'),
+            'durationMinutes': checkedByNameVal('durationMinutes'),
+            'intervalHours': checkedByNameVal('intervalHours'),
+            'intervalMinutes': checkedByNameVal('intervalMinutes'),
+
             'price': document.getElementById('price-'+id).value,
             'bonus': document.getElementById('bonus-'+id).value,
             'grouped': groupVal(id),

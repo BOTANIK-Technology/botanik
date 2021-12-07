@@ -59,10 +59,11 @@ if (addService) {
      */
     let inputs = getCookie('inputs');
     if (inputs && inputs !== 'undefined') {
+
         inputs = JSON.parse(inputs);
         document.getElementById('service-name').value = inputs.name;
         document.getElementById('service-type').value = inputs.type;
-        document.getElementById('range').value = inputs.range;
+         // document.getElementById('range').value = inputs.range;
         document.getElementById('price').value = inputs.price;
         document.getElementById('bonus').value = inputs.bonus;
         document.getElementById('quantity').value = inputs.quantity;
@@ -84,7 +85,10 @@ if (addService) {
         setValues(selectors, inputs.addresses);
 
         setChecked(document.getElementsByName('group'), inputs.grouped);
-        setChecked(document.getElementsByName('interval'), inputs.interval);
+        setChecked(document.getElementsByName('durationHours'), inputs.durationHours);
+        setChecked(document.getElementsByName('durationMinutes'), inputs.durationMinutes);
+        setChecked(document.getElementsByName('intervalHours'), inputs.intervalHours);
+        setChecked(document.getElementsByName('intervalMinutes'), inputs.intervalMinutes);
     }
 
     function addressesVal () {
@@ -108,8 +112,8 @@ if (addService) {
         return array;
     }
 
-    function intervalVal () {
-        return getCheckedVal(document.getElementsByName('interval'));
+    function checkedByNameVal (name) {
+        return getCheckedVal(document.getElementsByName(name));
     }
 
     function groupVal () {
@@ -129,8 +133,11 @@ if (addService) {
             'name': document.getElementById('service-name').value,
             'type': document.getElementById('service-type').value,
             'addresses': addressesVal(),
-            'interval': intervalVal(),
-            'range': document.getElementById('range').value,
+            'durationHours': checkedByNameVal('durationHours'),
+            'durationMinutes': checkedByNameVal('durationMinutes'),
+            'intervalHours': checkedByNameVal('intervalHours'),
+            'intervalMinutes': checkedByNameVal('intervalMinutes'),
+
             'price': document.getElementById('price').value,
             'bonus': document.getElementById('bonus').value,
             'grouped': groupVal(),

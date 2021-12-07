@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\ConnectService;
 use Closure;
 use Illuminate\Http\Request;
-use ConnectService;
+
 
 class SetBusiness
 {
@@ -35,7 +36,9 @@ class SetBusiness
         );
 
         if (!ConnectService::dbConnect($business->db_name))
+        {
             abort(501);
+        }
 
         view()->share('logotype', !is_null($business->img) ? url('public/storage/'.$business->img) : '/images/botanik-head.png');
         view()->share('package', $request->package);

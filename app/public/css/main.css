@@ -592,3 +592,10 @@ textarea {
     width: 15px;
     height: 15px;
 }
+
+.list-label {
+    font-size: 20px;
+    text-align: left;
+    margin-bottom: 5px;
+}
+

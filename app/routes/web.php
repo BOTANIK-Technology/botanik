@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +23,8 @@ Route::get('/', function () {
     Artisan::call('route:clear');
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
-    abort(404);
+    return 'Botanic.inc';
+//    abort(404);
 });
 
 /**
@@ -109,6 +111,7 @@ Route::group(
             function() {
                 Route::post('/services_addresses', [App\Http\Controllers\ScheduleController::class, 'getAddresses'])->name('api.services_addresses');
                 Route::post('/services_masters', [App\Http\Controllers\ScheduleController::class, 'getMasters'])->name('api.services_masters');
+                Route::post('/services_list', [App\Http\Controllers\ScheduleController::class, 'getServices'])->name('api.services_list');
             }
         );
 

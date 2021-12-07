@@ -12,8 +12,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 
@@ -48,9 +47,9 @@ class ServiceController extends Controller
         $this->params['services'] = Service::all();
         $this->params['addresses'] = Address::all();
         $this->params['view'] = $request->get('view') ?? 'services';
-        $this->params['load'] = $request->get('load') ?? 5;
-        $this->params['load_types'] = $request->get('load_types') ?? 5;
-        $this->params['load_addresses'] = $request->get('load_addresses') ?? 5;
+        $this->params['load'] = $request->get('load') ?? 10;
+        $this->params['load_types'] = $request->get('load_types') ?? 10;
+        $this->params['load_addresses'] = $request->get('load_addresses') ?? 10;
     }
 
     /**
@@ -110,7 +109,7 @@ class ServiceController extends Controller
                 break;
             case 'create':
             case 'edit':
-                $this->params['intervals'] = Interval::all();
+//                $this->params['intervals'] = Interval::all();
                 $this->params['types_select'] = TypeService::all();
                 $this->params['addresses'] = Address::all();
                 if ($this->params['addresses']->isEmpty()) $this->params['addresses'] = 0;
@@ -222,13 +221,17 @@ class ServiceController extends Controller
             $service = new Service();
             $type = TypeService::find( $request->input('type') );
             $service->name = $request->input('name');
-            $service->interval_id = $request->input('interval');
-            $service->range = $request->input('range');
+
+
             $service->price = $request->input('price');
             $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
             $service->cash_pay = $request->input('cashpay');
             $service->online_pay = $request->input('onlinepay');
             $service->bonus_pay = $request->input('bonuspay');
+
+            $service->interval_id = $this->getIntervalId($request, 'duration');
+            $service->range =$this->getIntervalRange($request, 'interval');
+
             $type->services()->save($service);
             $service->attachAddresses($request->input('addresses'));
 
@@ -246,6 +249,19 @@ class ServiceController extends Controller
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
+    }
+
+    public function getIntervalId($request, $type)
+    {
+        $intervalLength = $this->getIntervalRange($request, $type);
+        $item =  Interval::where('minutes', $intervalLength)->first();
+        return $item ? $item->id : 1;
+
+    }
+
+    public function getIntervalRange($request, $type)
+    {
+        return $request->input($type . 'Minutes') + $request->input($type . 'Hours') * 60;
     }
 
     /**
@@ -312,15 +328,15 @@ class ServiceController extends Controller
      * @param Request $request
      * @return Validator
      */
-    private function validateService(Request $request): Validator
+    private function validateService(Request $request)
     {
-        $arr = [
+        $rules = [
             'price'     => 'required|integer|min:1',
             'bonus'     => 'nullable|integer|min:1',
             'type'      => 'required|integer',
             'addresses' => 'required|array',
             'name'      => 'required|string',
-            'interval'  => 'required|integer|min:0|max:24',
+//            'interval'  => 'required|integer|min:0|max:24',
             'range'     => 'integer|min:0',
             'message'   => 'nullable|required_with:quantity|string',
             'quantity'  => 'nullable|required_with:message|integer|min:2',
@@ -332,13 +348,21 @@ class ServiceController extends Controller
         ];
         $data = $request->all();
         if($data['prepay'] == true){
-            $arr['prepay_message']='required|string';
-            $arr['prepay_card']='required|string';
+            $rules['prepay_message']='required|string';
+            $rules['prepay_card']='required|string';
         }else{
-            $arr['prepay_message']='nullable|string';
-            $arr['prepay_card']='nullable|string';
+            $rules['prepay_message']='nullable|string';
+            $rules['prepay_card']='nullable|string';
         }
-        return \Validator::make($data, $arr);
+        $validator =  \Validator::make($data, $rules);
+
+        //Проверяем на уникальность сочетания именя услуги и типа
+        $validator->after(function($validator) use ($data) {
+            if (Service::where('type_service_id', $data['type'])->where('name', $data['name'])->exists() ) {
+                $validator->errors()->add('name', 'Такая услуга в выбранной категории уже есть');
+            }
+        });
+        return $validator;
     }
 
     /**

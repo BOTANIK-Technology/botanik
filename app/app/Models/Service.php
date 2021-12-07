@@ -27,7 +27,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static Builder|Service newModelQuery()
  * @method static Builder|Service newQuery()
  * @method static Builder|Service query()
- * @mixin Eloquent
  * @property-read Interval $interval
  * @property-read ServiceTimetable|null $timetable
  * @property-read GroupService|null $group
@@ -53,6 +52,30 @@ class Service extends Model
     ];
 
     protected $guarded = ['id'];
+
+    protected $appends = ['intervalFields', 'rangeFields'];
+
+    public function getIntervalFieldsAttribute()
+    {
+        return [
+            'hours' => $this->interval->hoursField,
+            'minutes' => $this->interval->minutesField,
+        ];
+    }
+
+    public function getRangeFieldsAttribute()
+    {
+        $range = $this->getRangeInterval();
+        return [
+            'hours' => $range->hoursField,
+            'minutes' => $range->minutesField,
+        ];
+    }
+
+    public function getRangeInterval()
+    {
+        return Interval::where('minutes', $this->range)->first();
+    }
 
     /**
      * @return BelongsToMany
