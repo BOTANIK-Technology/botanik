@@ -42,7 +42,7 @@ class PersonalRecordEditTime extends CallbackQuery
             $buttons[] = [['text' => __('Нет свободных ячеек.'), 'callback_data' => '-']];
         else
             foreach ($times as $time)
-                $buttons[] = [['text' => $time, 'callback_data' => 'PersonalEditConfirm_' . $time]];
+                $buttons[] = [['text' => $time, 'callback_data' => 'PersonalRecordTime_' . $time]];
 
         return parent::buildInlineKeyboard($buttons);
     }

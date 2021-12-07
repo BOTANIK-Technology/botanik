@@ -12,8 +12,8 @@ class PersonalEditConfirm extends CallbackQuery
     {
         parent::__construct($request);
         $record = Record::find(parent::getRecordID());
-        $record->time = parent::setTime();
         $record->date = parent::getDate();
+        $record->time = parent::getTime();
         $record->save();
 
         $address_id = $record->address_id;
@@ -41,7 +41,7 @@ class PersonalEditConfirm extends CallbackQuery
                     'user_id' => $user_id,
                     'message' => $notice_mess
                 ]
-            ],
+            ]
             )->delay(now()->addMinutes(2));
 
         return true;

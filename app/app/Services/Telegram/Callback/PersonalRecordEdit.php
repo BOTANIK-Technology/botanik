@@ -15,7 +15,7 @@ class PersonalRecordEdit extends CallbackQuery
         parent::editMessage(
             __('Редактировать:'),
             parent::buildInlineKeyboard([
-//                [['text' => __('Дату'), 'callback_data' => '-']],
+                [['text' => __('Дату'), 'callback_data' => 'PersonalDatesService_'.$record_id]],
                 [['text' => __('Время'), 'callback_data' => 'PersonalRecordEditTime_'.$record_id]]
             ])
         );
