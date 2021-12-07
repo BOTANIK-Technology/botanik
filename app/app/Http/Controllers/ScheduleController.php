@@ -211,7 +211,7 @@ class ScheduleController extends Controller
                         'user_id' => $request->user_id,
                         'message' => $notice_mess
                     ]
-                ],
+                ]
             )->delay(now()->addMinutes(2));
 
             TelegramNotice::dispatch(
@@ -333,6 +333,25 @@ class ScheduleController extends Controller
             }
         }
         return response()->json(["result" => "OK", "addresses" => $addresses]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getServices(Request $request): JsonResponse
+    {
+        $service_type_id = $request->service_type_id;
+        $services = [];
+        if($service_type_id) {
+            $services = Service::query()
+                ->where('type_service_id', $service_type_id)
+                ->select('id', 'name')
+                ->get()
+                ->toArray();
+
+        }
+        return response()->json(["result" => "OK", "services" => $services]);
     }
 
     /**
