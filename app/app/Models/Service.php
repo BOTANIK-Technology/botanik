@@ -58,8 +58,8 @@ class Service extends Model
     public function getIntervalFieldsAttribute()
     {
         return [
-            'hours' => $this->interval->hoursField,
-            'minutes' => $this->interval->minutesField,
+            'hours' => $this->interval ? $this->interval->hoursField : 0,
+            'minutes' => $this->interval ? $this->interval->minutesField : 0,
         ];
     }
 
