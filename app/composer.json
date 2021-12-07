@@ -21,7 +21,8 @@
         "phpoffice/phpspreadsheet": "^1.15",
         "telegram-bot/api": "^2.3",
         "ext-curl": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-http": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",

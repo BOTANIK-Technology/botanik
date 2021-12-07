@@ -177,9 +177,9 @@ class UserTimetable extends Model
             foreach ($booked_array as $booked) {
                 if ($booked == $time) {
                     if ($table->service->range > 0) {
-                        $comparison = Carbon::parse($booked)->add($table->service->interval->value)->addMinutes($table->service->range);
+                        $comparison = Carbon::parse($booked)->addMinutes($table->service->interval->minutes)->addMinutes($table->service->range);
                     } else {
-                        $comparison = Carbon::parse($booked)->add($table->service->interval->value);
+                        $comparison = Carbon::parse($booked)->addMinutes($table->service->interval->minutes);
                     }
                     break;
                 }

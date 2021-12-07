@@ -8,13 +8,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Facades\TelegramService;
+use TelegramBot\Api\HttpException;
 
 class TelegramController extends Controller
 {
     /**
      * @param Request $request
      * @return mixed
-     * @throws \HttpException
+     * @throws HttpException
      */
     public function main(Request $request)
     {
@@ -69,7 +70,7 @@ class TelegramController extends Controller
                 return $this->text($request);
             }
 
-            throw new \HttpException('Not found', 404);
+            throw new HttpException('Not found', 404);
 
         }
     }

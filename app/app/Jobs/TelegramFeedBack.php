@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Facades\ConnectService;
 use App\Models\Record;
 use App\Models\TelegramSession;
 use App\Models\TelegramUser;
@@ -10,7 +11,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use ConnectService;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
 
 class TelegramFeedBack implements ShouldQueue
 {
@@ -42,8 +44,8 @@ class TelegramFeedBack implements ShouldQueue
 
 
     /**
-     * @throws \TelegramBot\Api\Exception
-     * @throws \TelegramBot\Api\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function handle()
     {
@@ -73,15 +75,15 @@ class TelegramFeedBack implements ShouldQueue
                 $user->telegramSession->save();
             }
 
-            //$bot = new \TelegramBot\Api\BotApi($this->token);
-//            $bot->sendMessage(
-//                $this->chat_id,
-//                __('Оцените услугу "'.$record->service->name.'"'),
-//                null,
-//                false,
-//                null,
-//                $keyboard
-//            );
+            $bot = new \TelegramBot\Api\BotApi($this->token);
+            $bot->sendMessage(
+                $this->chat_id,
+                __('Оцените услугу "'.$record->service->name.'"'),
+                null,
+                false,
+                null,
+                $keyboard
+            );
         }
     }
 }

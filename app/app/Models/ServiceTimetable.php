@@ -80,9 +80,9 @@ class ServiceTimetable extends Model
                 foreach ($booked_array as $booked) {
                     if ($booked == $time) {
                         if ($this->service->range > 0) {
-                            $comparison = Carbon::parse($booked)->add($this->service->interval->value)->addMinutes($this->service->range);
+                            $comparison = Carbon::parse($booked)->addMinutes($this->service->interval->minutes)->addMinutes($this->service->range);
                         } else {
-                            $comparison = Carbon::parse($booked)->add($this->service->interval->value);
+                            $comparison = Carbon::parse($booked)->addMinutes($this->service->interval->minutes);
                         }
                         break;
                     }

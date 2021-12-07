@@ -525,13 +525,12 @@ class TelegramAPI
         /*
          * Client feedback
          */
-//        TelegramFeedBack::dispatch(
-//            $this->business_db,
-//            $this->chat_id,
-//            $record_id,
-//            $this->token
-//        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->addDay());
-
+        TelegramFeedBack::dispatch(
+            $this->business_db,
+            $this->chat_id,
+            $record_id,
+            $this->token
+        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->addMinutes(2));
         ConnectService::dbConnect($this->business_db);
     }
 
