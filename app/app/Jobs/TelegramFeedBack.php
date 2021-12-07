@@ -6,6 +6,7 @@ use App\Facades\ConnectService;
 use App\Models\Record;
 use App\Models\TelegramSession;
 use App\Models\TelegramUser;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -50,7 +51,9 @@ class TelegramFeedBack implements ShouldQueue
     public function handle()
     {
         if (!ConnectService::dbConnect($this->db))
+        {
             return;
+        }
 
         $record = Record::find($this->record_id);
         if ($record && $record->status == true) {
@@ -78,7 +81,7 @@ class TelegramFeedBack implements ShouldQueue
             $bot = new \TelegramBot\Api\BotApi($this->token);
             $bot->sendMessage(
                 $this->chat_id,
-                __('Оцените услугу "'.$record->service->name.'"'),
+                __(Carbon::parse(now()) . ' / ' . Carbon::parse(now())->addMinutes(2) . ' Оцените услугу "'.$record->service->name.'"'),
                 null,
                 false,
                 null,
