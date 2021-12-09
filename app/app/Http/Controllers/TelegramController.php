@@ -19,6 +19,7 @@ class TelegramController extends Controller
      */
     public function main(Request $request)
     {
+        Log::debug('From bot', $request->input());
         $id = null;
         if ($request->has('message.chat.id')) {
             $id = $request->input('message.chat.id');
@@ -40,7 +41,8 @@ class TelegramController extends Controller
             }
         }
         else {
-            Log::debug($id . ': Клиент не создан: ' . var_export($request->input(), true));
+            Log::debug($id . ': Клиент не создан: ' );
+//            Log::debug($id . ': Клиент не создан: ' . var_export($request->input(), true));
         }
 
 
@@ -69,9 +71,9 @@ class TelegramController extends Controller
             if ($request->has('message.text')) {
                 return $this->text($request);
             }
-
-            throw new HttpException('Not found', 404);
-
+            Log::info('phone_number not found');
+            abort(404);
+//            throw new HttpException('phone_number not found', 404);
         }
     }
 

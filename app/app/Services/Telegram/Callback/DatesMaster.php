@@ -6,6 +6,7 @@ namespace App\Services\Telegram\Callback;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\UserTimetable;
+use Illuminate\Support\Facades\Log;
 use Jenssegers\Date\Date;
 use Illuminate\Support\Carbon;
 
@@ -64,6 +65,8 @@ class DatesMaster extends CallbackQuery
         $master = User::find($master_id);
         $master_days = [];
         $i = 1;
+        $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00') );
+
         foreach ($month as $k => $day) {
 
             if (UserTimetable::isWorkDay($master, parent::getAddressID(), parent::getServiceID(), Carbon::parse($k), $first_day)) {
