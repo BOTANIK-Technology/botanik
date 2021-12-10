@@ -338,7 +338,7 @@ class ServiceController extends Controller
             'type'      => 'required|integer',
             'addresses' => 'required|array',
             'name'      => 'required|string',
-//            'interval'  => 'required|integer|min:0|max:24',
+            'interval'  => 'required|integer|min:0|max:24',
             'range'     => 'integer|min:0',
             'message'   => 'nullable|required_with:quantity|string',
             'quantity'  => 'nullable|required_with:message|integer|min:2',
