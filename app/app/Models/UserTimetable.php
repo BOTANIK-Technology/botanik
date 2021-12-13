@@ -170,15 +170,12 @@ class UserTimetable extends Model
             $booked_array = [];
         }
 
-        $free = [];
-        $comparison = false;
-
         // массив-карта слотов мастера
         $timeMap = [];
-        $masterEndSlot = count($times);
+        $masterEndSlot = count($times) - 1;
 
         //сначала заполним единицами (доступно все)
-        for ($i = 0; $i <= count($times); $i++) {
+        for ($i = 0; $i <= $masterEndSlot; $i++) {
             $timeMap[$i] = 1;
         }
 
@@ -190,7 +187,6 @@ class UserTimetable extends Model
         if ($duration % 30) {
             $serviceSlotsCount++;
         }
-
 
         foreach ($booked_array as $book => $bookDuration) {
             // получим число слотов в услуге
@@ -210,16 +206,17 @@ class UserTimetable extends Model
 
 
             for ($i = 0; $i < $serviceSlotsCount; $i++) {
-
                 // уберем слоты перед текущей услугой - в которые мы не сможем втиснуться по времени
                 if ($i <= $timeBegin) {
                     $timeMap[$timeBegin - $i] = 0;
                 }
+            }
+        }
 
-                // Уберем слоты с конца рабочего дня
-                if($i < $masterEndSlot) {
-                    $timeMap[$masterEndSlot - $i] = 0;
-                }
+        for ($i = 0; $i < $serviceSlotsCount; $i++){
+            // Уберем слоты с конца рабочего дня
+            if($i < $masterEndSlot) {
+                $timeMap[$masterEndSlot - $i] = 0;
             }
         }
 
