@@ -165,10 +165,10 @@ class UserController extends Controller
 
             if (!$checked) {
                 $this->params['timetables']['timetable-' . $k] = $cookie;
-                setcookie('timetable-' . $k, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
+//                setcookie('timetable-' . $k, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
             } else {
                 $this->params['timetables']['checked-' . $k] = UserTimetable::getChecked($cookie);
-                setcookie('checked-' . $k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/' . $slug . '/users/']);
+//                setcookie('checked-' . $k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/' . $slug . '/users/']);
             }
         }
     }

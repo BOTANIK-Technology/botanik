@@ -38,17 +38,9 @@ class Time extends CallbackQuery
     {
         $master = User::find($master_id);
         $times = UserTimetable::getFreeTimes($master, $address_id, $service_id, $date);
-        Log::info('Time: ', $times);
-        $timeNew = [];
-        $max = count($times) - 1;
-        for ($i = 0; $i <= $max; $i++) {
-            $timeNew[] = $times[$i];
-            $timeNew[] = str_replace(':00', ':30', $times[$i] );
-            Log::info($i . ' - Time: ', $timeNew);
-        }
-        $timeNew[] = $times[$max];
-        Log::info($max . ' - Time: ', $timeNew);
-        return $this->getButtons($timeNew);
+        Log::info('Free Time: ', $times);
+
+        return $this->getButtons($times);
     }
 
     private function getButtons($times)
