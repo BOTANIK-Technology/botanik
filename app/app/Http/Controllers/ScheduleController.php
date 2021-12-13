@@ -61,7 +61,7 @@ class ScheduleController extends Controller
         if (isset($request->modal)) $this->params['modal'] = $request->modal;
 
         if ($user->hasRole('admin', 'owner')) {
-            $records = Record::whereDate('date', Carbon::parse($this->params['date']))->get();
+            $records = Record::whereDate('date', Carbon::parse($this->params['date']))->get()->toArray();
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
             $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
@@ -78,7 +78,7 @@ class ScheduleController extends Controller
 
             $types = Service::where('id', $s)->pluck('type_service_id')->toArray();
             $schedule = UserTimetable::userSchedule($user, Carbon::parse($this->params['date']));
-            $records = Record::where('user_id', $user->id)->whereDate( 'date', Carbon::parse($this->params['date']) )->get();
+            $records = Record::where('user_id', $user->id)->whereDate( 'date', Carbon::parse($this->params['date']) )->get()->toArray();
             $this->params['types'] = $types;
             $this->params['current_type'] = $request->has('current_type') ? $request->input('current_type') : $types[0];
             $this->params['schedule'] = $schedule['times'] ?? false;
@@ -96,6 +96,7 @@ class ScheduleController extends Controller
     public function getView(Request $request)
     {
         $this->setParams($request);
+//        dd($this->params);
         return view($this->view, $this->params);
     }
 
@@ -106,6 +107,7 @@ class ScheduleController extends Controller
      */
     public function index(Request $request)
     {
+
         return $this->getView($request);
     }
 

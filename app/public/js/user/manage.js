@@ -99,7 +99,7 @@ let password = document.getElementById('password');
 let phone = document.getElementById('phone');
 let email = document.getElementById('email');
 let calendar = document.getElementsByClassName('calendar-a');
-let serviceOptions = document.getElementById('service-type-0').innerHTML;
+// let serviceOptions = document.getElementById('service-type-99').innerHTML;
 let addedServices = getCookie('service-type');
 
 inputActive([fio, password, phone, email]);

@@ -129,7 +129,11 @@ class UserTimetable extends Model
         $date = mb_strtolower(Carbon::parse($date)->format('l'));
 
         $table = $user->timetables->where('address_id', $address_id)->where('service_id', $service_id)->first();
+        Log::info('getTimes: ', $table->toArray());
+        $times = false;
         if ($table && !is_null($table->$date)) {
+            $times = json_decode($table->$date, true);
+
             return json_decode($table->$date);
         }
         return false;

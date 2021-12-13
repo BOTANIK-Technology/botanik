@@ -21,26 +21,27 @@ class DatesMaster extends CallbackQuery
     {
         parent::__construct($request);
         $master_id = parent::setMasterID();
-        $this->back = 'Master_'.parent::getAddressID();
+        $this->back = 'Master_' . parent::getAddressID();
         return parent::editMessage(__('Выберете дату'), $this->masterDate($master_id, $month));
     }
 
-    private function masterDate($master_id, $month) {
+    private function masterDate($master_id, $month)
+    {
 
         switch ($month) {
             case 'DateNext':
                 $first_day = new Carbon('first day of next month');
                 $date[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DatesMaster_'.$master_id],
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DatesMaster_' . $master_id],
                     $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateLater_'.$master_id]
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateLater_' . $master_id]
                 ];
                 $month = UserTimetable::getNextMonthBot();
                 break;
             case 'DateLater':
                 $first_day = new Carbon('first day of 2 months');
                 $date[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DateNext_'.$master_id],
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DateNext_' . $master_id],
                     $this->getNameOfMonth($first_day),
                     ['text' => ' ', 'callback_data' => '-']
                 ];
@@ -51,26 +52,27 @@ class DatesMaster extends CallbackQuery
                 $date[] = [
                     ['text' => ' ', 'callback_data' => '-'],
                     $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateNext_'.$master_id]
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateNext_' . $master_id]
                 ];
                 $month = UserTimetable::getCurrentMonthBot();
         }
 
         $days = []; //name of the days of the week
-        foreach (UserTimetable::getDays() as $day)
+        foreach (UserTimetable::getDays() as $day) {
             $days[] = ['text' => $day, 'callback_data' => '-'];
+        }
         $date[] = $days;
         unset($days);
 
         $master = User::find($master_id);
         $master_days = [];
         $i = 1;
-        $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00') );
+        $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00'));
 
         foreach ($month as $k => $day) {
 
             if (UserTimetable::isWorkDay($master, parent::getAddressID(), parent::getServiceID(), Carbon::parse($k), $first_day)) {
-                $master_days[] = ['text' => $day, 'callback_data' => 'Time_'.$k];
+                $master_days[] = ['text' => $day, 'callback_data' => 'Time_' . $k];
             } else {
                 $master_days[] = ['text' => ' ', 'callback_data' => '-'];
             }
@@ -91,7 +93,8 @@ class DatesMaster extends CallbackQuery
         return parent::buildInlineKeyboard($date);
     }
 
-    private function getNameOfMonth (Carbon $date) {
+    private function getNameOfMonth(Carbon $date)
+    {
         return ['text' => Date::parse($date->toFormattedDateString())->format('F'), 'callback_data' => '-'];
     }
 }

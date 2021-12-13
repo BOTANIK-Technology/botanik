@@ -46,7 +46,6 @@
 
             <div class="line full-width"></div>
 
-
             @foreach($user->timetables as $i => $timetable)
                 <div class="flex direction-column master-only">
                     <label class="list-label" for="service-type-{{$i}}">Тип услуги</label>
