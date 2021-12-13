@@ -82,9 +82,13 @@
 <style>
     .timetable.admin {
         max-width: 900px;
-        grid-template-columns: 7.1% repeat(23, 1fr);
+        grid-template-columns: 10% repeat(23, 1fr);
     }
     .schedule-main {
         grid-template-columns: 15% 1fr 900px 10.5%;
+    }
+    .timetable > .bg-service {
+        max-width: 102px;
+        height: 35px;
     }
 </style>

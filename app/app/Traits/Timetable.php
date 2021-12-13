@@ -57,28 +57,28 @@ trait Timetable
     ];
 
     private static array $mouths = [
-        'january'   => 'январь',
-        'february'  => 'февраль',
-        'march'     => 'март',
-        'april'     => 'апрель',
-        'may'       => 'май',
-        'june'      => 'июнь',
-        'july'      => 'июль',
-        'august'    => 'август',
+        'january' => 'январь',
+        'february' => 'февраль',
+        'march' => 'март',
+        'april' => 'апрель',
+        'may' => 'май',
+        'june' => 'июнь',
+        'july' => 'июль',
+        'august' => 'август',
         'september' => 'сентябрь',
-        'october'   => 'октябрь',
-        'november'  => 'ноябрь',
-        'december'  => 'декабрь',
+        'october' => 'октябрь',
+        'november' => 'ноябрь',
+        'december' => 'декабрь',
     ];
 
     public static array $days = [
-        'monday'    => 'ПН',
-        'tuesday'   => 'ВТ',
+        'monday' => 'ПН',
+        'tuesday' => 'ВТ',
         'wednesday' => 'СР',
-        'thursday'  => 'ЧТ',
-        'friday'    => 'ПТ',
-        'saturday'  => 'СБ',
-        'sunday'    => 'ВС'
+        'thursday' => 'ЧТ',
+        'friday' => 'ПТ',
+        'saturday' => 'СБ',
+        'sunday' => 'ВС'
     ];
 
     /**
@@ -142,16 +142,16 @@ trait Timetable
      *
      * @return array
      */
-    public function schedule () : array
+    public function schedule(): array
     {
         return [
-            $this->days['monday']    => is_null($this->monday)    ? null : json_decode($this->monday),
-            $this->days['tuesday']   => is_null($this->tuesday)   ? null : json_decode($this->tuesday),
+            $this->days['monday'] => is_null($this->monday) ? null : json_decode($this->monday),
+            $this->days['tuesday'] => is_null($this->tuesday) ? null : json_decode($this->tuesday),
             $this->days['wednesday'] => is_null($this->wednesday) ? null : json_decode($this->wednesday),
-            $this->days['thursday']  => is_null($this->thursday)  ? null : json_decode($this->thursday),
-            $this->days['friday']    => is_null($this->friday)    ? null : json_decode($this->friday),
-            $this->days['saturday']  => is_null($this->saturday)  ? null : json_decode($this->saturday),
-            $this->days['sunday']    => is_null($this->sunday)    ? null : json_decode($this->sunday),
+            $this->days['thursday'] => is_null($this->thursday) ? null : json_decode($this->thursday),
+            $this->days['friday'] => is_null($this->friday) ? null : json_decode($this->friday),
+            $this->days['saturday'] => is_null($this->saturday) ? null : json_decode($this->saturday),
+            $this->days['sunday'] => is_null($this->sunday) ? null : json_decode($this->sunday),
         ];
     }
 
@@ -163,16 +163,16 @@ trait Timetable
      * @param bool $d_index
      * @return array
      */
-    public static function generateDateRange(Carbon $start_date, Carbon $end_date, $F = true, string $format = 'Y-m-d', bool $d_index = true) : array
+    public static function generateDateRange(Carbon $start_date, Carbon $end_date, $F = true, string $format = 'Y-m-d', bool $d_index = true): array
     {
         $dates = [];
-        if($F) $dates[] = Date::parse($start_date)->format('F');
+        if ($F) $dates[] = Date::parse($start_date)->format('F');
 
         if ($d_index) {
-            for($date = $start_date; $date->lte($end_date); $date->addDay())
+            for ($date = $start_date; $date->lte($end_date); $date->addDay())
                 $dates[$date->format('d')] = $date->format($format);
         } else {
-            for($date = $start_date; $date->lte($end_date); $date->addDay())
+            for ($date = $start_date; $date->lte($end_date); $date->addDay())
                 $dates[] = $date->format($format);
         }
 
@@ -187,7 +187,7 @@ trait Timetable
     public static function getCurrentMonth($F = true, $now = true): array
     {
         $now ? $start = Carbon::now() : $start = new Carbon('first monday of this month');
-        $end   = Carbon::now()->endOfMonth();
+        $end = Carbon::now()->endOfMonth();
         return self::generateDateRange($start, $end, $F);
     }
 
@@ -199,7 +199,7 @@ trait Timetable
     public static function getNextMonth($F = true): array
     {
         $start = new Carbon('first day of next month');
-        $end   = new Carbon('last day of next month');
+        $end = new Carbon('last day of next month');
         return self::generateDateRange($start, $end, $F);
     }
 
@@ -211,7 +211,7 @@ trait Timetable
     public static function getMonthLater($F = true): array
     {
         $start = new Carbon('first day of 2 months');
-        $end   = new Carbon('last day of 2 months');
+        $end = new Carbon('last day of 2 months');
         return self::generateDateRange($start, $end, $F);
     }
 
@@ -221,7 +221,7 @@ trait Timetable
      */
     public static function getThreeMonth(): array
     {
-        return [self::getCurrentMonth(),self::getNextMonth(),self::getMonthLater()];
+        return [self::getCurrentMonth(), self::getNextMonth(), self::getMonthLater()];
     }
 
     /**
@@ -231,7 +231,7 @@ trait Timetable
     public static function getNextMonthBot(): array
     {
         $start = new Carbon('first day of next month');
-        $end   = new Carbon('last day of next month');
+        $end = new Carbon('last day of next month');
         if (!$start->isMonday())
             $start = self::getCurrentStart();
         return self::generateDateRangeBot($start, $end);
@@ -244,10 +244,10 @@ trait Timetable
      */
     public static function getMonthLaterBot($later = 2): array
     {
-        $start = new Carbon('first day of '.$later.' months');
-        $end   = new Carbon('last day of '.$later.' months');
+        $start = new Carbon('first day of ' . $later . ' months');
+        $end = new Carbon('last day of ' . $later . ' months');
         if ($start->format('l') != 'monday')
-            $start = self::getCurrentStart($later-1, $later);
+            $start = self::getCurrentStart($later - 1, $later);
         return self::generateDateRangeBot($start, $end);
     }
 
@@ -259,9 +259,9 @@ trait Timetable
     public static function getMondays($start = 'this', $end = 'next'): DatePeriod
     {
         return new DatePeriod(
-            Carbon::parse('first monday of '.$start.' month'),
+            Carbon::parse('first monday of ' . $start . ' month'),
             CarbonInterval::week(),
-            Carbon::parse('first monday of '.$end.' month')
+            Carbon::parse('first monday of ' . $end . ' month')
         );
     }
 
@@ -276,7 +276,7 @@ trait Timetable
         $arr = [];
         foreach ($mondays as $monday)
             $arr[] = $monday;
-        return \Date::parse($arr[count($arr)-1]);
+        return \Date::parse($arr[count($arr) - 1]);
     }
 
     /**
@@ -287,7 +287,7 @@ trait Timetable
     public static function generateDateRangeBot(Carbon $start_date, Carbon $end_date): array
     {
         $range = [];
-        for($date = $start_date; $date->lte($end_date); $date->addDay()) {
+        for ($date = $start_date; $date->lte($end_date); $date->addDay()) {
             $range[$date->format('Y-m-d')] = $date->format('d');
         }
         return $range;
@@ -300,7 +300,7 @@ trait Timetable
     public static function getCurrentMonthBot(): array
     {
         $start = new Carbon('first monday of this month');
-        $end   = Carbon::now()->endOfMonth();
+        $end = Carbon::now()->endOfMonth();
         return self::generateDateRangeBot($start, $end);
     }
 
@@ -310,10 +310,10 @@ trait Timetable
      */
     public static function getDaysOfMonth(string $month = ''): array
     {
-        $start = new Carbon('first monday of '.$month);
-        $end   = Carbon::parse($start->toDateString())->endOfMonth();
+        $start = new Carbon('first monday of ' . $month);
+        $end = Carbon::parse($start->toDateString())->endOfMonth();
         $diff = (int)$start->format('d');
-        if($diff != 1) {
+        if ($diff != 1) {
             $start = $start->addDays(-7);
         }
         return self::generateDateRangeBot($start, $end);
@@ -324,13 +324,15 @@ trait Timetable
      * @param string $Y_m_d
      * @return array|bool
      */
-    public static function getBookedTimes ($model, string $Y_m_d)
+    public static function getBookedTimes($model, string $Y_m_d)
     {
         /** @var Record $records */
         $records = $model->records->where('date', $Y_m_d);
 
         if ($records->isEmpty())
+        {
             return false;
+        }
 
         $times = [];
         $first = $records->first();
@@ -341,17 +343,17 @@ trait Timetable
             $needle = $first->service->group->quantity;
             $duplicates = $records->toBase()->countBy('time')->all();
 
-            foreach ($duplicates as $time => $count)
-
+            foreach ($duplicates as $time => $count) {
                 if ($count >= $needle)
-                    $times[] = $time;
-
+                    $times[$time] = $first->service->interval->minutes + $first->service->range;
+            }
         } else {
-            foreach ($records as $record)
-                $times[] = $record->time;
-
+            foreach ($records as $record) {
+                $times[$record->time] = $record->service->interval->minutes + $record->service->range;
+            }
         }
 
+        //  в массиве время записи и длительность услуги в минутах
         return $times;
     }
 
@@ -359,13 +361,13 @@ trait Timetable
      * @param array $timetable
      * @return array
      */
-    public static function getChecked (array $timetable) : array
+    public static function getChecked(array $timetable): array
     {
         $checked = [];
 
         foreach ($timetable as $day_of_week => $times)
             foreach ($times as $time)
-                $checked[] = $day_of_week.'-'.$time;
+                $checked[] = $day_of_week . '-' . $time;
 
         return $checked;
     }

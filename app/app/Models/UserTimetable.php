@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use \App\Traits\Timetable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Log;
+use function PHPUnit\Framework\greaterThanOrEqual;
 
 /**
  * App\Models\Timetable
@@ -70,7 +71,8 @@ class UserTimetable extends Model
      * @param Carbon|null $date
      * @return false|array
      */
-    public static function userSchedule (User $user, Carbon $date = null) {
+    public static function userSchedule(User $user, Carbon $date = null)
+    {
         if (is_null($date))
             $date = Carbon::now()->format('l');
         else
@@ -98,7 +100,7 @@ class UserTimetable extends Model
      * @param Carbon|null $comparison
      * @return bool
      */
-    public static function isWorkDay (User $user, int $address_id, int $service_id, Carbon $date, Carbon $comparison = null) : bool
+    public static function isWorkDay(User $user, int $address_id, int $service_id, Carbon $date, Carbon $comparison = null): bool
     {
         if (!is_null($comparison) && $comparison->greaterThan($date))
             return false;
@@ -124,19 +126,18 @@ class UserTimetable extends Model
      * @param int $service_id
      * @return array|bool
      */
-    public static function getTimes (User $user, int $address_id, int $service_id, string $date)
+    public static function getTimes(User $user, int $address_id, int $service_id, string $date)
     {
         $date = mb_strtolower(Carbon::parse($date)->format('l'));
 
         $table = $user->timetables->where('address_id', $address_id)->where('service_id', $service_id)->first();
+
         Log::info('getTimes: ', $table->toArray());
         $times = false;
         if ($table && !is_null($table->$date)) {
             $times = json_decode($table->$date, true);
-
-            return json_decode($table->$date);
         }
-        return false;
+        return $times;
     }
 
     /**
@@ -146,10 +147,11 @@ class UserTimetable extends Model
      * @param string $date
      * @return array
      */
-    public static function getFreeTimes (User $user, int $address_id, int $service_id, string $date) : array
+    public static function getFreeTimes(User $user, int $address_id, int $service_id, string $date): array
     {
         $check_hours = Carbon::parse($date)->isToday();
 
+        // Расписание мастера
         $times = self::getTimes($user, $address_id, $service_id, $date);
 
         if (!$times) {
@@ -158,42 +160,76 @@ class UserTimetable extends Model
         }
 
 
-
+        // параметры услуги
         $table = $user->timetables->where('address_id', $address_id)->where('service_id', $service_id)->first();
 
+        // Список уже забронированных услуг с длительностью
         $booked_array = self::getBookedTimes($user, $date);
 
         if (!$booked_array) {
-
             $booked_array = [];
         }
 
         $free = [];
         $comparison = false;
-        foreach ($times as $time) {
 
-            if ($check_hours) {
-                if (!Carbon::parse($time)->greaterThan(Carbon::now())) {
-                    continue;
-                }
+        // массив-карта слотов мастера
+        $timeMap = [];
+        $masterEndSlot = count($times);
+
+        //сначала заполним единицами (доступно все)
+        for ($i = 0; $i <= count($times); $i++) {
+            $timeMap[$i] = 1;
+        }
+
+        // Длительность проверяемой услуги
+        $duration = $table->service->interval->minutes + $table->service->range;
+
+        // Число слотов по 30мин в проверяемой услуге
+        $serviceSlotsCount = intdiv($duration, 30);
+        if ($duration % 30) {
+            $serviceSlotsCount++;
+        }
+
+
+        foreach ($booked_array as $book => $bookDuration) {
+            // получим число слотов в услуге
+            $bookSlotsCount = intdiv($bookDuration, 30);
+            if ($bookDuration % 30) {
+                $bookSlotsCount++;
             }
 
-            foreach ($booked_array as $booked) {
-                if ($booked == $time) {
-                    if ($table->service->range > 0) {
-                        $comparison = Carbon::parse($booked)->addMinutes($table->service->interval->minutes)->addMinutes($table->service->range);
-                    } else {
-                        $comparison = Carbon::parse($booked)->addMinutes($table->service->interval->minutes);
-                    }
-                    break;
-                }
+            // Слот, соответствующий началу текущей услуги
+            $timeBegin = array_search($book, $times);
+
+
+            //уберем недоступные в процессе выполнения текущей услуги слоты
+            for ($i = 0; $i <= $bookSlotsCount; $i++) {
+                $timeMap[$timeBegin + $i] = 0;
             }
 
-            if (!$comparison || Carbon::parse($time)->greaterThanOrEqualTo($comparison)) {
-                $free[] = $time;
+
+            for ($i = 0; $i < $serviceSlotsCount; $i++) {
+
+                // уберем слоты перед текущей услугой - в которые мы не сможем втиснуться по времени
+                if ($i <= $timeBegin) {
+                    $timeMap[$timeBegin - $i] = 0;
+                }
+
+                // Уберем слоты с конца рабочего дня
+                if($i < $masterEndSlot) {
+                    $timeMap[$masterEndSlot - $i] = 0;
+                }
             }
         }
 
+        // Перенесем карту слотов в формат времени
+        $free = [];
+        foreach ($timeMap as $key => $value){
+            if ($value){
+                $free[] = $times[$key];
+            }
+        }
         return $free;
     }
 }
