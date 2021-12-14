@@ -211,11 +211,11 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
         /**
          * Calendar
          */
-        calendar.addEventListener('click', function () {
-            unsetCookies(id);
-            setCookie('inputs-'+id, JSON.stringify(send(id)), {'path': COOKIE_URL});
-            window.location.href = this.dataset.href;
-        });
+        // calendar.addEventListener('click', function () {
+        //     unsetCookies(id);
+        //     setCookie('inputs-'+id, JSON.stringify(send(id)), {'path': COOKIE_URL});
+        //     window.location.href = this.dataset.href;
+        // });
 
         /**
          * Group
