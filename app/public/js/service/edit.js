@@ -143,7 +143,7 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
             inputs = JSON.parse(inputs);
             document.getElementById('service-name-'+id).value = inputs.name;
             document.getElementById('service-type-'+id).value = inputs.type;
-            document.getElementById('range-'+id).value = inputs.range;
+            // document.getElementById('range-'+id).value = inputs.range;
             document.getElementById('price-'+id).value = inputs.price;
             document.getElementById('bonus-'+id).value = inputs.bonus;
             document.getElementById('quantity-'+id).value = inputs.quantity;
@@ -165,7 +165,11 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
             setValues(selectors, inputs.addresses);
 
             setChecked(document.getElementsByName('group-'+id), inputs.grouped);
-            setChecked(document.getElementsByName('interval-'+id), inputs.interval);
+
+            setChecked(document.getElementsByName('durationHours'), inputs.durationHours);
+            setChecked(document.getElementsByName('durationMinutes'), inputs.durationMinutes);
+            setChecked(document.getElementsByName('intervalHours'), inputs.intervalHours);
+            setChecked(document.getElementsByName('intervalMinutes'), inputs.intervalMinutes);
         }
 
         /**
