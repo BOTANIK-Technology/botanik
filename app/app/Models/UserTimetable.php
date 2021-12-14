@@ -150,6 +150,8 @@ class UserTimetable extends Model
     public static function getFreeTimes(User $user, int $address_id, int $service_id, string $date): array
     {
         $check_hours = Carbon::parse($date)->isToday();
+        $now = Carbon::now();
+
 
         // Расписание мастера
         $times = self::getTimes($user, $address_id, $service_id, $date);
@@ -176,7 +178,12 @@ class UserTimetable extends Model
 
         //сначала заполним единицами (доступно все)
         for ($i = 0; $i <= $masterEndSlot; $i++) {
-            $timeMap[$i] = 1;
+            // если запись на сегодня - отбросим уже прошедшие слоты
+            if ($check_hours && !Carbon::parse($times[$i])->greaterThanOrEqualTo($now)) {
+                $timeMap[$i] = 0;
+            } else {
+                $timeMap[$i] = 1;
+            }
         }
 
         // Длительность проверяемой услуги
@@ -187,6 +194,7 @@ class UserTimetable extends Model
         if ($duration % 30) {
             $serviceSlotsCount++;
         }
+Log::info('User-servise: ', [$duration, $serviceSlotsCount]);
 
         foreach ($booked_array as $book => $bookDuration) {
             // получим число слотов в услуге
@@ -198,7 +206,7 @@ class UserTimetable extends Model
             // Слот, соответствующий началу текущей услуги
             $timeBegin = array_search($book, $times);
 
-
+Log::info('booked: ', [$bookDuration, $bookSlotsCount]);
             //уберем недоступные в процессе выполнения текущей услуги слоты
             for ($i = 0; $i <= $bookSlotsCount; $i++) {
                 $timeMap[$timeBegin + $i] = 0;
@@ -213,20 +221,21 @@ class UserTimetable extends Model
             }
         }
 
-        for ($i = 0; $i < $serviceSlotsCount; $i++){
+        for ($i = 0; $i < $serviceSlotsCount; $i++) {
             // Уберем слоты с конца рабочего дня
-            if($i < $masterEndSlot) {
+            if ($i < $masterEndSlot) {
                 $timeMap[$masterEndSlot - $i] = 0;
             }
         }
 
         // Перенесем карту слотов в формат времени
         $free = [];
-        foreach ($timeMap as $key => $value){
-            if ($value){
+        foreach ($timeMap as $key => $value) {
+            if ($value) {
                 $free[] = $times[$key];
             }
         }
+        Log::info('timeMap', $timeMap);
         return $free;
     }
 }

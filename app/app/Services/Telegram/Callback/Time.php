@@ -29,7 +29,9 @@ class Time extends CallbackQuery
 
     private function serviceTime(int $service_id, string $date)
     {
+        /** @var Service $service */
         $service = Service::find($service_id);
+        Log::info('Service Time', [$service->toArray(), $date]);
         $times = $service->timetable->getFreeTimes($date);
         return $this->getButtons($times);
     }

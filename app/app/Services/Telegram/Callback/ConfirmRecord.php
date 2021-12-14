@@ -20,10 +20,11 @@ class ConfirmRecord extends CallbackQuery
     private function getText($time): string
     {
         if (is_null(parent::getMasterID()))
+
             return
                 'Оформление записи:'."\n".
                 '1. Услуга: '.\App\Models\Service::find( $this->getServiceID() )->name."\n".
-                '2. Адрес: '.\App\Models\Address::find( $this->getAddressID() )->address."\n".
+                '2. Адрес: '. (\App\Models\Address::find( $this->getAddressID() )->address ?? " ") ."\n".
                 '3. Дата: '.Date::parse( parent::getDate() )->format('l j F Y')."\n".
                 '4. Время: '.$time."\n".
                 '5. Стоимость: '.\App\Models\Service::find( parent::getServiceID() )->price.' грн'."\n\n".

@@ -43,9 +43,9 @@
                 {{--            <label class="row-8 col-1 align-self-start" for="range">{{__('Интервал *')}}</label>--}}
                 <label class="row-8 col-1 align-self-start" for="price">{{__('Стоимость *')}}</label>
                 <label class="row-9 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
-{{--                <label class="row-10 col-1 align-self-start" for="calendar">{{__('Расписание')}}</label>--}}
-                <label class="row-11 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
-                <label class="row-12 col-1 align-self-start" for="prepay-1">{{__('Оплата *')}}</label>
+                <label class="row-10 col-1 align-self-start" for="calendar">{{__('Расписание')}}</label>
+                <label class="row-12 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
+                <label class="row-13 col-1 align-self-start" for="prepay-1">{{__('Оплата *')}}</label>
 
                 <div class="row-1 col-2">
                     <input id="service-name-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->name}}" placeholder="{{__('Введите название')}}">
@@ -131,17 +131,17 @@
                     <input id="bonus-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->bonus}}" placeholder="{{__('Введите количество')}}">
                 </div>
 
-{{--                <div class="row-10 col-2 align-self-center">--}}
-{{--                    <button--}}
-{{--                            id="calendar-{{$view_service->id}}"--}}
-{{--                            class="background-none calendar-a"--}}
-{{--                            data-href="{{route('window.service', ['business' => $slug, 'load' => $load, 'type_id' => $view_service_type->id, 'service_id' => $view_service->id, 'modal' => 'timetable'])}}"--}}
-{{--                    >--}}
-{{--                        <div class="calendar-icon"></div>--}}
-{{--                    </button>--}}
-{{--                </div>--}}
+                <div class="row-10 col-2 align-self-center">
+                    <button
+                            id="calendar-{{$view_service->id}}"
+                            class="background-none calendar-a"
+                            data-href="{{route('window.service', ['business' => $slug, 'load' => $load, 'type_id' => $view_service_type->id, 'service_id' => $view_service->id, 'modal' => 'timetable'])}}"
+                    >
+                        <div class="calendar-icon"></div>
+                    </button>
+                </div>
 
-                <div class="row-10 col-2 grid intervals">
+                <div class="row-11 col-2 grid intervals">
                     <input id="group-1-{{$view_service->id}}" type="radio" name="group-{{$view_service->id}}" value="1" {{isset($view_service->group) ? 'checked' : ''}}>
                     <label for="group-1-{{$view_service->id}}" class="user-select-none">{{__('Да')}}</label>
                     <input id="group-0-{{$view_service->id}}" type="radio" name="group-{{$view_service->id}}" value="0" {{!isset($view_service->group) ? 'checked' : ''}}>

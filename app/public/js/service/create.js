@@ -276,10 +276,10 @@ if (addService) {
     /**
      * Calendar
      */
-    // calendar.addEventListener('click', function () {
-    //     setCookie('inputs', JSON.stringify(send()), {'path':COOKIE_URL});
-    //     window.location.href = this.dataset.href;
-    // });
+    calendar.addEventListener('click', function () {
+        setCookie('inputs', JSON.stringify(send()), {'path':COOKIE_URL});
+        window.location.href = this.dataset.href;
+    });
 
     /**
      * Group
