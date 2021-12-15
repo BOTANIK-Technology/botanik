@@ -18,7 +18,7 @@ class IntervalSeeder extends Seeder
         while($hours <= 24) {
             $minutes = 0;
             while ($minutes <= 55) {
-                $minutes_30 = new Interval();
+                $minutes_30 = new Interval('botanik_qwertyuiopasdfghjklzxcvbnmqwerty');
                 $minutes_30->name = $hours . ' часов: ' . $minutes . ' минут';
                 $minutes_30->value = $hours . ' hours: ' . $minutes . ' minutes';
                 $minutes_30->minutes = $minutes + $hours * 60;

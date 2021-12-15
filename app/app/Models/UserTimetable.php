@@ -102,6 +102,7 @@ class UserTimetable extends Model
      */
     public static function isWorkDay(User $user, int $address_id, int $service_id, Carbon $date, Carbon $comparison = null): bool
     {
+//        Log::info('isWorkDay', [$date, $comparison]);
         if (!is_null($comparison) && $comparison->greaterThan($date))
             return false;
 
