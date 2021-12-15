@@ -45,6 +45,7 @@ class BusinessController extends Controller
                 'password' => $request->input('password'),
             ]);
 
+            /** @var Business $business */
             $business = Business::create([
                 'name'       => $request->input('business_name'),
                 'bot_name'   => $request->input('bot_name'),

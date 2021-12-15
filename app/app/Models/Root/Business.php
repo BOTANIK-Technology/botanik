@@ -2,6 +2,7 @@
 
 namespace App\Models\Root;
 
+use App\Facades\ConnectService;
 use App\Models\Address;
 use App\Models\FeedBack;
 use App\Models\Information;
@@ -11,23 +12,18 @@ use App\Models\Review;
 use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
-use Artisan;
-use ConnectService;
-use DB;
-use Eloquent;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use http\Url;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
-use Log;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Exception;
-use Mail;
-use Storage;
-use URL;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
@@ -68,7 +64,6 @@ use Swift_SmtpTransport;
  * @method static Builder|Business whereStatus($value)
  * @method static Builder|Business whereToken($value)
  * @method static Builder|Business whereUpdatedAt($value)
- * @mixin Eloquent
  */
 class Business extends Model
 {
