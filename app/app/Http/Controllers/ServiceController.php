@@ -103,7 +103,7 @@ class ServiceController extends Controller
                 $this->params['service_id'] = $request->service_id;
                 if (!is_null($request->service_id)) {
                     $this->params['type_id'] = Service::find($request->service_id)->type_service_id;
-                    $this->setTimetableCookies(Service::find($request->service_id), $business, true);
+//                    $this->setTimetableCookies(Service::find($request->service_id), $business, true);
                 }
 
                 break;
@@ -123,8 +123,8 @@ class ServiceController extends Controller
                 $this->params['view_service_type'] = TypeService::find($this->params['view_service']->type_service_id);
             }
 
-            if ($modal == 'edit')
-                $this->setTimetableCookies($this->params['view_service'], $business);
+//            if ($modal == 'edit')
+//                $this->setTimetableCookies($this->params['view_service'], $business);
         }
 
         return $this->getView($request);
