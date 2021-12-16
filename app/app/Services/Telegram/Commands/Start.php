@@ -12,12 +12,14 @@ class Start extends Command
 
         parent::__construct($request);
         if ( parent::isUser() )
+        {
             return $this->redirect();
+        }
         return $this->registration();
     }
 
     private function registration() {
-        $this->sendMessage(
+        return $this->sendMessage(
             __('Чтобы пройти регистрацию, поделитесь, пожалуйста, своим номером.'),
             $this->buildReplyKeyboard([[['request_contact' => true, 'text' => 'Поделиться']]])
         );

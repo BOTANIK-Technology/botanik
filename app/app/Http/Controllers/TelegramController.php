@@ -40,7 +40,7 @@ class TelegramController extends Controller
             }
         }
         else {
-            Log::debug($id . ': Клиент не создан: ' );
+       //     Log::debug($id . ': Клиент не создан: ' );
 //            Log::debug($id . ': Клиент не создан: ' . var_export($request->input(), true));
         }
 
@@ -66,11 +66,10 @@ class TelegramController extends Controller
 
         }
         else {
-
             if ($request->has('message.text')) {
                 return $this->text($request);
             }
-            Log::info('phone_number not found');
+//            Log::info('phone_number not found');
             abort(404);
 //            throw new HttpException('phone_number not found', 404);
         }

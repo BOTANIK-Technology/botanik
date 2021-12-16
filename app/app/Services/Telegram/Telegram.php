@@ -157,7 +157,9 @@ class Telegram
     public function getNumber(Request $request): bool
     {
         if ($request->has('client'))
+        {
             return $this->redirectToStart($request);
+        }
 
         $client = TelegramUser::create(
             [

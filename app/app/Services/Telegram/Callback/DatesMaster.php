@@ -4,6 +4,7 @@ namespace App\Services\Telegram\Callback;
 
 
 use App\Models\User;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use App\Models\UserTimetable;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,7 @@ class DatesMaster extends CallbackQuery
      * DatesMaster constructor.
      * @param Request $request
      * @param null $month
+     * @throws GuzzleException
      */
     public function __construct(Request $request, $month = null)
     {
@@ -27,7 +29,6 @@ class DatesMaster extends CallbackQuery
 
     private function masterDate($master_id, $month)
     {
-
         switch ($month) {
             case 'DateNext':
                 $first_day = new Carbon('first day of next month');
@@ -49,6 +50,7 @@ class DatesMaster extends CallbackQuery
                 break;
             default:
                 $first_day = Carbon::now();
+
                 $date[] = [
                     ['text' => ' ', 'callback_data' => '-'],
                     $this->getNameOfMonth($first_day),
