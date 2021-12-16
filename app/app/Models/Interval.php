@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Interval newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Interval newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Interval query()
- * @mixin \Eloquent
  */
 class Interval extends Model
 {
