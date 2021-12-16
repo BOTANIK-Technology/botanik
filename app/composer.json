@@ -22,7 +22,8 @@
         "telegram-bot/api": "^2.3",
         "ext-curl": "*",
         "ext-pdo": "*",
-        "ext-http": "*"
+        "ext-http": "*",
+      "ext-mysql_xdevapi": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",

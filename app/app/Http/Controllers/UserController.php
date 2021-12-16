@@ -329,7 +329,6 @@ class UserController extends Controller
      */
     public function addService(Request $request)
     {
-
         $this->params['services'] = Service::withoutTimetable();
         $this->params['addresses'] = Address::all();
         $this->params['moreService'] = intval($request->moreService);
@@ -338,10 +337,10 @@ class UserController extends Controller
             $user = User::find($request->id);
             $this->params['user'] = $user;
             $this->params['id'] = $request->id;
-            return $this->getView($request);
-        } else
+        } else {
             $this->params['roles'] = [Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()];
-
+        }
+//        dd($this->params);
         return $this->getView($request);
     }
 
@@ -349,7 +348,8 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function deleteUser(Request $request): JsonResponse
+    public
+    function deleteUser(Request $request): JsonResponse
     {
 
         try {
@@ -396,7 +396,8 @@ class UserController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function manageConfirm(Request $request)
+    public
+    function manageConfirm(Request $request)
     {
         $user = User::find($request->id);
         $user->status = 1;
@@ -429,7 +430,8 @@ class UserController extends Controller
      * @param Request $request
      * @return Factory|View
      */
-    public function manageReject(Request $request)
+    public
+    function manageReject(Request $request)
     {
         $this->deleteUser($request);
         return $this->index($request);
@@ -439,7 +441,8 @@ class UserController extends Controller
      * @param Request $request
      * @return Factory|View
      */
-    public function getView(Request $request)
+    public
+    function getView(Request $request)
     {
         if (!isset($this->params['timetables'])) {
             $this->params['timetables'] = [];
@@ -453,7 +456,8 @@ class UserController extends Controller
      * @param bool $create
      * @return Validator
      */
-    private function validateUser(Request $request, $create = true): Validator
+    private
+    function validateUser(Request $request, $create = true): Validator
     {
         $rules = [
             'name' => 'required|string|min:1',

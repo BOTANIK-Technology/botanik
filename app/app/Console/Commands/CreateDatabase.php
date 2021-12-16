@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PDO;
 
 class CreateDatabase extends Command
@@ -41,7 +42,11 @@ class CreateDatabase extends Command
     {
         try {
             $dbname = $this->argument('dbname');
-            $connection = $this->hasArgument('connection') && $this->argument('connection') ? $this->argument('connection'): DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME);
+            $connection = $this->hasArgument('connection') && $this->argument('connection')
+                ? $this->argument('connection')
+                : DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+            Log::debug('connection', [$connection, DB::connection($connection)]);
 
             $hasDb = DB::connection($connection)->select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "."'".$dbname."'");
 

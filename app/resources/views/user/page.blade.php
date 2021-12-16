@@ -78,7 +78,7 @@
                     <div class="flex align-items-center text ellipsis">
                         @if ($sort == 'master')
                             @foreach($item->services as $service)
-                                {{$service->typeServices->type}}{{count($item->services)-1 !== $loop->index ? ', ': ''}}
+                                {{$service->name}}({{$service->typeServices->type}}){{count($item->services)-1 !== $loop->index ? ', ': ''}}
                             @endforeach
                         @else
                             {{$item->roles[0]->name}}

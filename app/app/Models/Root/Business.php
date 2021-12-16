@@ -14,7 +14,6 @@ use App\Models\Service;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use http\Url;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
@@ -213,7 +213,8 @@ class Business extends Model
     {
         // Create a new database
         try {
-            Artisan::call('make:database', ['dbname' => $this->db_name]);
+            $res = Artisan::call('make:database', ['dbname' => $this->db_name]);
+            Log::debug('DB make', [$res]);
         }
         catch (Exception $e) {
             Log::error($e->getMessage().' *** Cannot create "'.$this->db_name.'" database');
