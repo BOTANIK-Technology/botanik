@@ -97,11 +97,14 @@ class ServiceTimetable extends Model
         }
         Log::info('Service-servise: ', [$duration, $serviceSlotsCount]);
 
+        // Перебираем все созданные услуги и отмечаем недоступные из-них слоты
         foreach ($booked_array as $book => $bookDuration) {
+            //Если прилетел слот для игнорирования (при правке даты уже созданной записи) - то мы его игнорируем
             if($book == $ignore_time) {
                 continue;
             }
-            // получим число слотов в услуге
+
+            // получим число слотов в текущей услуге
             $bookSlotsCount = intdiv($bookDuration, 30);
             if ($bookDuration % 30) {
                 $bookSlotsCount++;
