@@ -271,7 +271,10 @@ b {
     font-size: 14px;
     line-height: 22px;
     color: #5B5B5B;
-    padding-left: 24px;
+    padding-left: 15px;
+}
+.table .text.small {
+    font-size: 10px;
 }
 input[type=radio],input[type=checkbox] {
     display:none;
