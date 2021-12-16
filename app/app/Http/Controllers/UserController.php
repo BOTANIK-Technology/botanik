@@ -91,7 +91,7 @@ class UserController extends Controller
                 $this->params['id'] = $request->id;
                 $this->params['user'] = User::find($this->params['id']);
 
-                $this->setUserCookies($this->params['user'], $request->business);
+//                $this->setUserCookies($this->params['user'], $request->business);
                 $this->setTimetableCookies($this->params['user'], $request->business);
 
                 $this->params['services'] = Service::withoutTimetable();
@@ -112,7 +112,7 @@ class UserController extends Controller
                 $this->params['moreService'] = intval($request->moreService);
                 $this->params['currentService'] = intval($request->currentService);
                 $this->params['user'] = User::find($this->params['id']);
-                $this->setUserCookies($this->params['user'], $request->business);
+//                $this->setUserCookies($this->params['user'], $request->business);
                 break;
             case 'note':
                 break;
