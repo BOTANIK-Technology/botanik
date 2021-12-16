@@ -148,7 +148,7 @@ class UserTimetable extends Model
      * @param string $date
      * @return array
      */
-    public static function getFreeTimes(User $user, int $address_id, int $service_id, string $date): array
+    public static function getFreeTimes(User $user, int $address_id, int $service_id, string $date,$ignore_time = null): array
     {
         $check_hours = Carbon::parse($date)->isToday();
         $now = Carbon::now();
@@ -198,6 +198,9 @@ class UserTimetable extends Model
 Log::info('User-servise: ', [$duration, $serviceSlotsCount]);
 
         foreach ($booked_array as $book => $bookDuration) {
+            if($book == $ignore_time) {
+                continue;
+            }
             // получим число слотов в услуге
             $bookSlotsCount = intdiv($bookDuration, 30);
             if ($bookDuration % 30) {

@@ -50,7 +50,7 @@ class ServiceTimetable extends Model
 
         return false;
     }
-    public function getFreeTimes(string $date): array
+    public function getFreeTimes(string $date,$ignore_time = null): array
     {
         $check_hours = Carbon::parse($date)->isToday();
         $now = Carbon::now();
@@ -98,6 +98,9 @@ class ServiceTimetable extends Model
         Log::info('Service-servise: ', [$duration, $serviceSlotsCount]);
 
         foreach ($booked_array as $book => $bookDuration) {
+            if($book == $ignore_time) {
+                continue;
+            }
             // получим число слотов в услуге
             $bookSlotsCount = intdiv($bookDuration, 30);
             if ($bookDuration % 30) {

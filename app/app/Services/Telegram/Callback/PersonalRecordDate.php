@@ -11,30 +11,29 @@ class PersonalRecordDate extends CallbackQuery
     {
         parent::__construct($request);
         parent::setDate();
-
         $record = Record::find(parent::getRecordID());
         $this->back = 'PersonalDatesService_'.parent::getRecordID();
 
         if ( !is_null($record->user_id) && !empty($record->user_id) ) {
-            $buttons = $this->masterTime($record->user_id, $record->service_id, $record->address_id, $record->date);
+            $buttons = $this->masterTime($record);
         } else {
-            $buttons = $this->serviceTime($record->service_id, $record->date);
+            $buttons = $this->serviceTime($record);
         }
 
         return parent::editMessage(__('Выберите время'), $buttons);
     }
 
-    private function serviceTime (int $service_id, string $date)
+    private function serviceTime ($record)
     {
-        $service = \App\Models\Service::find($service_id);
-        $times = $service->timetable->getFreeTimes($date);
+        $service = \App\Models\Service::find($record->service_id);
+        $times = $service->timetable->getFreeTimes($record->date,$record->time);
         return $this->getButtons($times);
     }
 
-    private function masterTime(int $master_id, int $service_id, int $address_id, string $date)
+    private function masterTime($record)
     {
-        $master = \App\Models\User::find($master_id);
-        $times = \App\Models\UserTimetable::getFreeTimes($master, $address_id, $service_id, $date);
+        $master = \App\Models\User::find($record->user_id);
+        $times = \App\Models\UserTimetable::getFreeTimes($master, $record->address_id, $record->service_id, $record->date,$record->time);
         return $this->getButtons($times);
     }
 
@@ -45,7 +44,7 @@ class PersonalRecordDate extends CallbackQuery
             $buttons[] = [['text' => __('Нет свободных ячеек.'), 'callback_data' => '-']];
         else
             foreach ($times as $time)
-                $buttons[] = [['text' => $time, 'callback_data' => 'PersonalEditConfirm_' . $time]];
+                $buttons[] = [['text' => $time, 'callback_data' => 'PersonalRecordTime_' . $time]];
 
         return parent::buildInlineKeyboard($buttons);
     }

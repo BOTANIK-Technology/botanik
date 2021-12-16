@@ -431,7 +431,7 @@ input[type=radio]:checked + label,input[type=checkbox]:checked + label {
     grid-row: 2;
     font-size: 18px;
     text-align: center;
-    min-height: 78px;
+    /*min-height: 78px;*/
 }
 .modal-footer {
     grid-row: 3;
