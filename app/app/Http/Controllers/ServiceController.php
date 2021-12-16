@@ -46,19 +46,26 @@ class ServiceController extends Controller
         $this->params['types'] = TypeService::all();
         $this->params['services'] = Service::all();
         $this->params['addresses'] = Address::all();
-        $this->params['view'] = $request->get('view') ?? 'services';
-        $this->params['load'] = $request->get('load') ?? 10;
-        $this->params['load_types'] = $request->get('load_types') ?? 10;
-        $this->params['load_addresses'] = $request->get('load_addresses') ?? 10;
+        $this->params['view'] = $request->get('view', 'services');
+        $this->params['load'] = $request->get('load', 10);
+        $this->params['load_types'] = $request->get('load_types', 10);
+        $this->params['load_addresses'] = $request->get('load_addresses', 10);
     }
 
     /**
      * @param Request $request
      * @return Factory|View
      */
-    public function getView (Request $request)
+    public function getView(Request $request)
     {
+        if (!isset($this->params['timetables'])) {
+            $this->params['timetables'] = [];
+        }
+        if (!isset($this->params['checked'])) {
+            $this->params['checked'] = [];
+        }
         $this->setParams($request);
+
         return view($this->view, $this->params);
     }
 
@@ -75,7 +82,7 @@ class ServiceController extends Controller
      * @param Request $request
      * @return Factory|View|void
      */
-    public function window (Request $request)
+    public function window(Request $request)
     {
         $id = $request->id ?? $request->service_id;
         $business = $request->business;
@@ -92,6 +99,8 @@ class ServiceController extends Controller
             default:
                 abort(404);
         }
+        $serviceView = Service::find($id);
+        $serviceRequest = Service::find($request->service_id);
 
         switch ($modal) {
             case 'delete':
@@ -101,42 +110,46 @@ class ServiceController extends Controller
                 $this->params['times'] = ServiceTimetable::getHours();
                 $this->params['days'] = ServiceTimetable::getDays();
                 $this->params['service_id'] = $request->service_id;
-                if (!is_null($request->service_id)) {
-                    $this->params['type_id'] = Service::find($request->service_id)->type_service_id;
-//                    $this->setTimetableCookies(Service::find($request->service_id), $business, true);
-                }
 
+                if ($serviceRequest) {
+                    $this->params['type_id'] = $serviceRequest->type_service_id;
+                    $this->setTimetableCookies($serviceRequest, true);
+                }
+                break;
+            case 'view':
+                $this->params['view_service'] = $serviceView;
+
+                if ($serviceView) {
+                    $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
+                }
                 break;
             case 'create':
             case 'edit':
-//                $this->params['intervals'] = Interval::all();
                 $this->params['types_select'] = TypeService::all();
                 $this->params['addresses'] = Address::all();
-                if ($this->params['addresses']->isEmpty()) $this->params['addresses'] = 0;
+                $this->params['view_service'] = $serviceView;
+
+                if ($serviceView) {
+                    $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
+                }
+
+                if ($this->params['addresses']->isEmpty()) {
+                    $this->params['addresses'] = 0;
+                }
+
+                if (!$request->input('no_cookie')) {
+                    $this->setTimetableCookies($serviceView);
+                }
                 break;
-        }
-
-        if ($modal == 'edit' || $modal == 'view') {
-            $this->params['view_service'] = Service::find($id);
-
-            if($this->params['view_service']) {
-                $this->params['view_service_type'] = TypeService::find($this->params['view_service']->type_service_id);
-            }
-
-//            if ($modal == 'edit')
-//                $this->setTimetableCookies($this->params['view_service'], $business);
         }
 
         return $this->getView($request);
     }
 
 
-    private function setTimetableCookies($view_service, $slug, $checked = false)
+    private function setTimetableCookies($view_service, $checked = false)
     {
         if (!$view_service)
-            return;
-
-        if ( isset($_COOKIE['timetable-'.$view_service->id]) )
             return;
 
         if (!$view_service->timetable)
@@ -144,16 +157,20 @@ class ServiceController extends Controller
 
         $days = ServiceTimetable::getDaysEn();
         $timetable = [];
-        foreach ($days as $day)
-            if(!is_null($view_service->timetable->$day))
+        foreach ($days as $day) {
+            if (!is_null($view_service->timetable->$day)) {
                 $timetable[$day] = json_decode($view_service->timetable->$day);
+            }
+        }
 
         switch ($checked) {
             case false:
-                setcookie('timetable-'.$view_service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+                $this->params['timetables']['timetable-' . $view_service->id] = $timetable;
+//                setcookie('timetable-'.$view_service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
                 break;
             case true:
-                setcookie('checked-'.$view_service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
+                $this->params['checked']['checked-' . $view_service->id] = ServiceTimetable::getChecked($timetable);
+//                setcookie('checked-'.$view_service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
                 break;
         }
     }
@@ -167,8 +184,7 @@ class ServiceController extends Controller
         try {
             $type = TypeService::create(['type' => $request->service]);
             return response()->json(['id' => $type->id, 'type' => $type->type], 201);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -182,8 +198,7 @@ class ServiceController extends Controller
         try {
             $address = Address::create(['address' => $request->address]);
             return response()->json(['id' => $address->id, 'address' => $address->address], 201);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -197,8 +212,7 @@ class ServiceController extends Controller
     {
         try {
             Service::find($id)->delete();
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
 
@@ -219,7 +233,7 @@ class ServiceController extends Controller
 
         try {
             $service = new Service();
-            $type = TypeService::find( $request->input('type') );
+            $type = TypeService::find($request->input('type'));
             $service->name = $request->input('name');
 
 
@@ -230,7 +244,7 @@ class ServiceController extends Controller
             $service->bonus_pay = $request->input('bonuspay');
 
             $service->interval_id = $this->getIntervalId($request, 'duration');
-            $service->range =$this->getIntervalRange($request, 'interval');
+            $service->range = $this->getIntervalRange($request, 'interval');
 
             $type->services()->save($service);
             $service->attachAddresses($request->input('addresses'));
@@ -241,12 +255,11 @@ class ServiceController extends Controller
             if ($request->prepay)
                 $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
 
-            if (!empty($request->input('quantity')) &&  !empty($request->input('message')))
+            if (!empty($request->input('quantity')) && !empty($request->input('message')))
                 $service->group()->create(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
 
             return response()->json(['ok' => true]);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -254,7 +267,7 @@ class ServiceController extends Controller
     public function getIntervalId($request, $type)
     {
         $intervalLength = $this->getIntervalRange($request, $type);
-        $item =  Interval::where('minutes', $intervalLength)->first();
+        $item = Interval::where('minutes', $intervalLength)->first();
         return $item ? $item->id : 1;
 
     }
@@ -284,7 +297,7 @@ class ServiceController extends Controller
             $service->name = $request->input('name');
 
             $service->interval_id = $this->getIntervalId($request, 'duration');
-            $service->range =$this->getIntervalRange($request, 'interval');
+            $service->range = $this->getIntervalRange($request, 'interval');
 
             $service->price = $request->input('price');
             $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
@@ -300,14 +313,14 @@ class ServiceController extends Controller
             if ($request->prepay)
                 $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
 
-            if (!empty($request->input('quantity')) &&  !empty($request->input('message')))
+            if (!empty($request->input('quantity')) && !empty($request->input('message')))
                 $service->updateGroup(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
             else
                 if (isset($service->group)) $service->group->delete();
 
             return response()->json(['ok' => true]);
         } catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage().' '.$e->getLine()]], 500);
+            return response()->json(['errors' => ['server' => $e->getMessage() . ' ' . $e->getLine()]], 500);
         }
     }
 
@@ -320,8 +333,7 @@ class ServiceController extends Controller
         try {
             Service::find($request->id)->delete();
             return response()->json(['ok' => true]);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]]);
         }
     }
@@ -333,30 +345,30 @@ class ServiceController extends Controller
     private function validateService(Request $request)
     {
         $rules = [
-            'price'     => 'required|integer|min:1',
-            'bonus'     => 'nullable|integer|min:1',
-            'type'      => 'required|integer',
+            'price' => 'required|integer|min:1',
+            'bonus' => 'nullable|integer|min:1',
+            'type' => 'required|integer',
             'addresses' => 'required|array',
-            'name'      => 'required|string',
+            'name' => 'required|string',
 //            'interval'  => 'required|integer|min:0|max:24',
-            'range'     => 'integer|min:0',
-            'message'   => 'nullable|required_with:quantity|string',
-            'quantity'  => 'nullable|required_with:message|integer|min:2',
+            'range' => 'integer|min:0',
+            'message' => 'nullable|required_with:quantity|string',
+            'quantity' => 'nullable|required_with:message|integer|min:2',
             'timetable' => 'nullable|array',
-            'prepay'    => 'required|boolean',
-            'cashpay'   => 'required|boolean',
+            'prepay' => 'required|boolean',
+            'cashpay' => 'required|boolean',
             'onlinepay' => 'required|boolean',
-            'bonuspay'  => 'required|boolean',
+            'bonuspay' => 'required|boolean',
         ];
         $data = $request->all();
-        if($data['prepay'] == true){
-            $rules['prepay_message']='required|string';
-            $rules['prepay_card']='required|string';
-        }else{
-            $rules['prepay_message']='nullable|string';
-            $rules['prepay_card']='nullable|string';
+        if ($data['prepay'] == true) {
+            $rules['prepay_message'] = 'required|string';
+            $rules['prepay_card'] = 'required|string';
+        } else {
+            $rules['prepay_message'] = 'nullable|string';
+            $rules['prepay_card'] = 'nullable|string';
         }
-        $validator =  \Validator::make($data, $rules);
+        $validator = \Validator::make($data, $rules);
 
         //Проверяем на уникальность сочетания имени услуги и типа
         if ($request->is('*/add-service')) {
@@ -377,7 +389,7 @@ class ServiceController extends Controller
     {
         $count = ServiceAddress::query()->where('service_id', $data['service_id'])
             ->where('address_id', $data['ddress_id'])->count();
-        if($count > 0) return false;
+        if ($count > 0) return false;
     }
 
 }

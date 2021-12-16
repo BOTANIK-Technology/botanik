@@ -28,3 +28,9 @@
 #select-all {
     margin-bottom: 15px;
 }
+
+button.btn-warning {
+    background-color: floralwhite;
+    color: dodgerblue;
+}
+

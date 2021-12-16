@@ -4,9 +4,9 @@
         let note = '{{Auth::user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';
         let editRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $id])}}";
-        let timeTables = @json($timetables);
         let services = @json($services);
         let addresses = @json($addresses);
+        let timeTables = @json($timetables);
         for (let item in timeTables) {
             setCookie(item, JSON.stringify(timeTables[item]) );
         }
@@ -104,7 +104,7 @@
                         class="background-none calendar-a"
                         data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $i, 'moreService' => $moreService, 'id' => $id])}}"
                     >
-                        <div class="calendar cover" style="min-height: 15px; min-width: 25px; background-color: #71A3D6" title="Выбрать расписание">Выбрать</div>
+                        <div class="calendar-icon" title="Выбрать расписание"></div>
                     </button>
                 </div>
             @endfor

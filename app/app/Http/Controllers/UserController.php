@@ -92,8 +92,8 @@ class UserController extends Controller
                 $this->params['id'] = $request->id;
                 $this->params['user'] = User::find($this->params['id']);
 
-                $this->setUserCookies($this->params['user'], $request->business);
-                $this->setTimetableCookies($this->params['user'], $request->business);
+                $this->setUserCookies($this->params['user']);
+                $this->setTimetableCookies($this->params['user']);
 
                 $this->params['services'] = Service::withoutTimetable();
 
@@ -111,13 +111,13 @@ class UserController extends Controller
 
                 if (!is_null($this->params['id']))
                 {
-                    $this->setTimetableCookies(User::find($this->params['id']), $request->business, true);
+                    $this->setTimetableCookies(User::find($this->params['id']), true);
                 }
 
                 $this->params['moreService'] = intval($request->moreService);
                 $this->params['currentService'] = intval($request->currentService);
                 $this->params['user'] = User::find($this->params['id']);
-                $this->setUserCookies($this->params['user'], $request->business);
+                $this->setUserCookies($this->params['user']);
                 break;
             case 'note':
                 break;
@@ -129,7 +129,7 @@ class UserController extends Controller
 
     }
 
-    private function setUserCookies($user, $slug)
+    private function setUserCookies($user)
     {
         $this->params['user_data'] = [];
         if ($user) {
@@ -150,7 +150,7 @@ class UserController extends Controller
      * @param $slug
      * @param bool $checked
      */
-    private function setTimetableCookies($user, $slug, $checked = false)
+    private function setTimetableCookies($user, $checked = false)
     {
         $this->params['timetables'] = [];
         if (empty($user->timetables))
@@ -164,15 +164,17 @@ class UserController extends Controller
 
 
             $cookie = [];
-            foreach ($days as $day)
-                if (!is_null($timetable->$day))
+            foreach ($days as $day) {
+                if (!is_null($timetable->$day)) {
                     $cookie[$day] = json_decode($timetable->$day);
+                }
+            }
 
             if (!$checked) {
                 $this->params['timetables']['timetable-' . $k] = $cookie;
 //                setcookie('timetable-' . $k, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
             } else {
-                $this->params['timetables']['checked-' . $k] = UserTimetable::getChecked($cookie);
+                $this->params['checked']['checked-' . $k] = UserTimetable::getChecked($cookie);
 //                setcookie('checked-' . $k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/' . $slug . '/users/']);
             }
         }
@@ -318,7 +320,7 @@ class UserController extends Controller
     {
         $this->params['id'] = $request->id;
         $this->params['user'] = User::find($this->params['id']);
-        $this->setTimetableCookies($this->params['user'], $request->business);
+        $this->setTimetableCookies($this->params['user']);
         $this->params['services'] = Service::withoutTimetable();
         $this->params['addresses'] = Address::all();
         $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);

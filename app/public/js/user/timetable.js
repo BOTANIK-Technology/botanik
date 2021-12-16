@@ -21,6 +21,7 @@ if (timeBtn) {
                 cookies[times[el].dataset.day].push(times[el].dataset.time);
             checked.push(times[el].id);
         });
+        console.log(cookies);
         if (!Object.keys(cookies).length == 0) {
             setCookie('timetable-'+timeBtn.dataset.id, JSON.stringify(cookies), {'path':COOKIE_URL});
             setCookie('checked-'+timeBtn.dataset.id, JSON.stringify(checked), {'path':COOKIE_URL});

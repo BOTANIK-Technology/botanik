@@ -8,7 +8,6 @@ function closeError(id = 'error-modal') {
 function closeModal(event, id = 'modal', href = false) {
     removeClass(app, 'bg-blur');
     let refresh = document.getElementById('refresh-'+id);
-    console.log(refresh, 'refresh-'+id)
     if (refresh) {
         if (href !== false)
             refresh.href = href;

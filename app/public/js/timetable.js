@@ -22,3 +22,10 @@ all.addEventListener('click', function () {
         addClass(checkboxes[el], 'checked')
     });
 })
+
+let clr = document.querySelector('#clear-all');
+clr.addEventListener('click', function () {
+    Object.keys(checkboxes).forEach((el) => {
+        removeClass(checkboxes[el], 'checked')
+    });
+})

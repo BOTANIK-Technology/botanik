@@ -1,9 +1,7 @@
 let timeBtn = document.getElementById('time-confirm');
 if (timeBtn) {
 
-    let checked;
-    if(id !== '') checked = getCookie('checked-'+id);
-    else checked = getCookie('checked');
+    let checked = getCookie('checked-'+id);
     if (checked) {
         checked = JSON.parse(checked);
         checked.forEach((el) => {
@@ -23,6 +21,8 @@ if (timeBtn) {
                 cookies[times[el].dataset.day].push(times[el].dataset.time);
             checked.push(times[el].id);
         });
+        console.log(cookies);
+
         if (!Object.keys(cookies).length == 0) {
             if(id !== '') {
                 setCookie('timetable-'+id, JSON.stringify(cookies), {'path':COOKIE_URL});
@@ -40,6 +40,7 @@ if (timeBtn) {
                 deleteCookie('checked', COOKIE_URL);
             }
         }
+
         closeModal();
     });
 

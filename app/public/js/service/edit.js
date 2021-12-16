@@ -263,7 +263,8 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
             let Request = postRequest(CURRENT_URL+'/confirm', data);
             Request.onload = function() {
                 if (Request.status >= 200 && Request.status < 400) {
-                    location.reload()
+                    closeModal();
+                    // location.reload()
                 } else {
                     showErrors(Request.response)
                 }

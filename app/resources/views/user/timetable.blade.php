@@ -3,7 +3,14 @@
         let id = '{{$id}}';
     </script>
     <script src="{{asset('js/user/page.js')}}"></script>
+
     <script src="{{asset('js/cookie.min.js')}}"></script>
+    <script>
+        let checked = @json($checked);
+        for (let item in checked) {
+            setCookie(item, JSON.stringify(checked[item]));
+        }
+    </script>
     <script src="{{asset('js/timetable.js')}}"></script>
     <script src="{{asset('js/user/timetable.js')}}"></script>
 @endsection
@@ -11,9 +18,9 @@
 @section('modal')
     @component('modal')
 
-        @slot('header')
-            <a href="{{route('addService', ['business' => $slug, 'modal' => isset($id) ? 'edit' : 'create', 'id' => $id ?? 'new', 'sort' => $sort, 'moreService' => $moreService, 'load' => $load])}}"><div class="back-icon"></div></a>
-        @endslot
+{{--        @slot('header')--}}
+{{--            <a href="{{route('addService', ['business' => $slug, 'modal' => isset($id) ? 'edit' : 'create', 'id' => $id ?? 'new', 'sort' => $sort, 'moreService' => $moreService, 'load' => $load])}}"><div class="back-icon"></div></a>--}}
+{{--        @endslot--}}
 
         @include('layouts.timetable')
 
