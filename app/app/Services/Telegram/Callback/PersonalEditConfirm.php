@@ -13,7 +13,7 @@ class PersonalEditConfirm extends CallbackQuery
         parent::__construct($request);
         $record = Record::find(parent::getRecordID());
         $record->date = parent::getDate();
-        $record->time = parent::getTime();
+        $record->time = parent::setTime();
         $record->save();
 
         $address_id = $record->address_id;

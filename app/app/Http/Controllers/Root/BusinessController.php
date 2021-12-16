@@ -9,13 +9,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Root\Package;
+use Illuminate\Support\Facades\DB;
 use mysql_xdevapi\Exception;
 use Validator;
 
 class BusinessController extends Controller
 {
 
-    public function index ()
+    public function index()
     {
         $packages = Package::orderBy('id', 'DESC')->get() ?? false;
         return view('root.business', ['packages' => $packages]);
@@ -25,7 +26,7 @@ class BusinessController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function create (Request $request): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $validator = $this->validator($request);
         if ($validator->fails())
@@ -38,30 +39,29 @@ class BusinessController extends Controller
             $path = $request->input('image_path');
 
         try {
-
+            DB::beginTransaction();
             $owner = Owner::create([
-                'fio'      => $request->input('last_name').' '.$request->input('first_name').' '.$request->input('middle_name'),
-                'email'    => $request->input('email'),
+                'fio' => $request->input('last_name') . ' ' . $request->input('first_name') . ' ' . $request->input('middle_name'),
+                'email' => $request->input('email'),
                 'password' => $request->input('password'),
             ]);
 
             /** @var Business $business */
             $business = Business::create([
-                'name'       => $request->input('business_name'),
-                'bot_name'   => $request->input('bot_name'),
+                'name' => $request->input('business_name'),
+                'bot_name' => $request->input('bot_name'),
                 'package_id' => $request->input('package'),
-                'db_name'    => 'botanik_'.$request->input('slug'),
-                'slug'       => $request->input('slug'),
-                'img'        => $path,
-                'token'      => $request->input('tg_token'),
-                'pay_token'  => $request->has('pay_token') ? $request->input('pay_token') : null,
-                'catalog'    => $request->input('catalog'),
-                'owner_id'   => $owner->id,
+                'db_name' => 'botanik_' . $request->input('slug'),
+                'slug' => $request->input('slug'),
+                'img' => $path,
+                'token' => $request->input('tg_token'),
+                'pay_token' => $request->has('pay_token') ? $request->input('pay_token') : null,
+                'catalog' => $request->input('catalog'),
+                'owner_id' => $owner->id,
             ]);
-
+            DB::commit();
         } catch (Exception $e) {
-            if (!empty($owner))
-                $owner->delete();
+            DB::rollBack();
             return response()->json(['errors' => ['message' => $e->getMessage()]], '501');
         }
 
@@ -78,9 +78,8 @@ class BusinessController extends Controller
      * @param Request $request
      * @return \Illuminate\Validation\Validator
      */
-    public function validator (Request $request): \Illuminate\Validation\Validator
+    public function validator(Request $request): \Illuminate\Validation\Validator
     {
-
 
 
         $rules = [
