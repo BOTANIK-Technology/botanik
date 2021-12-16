@@ -22,8 +22,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
@@ -96,7 +98,9 @@ class Business extends Model
     public static function changeStatus ($id)
     {
         if (!$obj = self::find($id))
+        {
             return ['error' => 'Business with id="'.$id.'" not find in the table'];
+        }
 
         $obj->status ? $obj->status = false : $obj->status = true;
 
@@ -225,7 +229,9 @@ class Business extends Model
 
         // Connect to created database
         if ( ! ConnectService::dbConnect($db_name) )
+        {
             return false;
+        }
 
         // Do migrate
         try {
