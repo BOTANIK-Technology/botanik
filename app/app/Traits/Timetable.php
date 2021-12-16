@@ -329,8 +329,7 @@ trait Timetable
         /** @var Record $records */
         $records = $model->records->where('date', $Y_m_d);
 
-        if ($records->isEmpty())
-        {
+        if ($records->isEmpty()) {
             return false;
         }
 
@@ -365,10 +364,11 @@ trait Timetable
     {
         $checked = [];
 
-        foreach ($timetable as $day_of_week => $times)
-            foreach ($times as $time)
+        foreach ($timetable as $day_of_week => $times) {
+            foreach ($times as $time) {
                 $checked[] = $day_of_week . '-' . $time;
-
+            }
+        }
         return $checked;
     }
 }
