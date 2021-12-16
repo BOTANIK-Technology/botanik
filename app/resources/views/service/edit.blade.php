@@ -44,8 +44,8 @@
                 <label class="row-8 col-1 align-self-start" for="price">{{__('Стоимость *')}}</label>
                 <label class="row-9 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
                 <label class="row-10 col-1 align-self-start" for="calendar">{{__('Расписание')}}</label>
-                <label class="row-12 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
-                <label class="row-13 col-1 align-self-start" for="prepay-1">{{__('Оплата *')}}</label>
+                <label class="row-11 col-1 align-self-center" for="group-1">{{__('Групповая услуга *')}}</label>
+                <label class="row-12 col-1 align-self-start" for="prepay-1">{{__('Оплата *')}}</label>
 
                 <div class="row-1 col-2">
                     <input id="service-name-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->name}}" placeholder="{{__('Введите название')}}">
@@ -206,18 +206,6 @@
 
     @endcomponent
     <style>
-        div.add-service {
-            grid-template-columns: 20% 36% 1fr;
-            grid-template-rows: 30px 30px 200px 160px 60px 160px 60px 30px 30px 30px minmax(30px, 1fr) 30px;
-            grid-gap: 29px 20px;
-            width: 762px;
-            padding-left: 43px;
-        }
-        .hours {
-            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
-        }
-        .minutes {
-            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
-        }
+
     </style>
 @endsection

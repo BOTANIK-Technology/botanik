@@ -598,4 +598,23 @@ textarea {
     text-align: left;
     margin-bottom: 5px;
 }
+div.add-service {
+    grid-template-columns: 20% 36% 1fr;
+    grid-template-rows: auto;
+    grid-gap: 29px 20px;
+    width: 762px;
+    padding-left: 43px;
+}
+.hours {
+    grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
+}
+.minutes {
+    grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
+}
 
+.row-11 {
+    grid-row: 11;
+}
+.row-12 {
+    grid-row: 12;
+}

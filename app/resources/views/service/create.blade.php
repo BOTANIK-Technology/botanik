@@ -210,21 +210,7 @@
             <a href="{{route('service', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>
         @endslot
     @endcomponent
-    <style>
-        div.add-service {
-            grid-template-columns: 20% 36% 1fr;
-            grid-template-rows: 30px 30px 200px 160px 60px 160px 60px 30px 30px 30px minmax(30px, 1fr) 30px;
-            grid-gap: 29px 20px;
-            width: 762px;
-            padding-left: 43px;
-        }
-        .hours {
-            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
-        }
-        .minutes {
-            grid-template-columns: repeat(6, auto); grid-gap: 5px 5px;
-        }
-    </style>
+
 @endsection
 
 
