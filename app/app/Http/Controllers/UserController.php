@@ -14,6 +14,7 @@ use App\Models\UserTimetable;
 use App\Models\Role;
 use App\Models\Address;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
 use Illuminate\View\View;
 
@@ -44,7 +45,7 @@ class UserController extends Controller
         isset($request->sort) ? $this->params['sort'] = $request->sort : $this->params['sort'] = 'master';
         isset($request->load) ? $this->params['load'] = $request->load : $this->params['load'] = 15;
         $this->params['types'] = TypeService::all();
-        if ($this->params['sort'] == 'moder' && \Auth::user()->hasRole('owner')) {
+        if ($this->params['sort'] == 'moder' && Auth::user()->hasRole('owner')) {
             $this->params['table'] = User::where('status', 0)->take($this->params['load'])->get();
             $this->params['countUsers'] = $this->params['table']->count();
         } else {
@@ -91,7 +92,7 @@ class UserController extends Controller
                 $this->params['id'] = $request->id;
                 $this->params['user'] = User::find($this->params['id']);
 
-//                $this->setUserCookies($this->params['user'], $request->business);
+                $this->setUserCookies($this->params['user'], $request->business);
                 $this->setTimetableCookies($this->params['user'], $request->business);
 
                 $this->params['services'] = Service::withoutTimetable();
@@ -107,12 +108,16 @@ class UserController extends Controller
                 $this->params['times'] = $time->getHours();
                 $this->params['days'] = $time->getDays();
                 $this->params['id'] = $request->id ?? null;
+
                 if (!is_null($this->params['id']))
+                {
                     $this->setTimetableCookies(User::find($this->params['id']), $request->business, true);
+                }
+
                 $this->params['moreService'] = intval($request->moreService);
                 $this->params['currentService'] = intval($request->currentService);
                 $this->params['user'] = User::find($this->params['id']);
-//                $this->setUserCookies($this->params['user'], $request->business);
+                $this->setUserCookies($this->params['user'], $request->business);
                 break;
             case 'note':
                 break;
@@ -135,7 +140,7 @@ class UserController extends Controller
                     'address_id' => $user->timetables[$key] ? $user->timetables[$key]->address_id : 0,
                 ];
                 $this->params['userData']['user_data-' . $key] = $cookie;
-                setcookie('user_data-' . $key, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
+//                setcookie('user_data-' . $key, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
             }
         }
     }
