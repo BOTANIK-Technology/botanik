@@ -55,7 +55,7 @@
     grid-column: 3;
 }
 .timetable>div:not(.border-right-main) {
-    max-width: 51px;
+    max-width: 70px;
 }
 .timetable>div {
     height: 17px;
