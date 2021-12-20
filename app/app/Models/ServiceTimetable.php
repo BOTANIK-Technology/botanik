@@ -115,7 +115,7 @@ class ServiceTimetable extends Model
 
             Log::info('booked: ', [$bookDuration, $bookSlotsCount]);
             //уберем недоступные в процессе выполнения текущей услуги слоты
-            for ($i = 0; $i <= $bookSlotsCount; $i++) {
+            for ($i = 0; $i < $bookSlotsCount; $i++) {
                 $timeMap[$timeBegin + $i] = 0;
             }
 
