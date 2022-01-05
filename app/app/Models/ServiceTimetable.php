@@ -41,14 +41,13 @@ class ServiceTimetable extends Model
     public function isWorkDay (Carbon $date, Carbon $comparison = null) : bool
     {
         if (!is_null($comparison) && $comparison->greaterThan($date))
+        {
             return false;
+        }
 
         $date = mb_strtolower($date->format('l'));
 
-        if (isset($this->$date))
-            return true;
-
-        return false;
+        return isset($this->$date);
     }
     public function getFreeTimes(string $date,$ignore_time = null): array
     {

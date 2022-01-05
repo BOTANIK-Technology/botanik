@@ -65,7 +65,7 @@ class DatesService extends CallbackQuery
 
         /** @var Service $service */
         $service = Service::find($service_id);
-
+        $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00'));
         $i = 1;
         $days = [];
         foreach ($month as $k => $day) {

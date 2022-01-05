@@ -104,16 +104,19 @@ class UserTimetable extends Model
     {
 //        Log::info('isWorkDay', [$date, $comparison]);
         if (!is_null($comparison) && $comparison->greaterThan($date))
+        {
             return false;
+        }
 
         if (empty($user->timetables))
+        {
             return false;
+        }
 
         $date = mb_strtolower($date->format('l'));
         foreach ($user->timetables as $tab) {
             if ($tab->address_id == $address_id && $tab->service_id == $service_id) {
-                if (isset($tab->$date)) return true;
-                else return false;
+                return isset($tab->$date);
             }
         }
 
@@ -146,6 +149,7 @@ class UserTimetable extends Model
      * @param int $address_id
      * @param int $service_id
      * @param string $date
+     * @param null $ignore_time
      * @return array
      */
     public static function getFreeTimes(User $user, int $address_id, int $service_id, string $date,$ignore_time = null): array
@@ -195,8 +199,6 @@ class UserTimetable extends Model
         if ($duration % 30) {
             $serviceSlotsCount++;
         }
-Log::info('User-servise: ', [$duration, $serviceSlotsCount]);
-
 
         // Перебираем все созданные услуги и отмечаем недоступные из-них слоты
         foreach ($booked_array as $book => $bookDuration) {
@@ -214,7 +216,6 @@ Log::info('User-servise: ', [$duration, $serviceSlotsCount]);
             // Слот, соответствующий началу текущей услуги
             $timeBegin = array_search($book, $times);
 
-Log::info('booked: ', [$bookDuration, $bookSlotsCount]);
             //уберем недоступные в процессе выполнения текущей услуги слоты
             for ($i = 0; $i < $bookSlotsCount; $i++) {
                 $timeMap[$timeBegin + $i] = 0;
