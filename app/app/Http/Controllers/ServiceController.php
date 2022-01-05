@@ -292,6 +292,7 @@ class ServiceController extends Controller
 //            return response()->json(['errors' => ["message" => 'Такой адрес уже добавлен']], 405);
 //        }
         try {
+            /** @var Service $service */
             $service = Service::find($request->id);
             $service->type_service_id = $request->input('type');
             $service->name = $request->input('name');
@@ -305,13 +306,18 @@ class ServiceController extends Controller
             $service->online_pay = $request->input('onlinepay');
             $service->bonus_pay = $request->input('bonuspay');
             $service->save();
+
             $service->rewriteAddresses($request->input('addresses'));
 
             if ($request->has('timetable'))
                 $service->updateTimetable($request->input('timetable'));
 
-            if ($request->prepay)
+            if ($request->prepay) {
                 $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
+            } else {
+                $service->deletePrepayment();
+
+            }
 
             if (!empty($request->input('quantity')) && !empty($request->input('message')))
                 $service->updateGroup(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);

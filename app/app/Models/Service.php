@@ -213,6 +213,14 @@ class Service extends Model
     }
 
     /**
+     * @param array $prepayment
+     */
+    public function deletePrepayment () : void
+    {
+            $this->prepayment()->delete();
+    }
+
+    /**
      * @return bool|\Illuminate\Support\Collection
      */
     public static function withoutTimetable ()
