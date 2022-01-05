@@ -79,7 +79,7 @@ class Notice extends Model
      * @param array $notices
      * @return array|false
      */
-    public static function makeSeen( array $notices)
+    public static function makeSeen( $notices)
     {
         if ($notices->isEmpty())
         {
