@@ -529,8 +529,7 @@ class TelegramAPI
             $this->chat_id,
             $record_id,
             $this->token
-        )->delay(Carbon::parse(now())->addMinutes(2));
-//        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->addMinutes(2));
+        )->delay(Carbon::parse(now())->addDay());
 
         ConnectService::dbConnect($this->business_db);
     }
