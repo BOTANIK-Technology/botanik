@@ -17,7 +17,7 @@ class Personal extends Command
     public function __construct(Request $request, bool $back = false)
     {
         parent::__construct($request, $back);
-        parent::sendMessage('Личный кабинет', $this->getShares());
+        parent::sendMessage('🗝 Личный кабинет', $this->getShares());
     }
 
     /**
@@ -25,7 +25,7 @@ class Personal extends Command
      */
     private function getShares()
     {
-        $array[] = [['text' => 'Мои записи', 'callback_data' => 'PersonalRecords_']];
+        $array[] = [['text' => '⌨️ Мои записи', 'callback_data' => 'PersonalRecords_']];
 
         if (parent::hasPackage('pro'))
             $array[] = [['text' => 'Баланс баллов', 'callback_data' => 'PersonalBalance_']];
