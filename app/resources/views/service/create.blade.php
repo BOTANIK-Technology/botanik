@@ -21,8 +21,8 @@
 
         <div class="grid add-service">
 
-            <label class="row-1 col-1 align-self-start" for="service-name">{{__('Название *')}}</label>
-            <label class="row-2 col-1 align-self-start" for="service-type">{{__('Тип *')}}</label>
+            <label class="row-1 col-1 align-self-start" for="service-type">{{__('Тип *')}}</label>
+            <label class="row-2 col-1 align-self-start" for="service-name">{{__('Услуга *')}}</label>
             <label class="row-3 col-1 align-self-start" for="address">{{__('Адрес *')}}</label>
             <label class="row-4 col-1 align-self-start" for="interval-hours-0">{{__('Длительность')}}<br>{{__('(часы) *')}}</label>
             <label class="row-5 col-1 align-self-start" for="interval-minutes-0">{{__('Длительность')}}<br>{{__('(минуты) *')}}</label>
@@ -36,10 +36,6 @@
             <label class="row-13 col-1 align-self-start" >{{__('Оплата *')}}</label>
 
             <div class="row-1 col-2">
-                <input id="service-name" class="inp" type="text" placeholder="{{__('Введите название')}}">
-            </div>
-
-            <div class="row-2 col-2">
                 @if ($types)
                     <select id="service-type">
                         @foreach($types_select as $type)
@@ -53,6 +49,10 @@
                         </option>
                     </select>
                 @endif
+            </div>
+
+            <div class="row-2 col-2">
+                <input id="service-name" class="inp" type="text" placeholder="{{__('Введите название')}}">
             </div>
 
             <div class="row-3 col-2 align-self-start">
