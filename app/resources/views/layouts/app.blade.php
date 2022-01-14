@@ -22,6 +22,7 @@
     <!-- Styles -->
     <link href="{{ asset('css/reset.css') }}" rel="stylesheet">
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     @phone <link href="{{ asset('css/main-phone.css') }}" rel="stylesheet"> @endphone
     @guest
         <!-- Don't log user... -->
@@ -142,10 +143,33 @@
     </div>
     <footer>
         <!-- Non critical scripts -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="{{asset('js/modal.js')}}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
         @phone <script src="{{asset('js/phone-main.js')}}"></script> @endphone
         @yield('scripts')
         @yield('modal-scripts')
     </footer>
+
+    <script>
+        setInterval(function () {
+            $(document).ready(function() {
+                $.ajax({
+                    url: 'notice-event',
+                    dataType: 'json',
+                    method: 'post',
+                    data:{
+                        "_token": $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function(data) {
+                        for (item in data) {
+                            toastr.info(data[item].message);
+                        }
+                    }
+                });
+            });
+        },10000)
+    </script>
+
 </body>
 </html>

@@ -30,5 +30,25 @@ class NoticeController extends Controller
         return $this->index();
     }
 
+    /**
+     * @return array
+     */
+    public function getNoticeEvent(): ?array
+    {
+        $result  = [];
+        $notices = Notice::getNotice( \Auth::user() , true);
 
+        if ($notices->isEmpty())
+            return null;
+
+        foreach ($notices as $notice) {
+            if ($notice->seen == false) {
+                $result[$notice->id] = $notice;
+            }
+        }
+
+        Notice::makeSeen($notices);
+
+        return $result;
+    }
 }
