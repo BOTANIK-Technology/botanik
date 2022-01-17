@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
-
+ini_set("pcre.jit", "0");
 define('LARAVEL_START', microtime(true));
 
 /*

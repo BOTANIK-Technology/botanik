@@ -1,7 +1,11 @@
 @section('scripts')
     <script src="{{asset('js/cookie.min.js')}}"></script>
     <script>
-        let note = '{{Auth::user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
+        let saveData = "{{request()->get('savedata', 0)}}";
+        if (!saveData){
+       //     resetAll();
+        }
+        let note = '{{auth()->user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';
         let editRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $id])}}";
         let services = @json($services);
@@ -11,6 +15,7 @@
             setCookie(item, JSON.stringify(timeTables[item]) );
         }
         let userData = @json($userData ?? null);
+        console.log('user data', userData);
         if(userData && Object.keys(userData).length){
             for (let item in userData) {
                 setCookie(item, JSON.stringify(userData[item]));
@@ -113,7 +118,7 @@
         @slot('buttons')
             <div id="type-block" class="row-1 col-3 flex align-items-center justify-content-center">
                 <div class="add-b-icon"></div>
-                <a id="add-type" class="color text-decoration-none" href="{{route('addService', ['business' => $slug, 'id' => $user->id, 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load])}}">{{__('Добавить услугу к специалисту')}}</a>
+                <a id="add-type" class="color text-decoration-none" href="{{route('addService', ['business' => $slug, 'id' => $user->id, 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load, 'savedata' => 1])}}">{{__('Добавить услугу к специалисту')}}</a>
             </div><br>
             <button type="button" id="edit-user" class="btn-primary">
                 {{ __('Сохранить') }}

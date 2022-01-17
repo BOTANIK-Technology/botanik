@@ -19,18 +19,18 @@ if (editUserBtn) {
             send.addresses = getValues(adminAddressSelects);
         }
 
-        unsetCookies(countService);
-
         let Request = postRequest(editRoute+'/edit-user', send);
         Request.onload = function() {
             if (Request.status >= 200 && Request.status < 400) {
-                deleteCookie('input', COOKIE_URL);
-                for (let i = 0; i < countService; i++) {
-                    deleteCookie('timetable-'+i, COOKIE_URL);
-                    deleteCookie('checked-'+i, COOKIE_URL);
-                    deleteCookie('user_data-'+i, COOKIE_URL);
-                    deleteCookie('admin_data-'+i, COOKIE_URL);
-                }
+
+                // deleteCookie('input', COOKIE_URL);
+                // for (let i = 0; i < countService; i++) {
+                //     deleteCookie('timetable-'+i, COOKIE_URL);
+                //     deleteCookie('checked-'+i, COOKIE_URL);
+                //     deleteCookie('user_data-'+i, COOKIE_URL);
+                //     deleteCookie('admin_data-'+i, COOKIE_URL);
+                // }
+                resetAll();
                 closeModal();
             } else {
                 showErrors(Request.response);
