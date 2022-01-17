@@ -32,10 +32,10 @@
                 {{ __('Подтвердить') }}
             </button>
             @if (isset($id))
-                <a href="{{route('addService', ['business' => $slug, 'modal' => 'edit', 'id' => $id, 'sort' => $sort, 'moreService' => $moreService, 'load' => $load])}}"
+                <a href="{{route('addService', ['business' => $slug, 'modal' => 'edit', 'id' => $id, 'sort' => $sort, 'moreService' => $moreService, 'load' => $load, 'savedata' => 1])}}"
                    id="refresh-modal"></a>
             @else
-                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 'new', 'sort' => $sort, 'moreService' => $moreService, 'load' => $load])}}"
+                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 'new', 'sort' => $sort, 'moreService' => $moreService, 'load' => $load, 'savedata' => 1])}}"
                    id="refresh-modal"></a>
             @endif
         @endslot

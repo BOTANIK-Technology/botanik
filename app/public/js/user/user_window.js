@@ -23,8 +23,12 @@ let CreateUserWindow = function () {
         console.log('count: ', serviceCount);
         for (let i = 0; i < serviceCount; i++) {
             this.setCurrentData(i);
-            this.satAdminCurrentData(i)
+            this.satAdminCurrentData(i);
+            sleep(1000);
         }
+    }
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 
@@ -144,7 +148,6 @@ let CreateUserWindow = function () {
     this.setCurrentData = function (num) {
         let serviceType = document.getElementById('service-type-' + num);
         let data = getCookie('user_data-' + num);
-        console.log(data);
         if (data) {
             data = JSON.parse(data);
                 serviceType.value = data.service_type_id;

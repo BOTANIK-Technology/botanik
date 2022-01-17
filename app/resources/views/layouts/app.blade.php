@@ -17,12 +17,12 @@
     @yield('critical-scripts')
 
     <!-- Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link href="{{ asset('css/font.css') }}" rel="stylesheet">
 
     <!-- Styles -->
     <link href="{{ asset('css/reset.css') }}" rel="stylesheet">
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     @phone <link href="{{ asset('css/main-phone.css') }}" rel="stylesheet"> @endphone
     @guest
         <!-- Don't log user... -->
@@ -45,7 +45,7 @@
     @yield('styles')
 </head>
 <body>
-
+    <div id="sound"></div>
     @if($errors->any())
         <!-- Show errors -->
         @section('modal')
@@ -152,23 +152,14 @@
     </footer>
 
     <script>
-        setInterval(function () {
-            $(document).ready(function() {
-                $.ajax({
-                    url: 'notice-event',
-                    dataType: 'json',
-                    method: 'post',
-                    data:{
-                        "_token": $('meta[name="csrf-token"]').attr('content'),
-                    },
-                    success: function(data) {
-                        for (item in data) {
-                            toastr.info(data[item].message);
-                        }
-                    }
-                });
-            });
-        },10000)
+        function playSound(filename){
+            // var mp3Source = '<source src="' + filename + '.mp3" type="audio/mpeg">';
+            // var embedSource = '<embed hidden="true" autostart="true" loop="false" src="' + filename +'.mp3">';
+            // document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + mp3Source + embedSource + '</audio>';
+
+            const audio = new Audio(filename+'.mp3');
+            audio.play();
+        }
     </script>
 
 </body>

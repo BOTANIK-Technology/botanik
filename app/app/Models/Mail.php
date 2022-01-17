@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use TelegramBot\Api\BotApi;
-use TelegramBot\Api\Exception;
+use TelegramBot\Api\Exception as TelegramException;
 use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
@@ -61,10 +61,12 @@ class Mail extends Model
         $all = true;
         foreach ($params as $k => $val) {
             if (
-                $k != 'title'  &&
-                $k != 'button' &&
-                $k != 'title'  &&
-                $k != 'img'    &&
+                $k != 'title'     &&
+                $k != 'button'    &&
+                $k != 'sex'       &&
+                $k != 'age_end'   &&
+                $k != 'age_start' &&
+                $k != 'img'       &&
                 !is_null($val)
             ) {
                 $all = false;
@@ -84,6 +86,10 @@ class Mail extends Model
 
             $clients = new TelegramUser();
 
+            $sex = null;
+            if($params['sex'] != '') {
+                $sex['sex'] = $params['sex'];
+            }
             $ids = $clients
                 ->when($age_between, function ($query) use ($params) {
                     return $query->whereBetween('age', [$params['age_start'], $params['age_end']]);
@@ -94,7 +100,7 @@ class Mail extends Model
                 ->when($age_from, function ($query) use ($params) {
                     return $query->where('age', '>', $params['age_start']);
                 })
-                ->when(!empty($params['sex']), function ($query) use ($params) {
+                ->when($sex, function ($query) use ($params,$sex) {
                     return $query->where('sex', $params['sex']);
                 })
                 ->when(!empty($params['frequency']), function ($query) use ($params) {
@@ -133,29 +139,43 @@ class Mail extends Model
 
             foreach ($ids as $id) {
                 if(!empty($id)) {
-                    $bot->sendMessage(
-                        $id,
-                        $mess,
-                        'HTML',
-                        false,
-                        null,
-                        $keyboard
-                    );
+                    try {
+                        $bot->sendMessage(
+                            $id,
+                            $mess,
+                            'HTML',
+                            false,
+                            null,
+                            $keyboard
+                        );
+                    } catch (\InvalidArgumentException | TelegramException $e)  {
+                        // $e
+                        continue;
+                    }
                 }
             }
 
         } else {
             foreach ($ids as $id) {
                 if(!empty($id)) {
-                    $bot->sendPhoto(
-                        $id,
-                        asset('public/storage/' . $params['img']),
-                        $mess,
-                        null,
-                        $keyboard,
-                        false,
-                        'HTML'
-                    );
+                    if(!empty($id)) {
+                        try {
+                            $bot->sendPhoto(
+                                $id,
+                                asset('public/storage/' . $params['img']),
+                                $mess,
+                                null,
+                                $keyboard,
+                                false,
+                                'HTML'
+                            );
+                        } catch (\InvalidArgumentException | TelegramException $e)  {
+                            // $e
+                            continue;
+                        }
+
+                    }
+
                 }
             }
 

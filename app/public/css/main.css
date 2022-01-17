@@ -621,3 +621,8 @@ div.add-service {
 .row-12 {
     grid-row: 12;
 }
+
+#toast-container>.toast-info {
+    background-color: #d85389;
+    background-image: url('/images/notice_icon.svg') !important;
+}
