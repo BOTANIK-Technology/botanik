@@ -152,14 +152,30 @@
     </footer>
 
     <script>
-        function playSound(filename){
-            // var mp3Source = '<source src="' + filename + '.mp3" type="audio/mpeg">';
-            // var embedSource = '<embed hidden="true" autostart="true" loop="false" src="' + filename +'.mp3">';
-            // document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + mp3Source + embedSource + '</audio>';
+        setInterval(function () {
+            $(document).ready(function() {
+                $.ajax({
+                    url: 'notice-event',
+                    dataType: 'json',
+                    method: 'post',
+                    data:{
+                        "_token": $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function(data) {
+                        for (item in data) {
+                            toastr.info(data[item].message);
+                            function playSound(filename){
+                                // var mp3Source = '<source src="' + filename + '.mp3" type="audio/mpeg">';
+                                // var embedSource = '<embed hidden="true" autostart="true" loop="false" src="' + filename +'.mp3">';
+                                // document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + mp3Source + embedSource + '</audio>';
 
-            const audio = new Audio(filename+'.mp3');
-            audio.play();
-        }
+                                const audio = new Audio(filename+'.mp3');
+                                audio.play();
+                            }
+                        }
+                    });
+            });
+            },10000)
     </script>
 
 </body>
