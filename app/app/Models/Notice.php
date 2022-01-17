@@ -59,10 +59,10 @@ class Notice extends Model
 
     /**
      * @param User $user
-     *
+     * @param bool $skip
      * @return Collection|false
      */
-    public static function getNotice(User $user)
+    public static function getNotice(User $user,$skip = false)
     {
         $notices = $user->notices->sortDesc();
         foreach ($user->roles as $role)
@@ -72,7 +72,11 @@ class Notice extends Model
             foreach ($user->addresses as $address)
                 $notices = $notices->merge(self::where('address_id', $address->id)->orderBy('id', 'desc')->get());
 
-        return self::makeSeen($notices);
+        if($skip) {
+            return $notices;
+        } else {
+            return self::makeSeen($notices);
+        }
     }
 
     /**

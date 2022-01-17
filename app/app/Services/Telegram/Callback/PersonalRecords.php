@@ -12,7 +12,7 @@ class PersonalRecords extends CallbackQuery
     {
         parent::__construct($request);
         $this->back = 'Personal_';
-        parent::editMessage(__('Мои записи'), $this->getRecords());
+        parent::editMessage("⌨️ ".__('Мои записи'), $this->getRecords());
     }
 
     private function getRecords ()
@@ -23,7 +23,7 @@ class PersonalRecords extends CallbackQuery
         $records = [];
         foreach ($this->user->records as $k => $record)
             if (
-                Carbon::parse($record->date)->greaterThanOrEqualTo(Carbon::now())
+                Carbon::parse($record->date)->greaterThan(Carbon::now())
             )
                 $records[] = [['text' => __('Запись #').($k+1), 'callback_data' => 'PersonalRecord_'.$record->id]];
 

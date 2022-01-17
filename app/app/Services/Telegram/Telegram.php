@@ -105,7 +105,7 @@ class Telegram
     public function textCommand(Request $request): bool
     {
         switch ($request->input('message.text')) {
-            case 'Запись':
+            case '⌨️ Запись':
                 $class = $this->nsCommands.'TypesOfServices';
                 new $class($request);
             break;
@@ -113,19 +113,19 @@ class Telegram
                 $class = $this->nsCommands.'Catalog';
                 new $class($request);
             break;
-            case 'Акции':
+            case '💎 Акции':
                 $class = $this->nsCommands.'Shares';
                 new $class($request);
             break;
-            case 'Отзывы':
+            case '⭐️ Отзывы':
                 $class = $this->nsCommands.'Review';
                 new $class($request);
             break;
-            case 'О нас':
+            case '🔔 О нас':
                 $class = $this->nsCommands.'AboutUs';
                 new $class($request);
             break;
-            case 'Личный кабинет':
+            case '🗝 Личный кабинет':
                 $class = $this->nsCommands.'Personal';
                 new $class($request);
             break;
@@ -157,9 +157,7 @@ class Telegram
     public function getNumber(Request $request): bool
     {
         if ($request->has('client'))
-        {
             return $this->redirectToStart($request);
-        }
 
         $client = TelegramUser::create(
             [

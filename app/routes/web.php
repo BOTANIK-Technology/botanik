@@ -153,6 +153,7 @@ Route::group(
                  * Notice routes
                  */
                 Route::get('/notice', [App\Http\Controllers\NoticeController::class, 'index'])->name('notice');
+                Route::post('/notice-event', [App\Http\Controllers\NoticeController::class, 'getNoticeEvent'])->name('noticeEvent');
                 Route::get('/notice/delete/{id}', [App\Http\Controllers\NoticeController::class, 'delete'])->name('deleteNotice');
 
                 /**

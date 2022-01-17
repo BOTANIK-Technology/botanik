@@ -2,16 +2,13 @@
 
 namespace App\Services\Telegram\Callback;
 
-use App\Models\Record;
 use App\Models\Service;
-use App\Models\User;
-use App\Models\UserTimetable;
 use Illuminate\Http\Request;
 use App\Models\ServiceTimetable;
 use Jenssegers\Date\Date;
 use Illuminate\Support\Carbon;
 
-class PersonalDatesService extends CallbackQuery
+class DatesService extends CallbackQuery
 {
     /**
      * DatesService constructor.
@@ -21,35 +18,29 @@ class PersonalDatesService extends CallbackQuery
     public function __construct(Request $request, $month = null)
     {
         parent::__construct($request);
-        $record = Record::find(parent::setRecordID());
-        parent::setMasterID($record->user_id);
-        $this->back = 'PersonalRecordEdit_'.parent::getRecordID();
-
-        if(!empty($record->user_id)) {
-            $dates = $this->masterDate($record, $month);
-        } else {
-            $dates = $this->serviceDates($record->service_id, $month);
-        }
-
-        return parent::editMessage(__('Выберете дату'), $dates);
+        $this->back = 'PersonalRecordEditDate_'.parent::getServiceID();
+        parent::setMasterID(null);
+        parent::setAddressID();
+        return parent::editMessage('🕛 '.__('Выберете дату'), $this->serviceDates(parent::getServiceID(), $month));
     }
 
-    private function serviceDates($service_id, $month)
+    public function serviceDates($service_id, $month)
     {
+
         switch ($month) {
-            case 'PersonalDateNext':
+            case 'DateNext':
                 $first_day = new Carbon('first day of next month');
                 $dates[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'PersonalDatesService_'.parent::getRecordID()],
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'PersonalDatesService_'.parent::getAddressID()],
                     $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'PersonalDateLater_'.parent::getRecordID()]
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'PersonalDateLater_'.parent::getAddressID()]
                 ];
                 $month = ServiceTimetable::getNextMonthBot();
                 break;
-            case 'PersonalDateLater':
+            case 'DateLater':
                 $first_day = new Carbon('first day of 2 months');
                 $dates[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'PersonalDateNext_'.parent::getRecordID()],
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'PersonalDateNext_'.parent::getAddressID()],
                     $this->getNameOfMonth($first_day),
                     ['text' => ' ', 'callback_data' => '-']
                 ];
@@ -60,7 +51,7 @@ class PersonalDatesService extends CallbackQuery
                 $dates[] = [
                     ['text' => ' ', 'callback_data' => '-'],
                     $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'PersonalDateNext_'.parent::getRecordID()]
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'PersonalDateNext_'.parent::getAddressID()]
                 ];
                 $month = ServiceTimetable::getCurrentMonthBot();
         }
@@ -98,72 +89,6 @@ class PersonalDatesService extends CallbackQuery
         return parent::buildInlineKeyboard($dates);
 
     }
-
-    private function masterDate($record , $month)
-    {
-        $master_id = $record->user_id;
-        switch ($month) {
-            case 'PersonalDateNext':
-                $first_day = new Carbon('first day of next month');
-                $date[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'PersonalDatesService_'.parent::getRecordID()],
-                    $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'PersonalDateLater_'.parent::getRecordID()]
-                ];
-                $month = UserTimetable::getNextMonthBot();
-                break;
-            case 'PersonalDateLater':
-                $first_day = new Carbon('first day of 2 months');
-                $date[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'PersonalDateNext_'.parent::getRecordID()],
-                    $this->getNameOfMonth($first_day),
-                    ['text' => ' ', 'callback_data' => '-']
-                ];
-                $month = UserTimetable::getMonthLaterBot();
-                break;
-            default:
-                $first_day = Carbon::now();
-                $date[] = [
-                    ['text' => ' ', 'callback_data' => '-'],
-                    $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'PersonalDateNext_'.parent::getRecordID()]
-                ];
-                $month = UserTimetable::getCurrentMonthBot();
-        }
-
-        $days = []; //name of the days of the week
-        foreach (UserTimetable::getDays() as $day)
-            $days[] = ['text' => $day, 'callback_data' => '-'];
-        $date[] = $days;
-        unset($days);
-
-        $master = User::find($master_id);
-        $master_days = [];
-        $i = 1;
-        foreach ($month as $k => $day) {
-
-            if (UserTimetable::isWorkDay($master, $record->address_id, $record->service_id, Carbon::parse($k), $first_day)) {
-                $master_days[] = ['text' => $day, 'callback_data' => 'PersonalRecordDate_'.$k];
-            } else {
-                $master_days[] = ['text' => ' ', 'callback_data' => '-'];
-            }
-
-            if ($i % 7 == 0) {
-                $date[] = $master_days;
-                $master_days = [];
-            }
-
-            $i++;
-        }
-        $i--;
-        while ($i % 7 != 0) {
-            $master_days[] = ['text' => ' ', 'callback_data' => '-'];
-            $i++;
-        }
-        $date[] = $master_days;
-        return parent::buildInlineKeyboard($date);
-    }
-
 
     private function getNameOfMonth (Carbon $date) {
         return ['text' => Date::parse($date->toFormattedDateString())->format('F'), 'callback_data' => '-'];

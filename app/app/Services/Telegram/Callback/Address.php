@@ -13,7 +13,7 @@ class Address extends CallbackQuery
         parent::__construct($request);
         $service_id = parent::setServiceID();
         $this->back = 'Service_'.parent::getTypeID();
-        return $this->editMessage(__('Выберете адрес'), $this->getAddress($service_id));
+        return $this->editMessage('🌐 '.__('Выберете адрес'), $this->getAddress($service_id));
     }
 
     /**

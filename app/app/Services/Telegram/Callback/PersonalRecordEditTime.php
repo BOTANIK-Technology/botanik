@@ -18,7 +18,7 @@ class PersonalRecordEditTime extends CallbackQuery
         } else {
             $buttons = $this->serviceTime($record->service_id, $record->date);
         }
-        return parent::editMessage(__('Выберете время'), $buttons);
+        return parent::editMessage("🕛 ".__('Выберете время'), $buttons);
     }
 
     private function serviceTime (int $service_id, string $date)
@@ -42,7 +42,7 @@ class PersonalRecordEditTime extends CallbackQuery
             $buttons[] = [['text' => __('Нет свободных ячеек.'), 'callback_data' => '-']];
         else
             foreach ($times as $time)
-                $buttons[] = [['text' => $time, 'callback_data' => 'PersonalRecordTime_' . $time]];
+                $buttons[] = [['text' => $time, 'callback_data' => 'PersonalEditConfirm_' . $time]];
 
         return parent::buildInlineKeyboard($buttons);
     }

@@ -18,10 +18,10 @@ class DatesService extends CallbackQuery
     public function __construct(Request $request, $month = null)
     {
         parent::__construct($request);
-        $this->back = 'Address_' . parent::getServiceID();
+        $this->back = 'Address_'.parent::getServiceID();
         parent::setMasterID(null);
         parent::setAddressID();
-        return parent::editMessage(__('Выберете дату'), $this->serviceDates(parent::getServiceID(), $month));
+        return parent::editMessage('🕛 '.__('Выберете дату'), $this->serviceDates(parent::getServiceID(), $month));
     }
 
     public function serviceDates($service_id, $month)
@@ -31,16 +31,16 @@ class DatesService extends CallbackQuery
             case 'DateNext':
                 $first_day = new Carbon('first day of next month');
                 $dates[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DatesService_' . parent::getAddressID()],
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DatesService_'.parent::getAddressID()],
                     $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateLater_' . parent::getAddressID()]
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateLater_'.parent::getAddressID()]
                 ];
                 $month = ServiceTimetable::getNextMonthBot();
                 break;
             case 'DateLater':
                 $first_day = new Carbon('first day of 2 months');
                 $dates[] = [
-                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DateNext_' . parent::getAddressID()],
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DateNext_'.parent::getAddressID()],
                     $this->getNameOfMonth($first_day),
                     ['text' => ' ', 'callback_data' => '-']
                 ];
@@ -51,27 +51,24 @@ class DatesService extends CallbackQuery
                 $dates[] = [
                     ['text' => ' ', 'callback_data' => '-'],
                     $this->getNameOfMonth($first_day),
-                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateNext_' . parent::getAddressID()]
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateNext_'.parent::getAddressID()]
                 ];
                 $month = ServiceTimetable::getCurrentMonthBot();
         }
 
         $days = [];
         foreach (ServiceTimetable::getDays() as $day) //name of the days of the week
-        {
             $days[] = ['text' => $day, 'callback_data' => '-'];
-        }
         $dates[] = $days;
 
-        /** @var Service $service */
         $service = Service::find($service_id);
-        $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00'));
+
         $i = 1;
         $days = [];
         foreach ($month as $k => $day) {
 
             if ($service->timetable->isWorkDay(Carbon::parse($k), $first_day)) {
-                $days[] = ['text' => $day, 'callback_data' => 'Time_' . $k];
+                $days[] = ['text' => $day, 'callback_data' => 'Time_'.$k];
             } else {
                 $days[] = ['text' => ' ', 'callback_data' => '-'];
             }
@@ -93,8 +90,7 @@ class DatesService extends CallbackQuery
 
     }
 
-    private function getNameOfMonth(Carbon $date)
-    {
+    private function getNameOfMonth (Carbon $date) {
         return ['text' => Date::parse($date->toFormattedDateString())->format('F'), 'callback_data' => '-'];
     }
 }
