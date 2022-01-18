@@ -64,18 +64,20 @@ class Notice extends Model
      */
     public static function getNotice(User $user,$skip = false)
     {
-        $notices = $user->notices->sortDesc();
+        $notices = $user->notices;
         foreach ($user->roles as $role)
-            $notices = $notices->merge(self::where('role_id', $role->id)->orderBy('id', 'desc')->get());
+            $notices = $notices->merge(self::where('role_id', $role->id)->orderBy('created_at', 'desc')->get());
 
         if ($user->hasRole('admin'))
             foreach ($user->addresses as $address)
-                $notices = $notices->merge(self::where('address_id', $address->id)->orderBy('id', 'desc')->get());
+                $notices = $notices->merge(self::where('address_id', $address->id)->orderBy('created_at', 'desc')->get());
+
+        $result = $notices->sortByDesc('created_at');
 
         if($skip) {
-            return $notices;
+            return $result;
         } else {
-            return self::makeSeen($notices);
+            return self::makeSeen($result);
         }
     }
 
