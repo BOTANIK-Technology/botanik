@@ -58,11 +58,11 @@ class Notice extends Model
     }
 
     /**
-     * @param User $user
+     * @param $user
      * @param bool $skip
      * @return Collection|false
      */
-    public static function getNotice(User $user,$skip = false)
+    public static function getNotice($user,$skip = false)
     {
         $notices = $user->notices;
         foreach ($user->roles as $role)
@@ -105,7 +105,7 @@ class Notice extends Model
      * @param array $params
      * @param int $minutes
      */
-    public static function sendNotice(string $business_db, array $params, $minutes = 1) : void
+    public static function sendNotice(string $business_db, array $params, $minutes = 0) : void
     {
         if (ConnectService::prepareJob()) {
 

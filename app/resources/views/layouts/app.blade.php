@@ -166,7 +166,7 @@
         setInterval(function () {
             $(document).ready(function() {
                 $.ajax({
-                    url: 'notice-event',
+                    url: '/' + SLUG + '/notice-event',
                     dataType: 'json',
                     method: 'post',
                     data:{

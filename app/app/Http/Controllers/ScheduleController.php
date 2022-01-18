@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\ConnectService;
 use App\Jobs\SendNotice;
 use App\Jobs\TelegramFeedBack;
 use App\Jobs\TelegramNotice;
@@ -11,18 +12,17 @@ use App\Models\Record;
 use App\Models\Service;
 use App\Models\TelegramUser;
 use App\Models\User;
-use Auth;
+use App\Services\Telegram\TelegramAPI;
 use Carbon\Carbon;
-use ConnectService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\UserTimetable;
 use App\Models\TypeService;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use Validator;
 
 class ScheduleController extends Controller
 {
@@ -58,7 +58,9 @@ class ScheduleController extends Controller
         $this->params['days'] = UserTimetable::getDaysOfMonth($this->params['current_month']);
         $this->params['date'] = $request->has('date') ? $request->input('date') : Carbon::now()->format('Y-m-d');
 
-        if (isset($request->modal)) $this->params['modal'] = $request->modal;
+        if (isset($request->modal)) {
+            $this->params['modal'] = $request->modal;
+        }
 
         if ($user->hasRole('admin', 'owner')) {
             $records = Record::whereDate('date', Carbon::parse($this->params['date']))->get()->toArray();
@@ -196,6 +198,8 @@ class ScheduleController extends Controller
 
         $client = TelegramUser::find($request->client_id);
 
+        return TelegramAPI::createRecordNotice($service->name, $record, $client, $request);
+/*
         if (!ConnectService::prepareJob())
             return false;
 
@@ -216,15 +220,40 @@ class ScheduleController extends Controller
                 ]
             )->delay(now()->addMinutes(2));
 
+            $time = Carbon::parse($request->getDate() . " " . $request->getTime());
+
+            $remind1Time = $time->subHours(config('memoBefore'));
+            $remind2Time = $time->subDay();
+
+            // Проверка на ночное время. Если уведомление выпадает на ночь - переносим на утро.
+            if ($remind2Time->hour >= config('params.nightBeginHour') ){
+                $remind2Time->setHour(config('params.nightBeginHour'))->setMinutes(0);
+            }
+            else if ($remind2Time->hour < config('params.nightEndHour')){
+                $remind2Time->subDay()->setHours(config('params.nightBeginHour'));
+            }
+            if ($remind2Time > Carbon::now()){
+                TelegramNotice::dispatch(
+                    $request->business_db,
+                    $client->chat_id,
+                    $record->id,
+                    __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
+                    $request->date,
+                    $request->time,
+                    $request->token
+                )->delay($time->subDay());
+            }
+
             TelegramNotice::dispatch(
                 $request->business_db,
                 $client->chat_id,
                 $record->id,
-                __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date . " " . $request->time)->format('d.m.Y') . ' в ' . $request->time,
+                __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
                 $request->date,
                 $request->time,
                 $request->token
-            )->afterCommit();//->delay(Carbon::parse($request->date.' '.$request->time)->subHour());
+            )->delay($time->subDay());
+
 
 
             TelegramFeedBack::dispatch(
@@ -232,7 +261,7 @@ class ScheduleController extends Controller
                 $client->chat_id,
                 $record->id,
                 $request->token
-            )->delay(Carbon::parse($request->date.' '.$request->time)->addDay());
+            )->delay($time->addDay());
 
             return response()->json(['ok' => 'Запись создана']);
 
@@ -240,6 +269,7 @@ class ScheduleController extends Controller
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]], 500);
         }
+*/
     }
 
     /**

@@ -35,6 +35,7 @@ class ClientController extends Controller
      */
     public function setParams(Request $request)
     {
+
         isset($request->load) ? $this->params['load'] = $request->load : $this->params['load'] = 15;
         isset($request->sort) ? $this->params['sort'] = $request->sort : $this->params['sort'] = 'visit_asc';
 

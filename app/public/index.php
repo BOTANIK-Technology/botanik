@@ -1,7 +1,8 @@
 <?php
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
-ini_set("pcre.jit", "0");
+ini_set("pcre.jit", 0);
+ini_set('memory_limit', '512M');
 define('LARAVEL_START', microtime(true));
 
 /*

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notice;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class NoticeController extends Controller
 {
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index()
     {
@@ -22,7 +24,7 @@ class NoticeController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function delete(Request $request)
     {
@@ -36,7 +38,7 @@ class NoticeController extends Controller
     public function getNoticeEvent(): ?array
     {
         $result  = [];
-        $notices = Notice::getNotice( \Auth::user() , true);
+        $notices = Notice::getNotice(auth()->user() , true);
 
         if ($notices->isEmpty())
             return null;

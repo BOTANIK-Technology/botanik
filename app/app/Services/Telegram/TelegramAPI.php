@@ -13,6 +13,7 @@ use App\Models\Payment;
 use App\Models\Record;
 use App\Models\Service;
 use App\Models\TelegramSession;
+use App\Models\TelegramUser;
 use App\Models\User;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
@@ -405,12 +406,8 @@ class TelegramAPI
             'record_id'  => $record->id,
         ]);
 
-
-
         if ($record && $status) {
             $this->user->last_service = $service->id;
-            $recordsCount = Record::where('telegram_user_id', $this->user->id)->whereBetween('date', [date('Y').'-'.date('m').'-01', date('Y').'-'.date('m').'-31'])->count();
-            $this->user->frequency = (int)$recordsCount;
             if (isset($this->user->records) && !$this->user->records->isEmpty()) {
                 $duplicates = $this->user->records->toBase()->duplicates('service_id');
                 $max = ['count' => 0, 'id' => 0];
@@ -425,11 +422,13 @@ class TelegramAPI
             }
             if ($bonus == 0 && $service->bonus && $online_pay == true) {
                 $this->user->bonus += $service->bonus;
-            }
                 $this->user->save();
+            }
 
 
-            $this->createRecordNotice($service->name, $record->id);
+            self::createRecordNotice($service->name, $record, $this->user, $this);
+
+
             $this->groupMessage($service);
         }
 
@@ -487,57 +486,107 @@ class TelegramAPI
     }
 
     /**
-     * @param $service_name
-     * @param $record_id
      */
-    private function createRecordNotice($service_name, $record_id)
+    public static function createRecordNotice($service_name, Record $record, TelegramUser $client, $request)
     {
         if (!ConnectService::prepareJob())
-            return;
+        {
+            return response()->json(['error' => 'Ошибка создания задания'], 500);
+        }
+
 
         /**
          * Admin & Master notice
          */
-        $notice_mess = __('Новая запись на услугу') . ' <b>' . $service_name . '</b> от ' . $this->user->first_name . ' на ' . $this->getDate() . ' в ' . $this->getTime();
-        SendNotice::dispatch(
-            $this->business_db,
-            [
+        $notice_mess = __('Новая запись на услугу') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $record->date . ' в ' . $record->time;
+
+        try {
+            SendNotice::dispatch(
+                $request->business_db,
                 [
-                    'address_id' => $this->getAddressID(),
-                    'message'    => $notice_mess,
+                    [
+                        'address_id' => $record->address_id,
+                        'message'    => $notice_mess,
+                    ],
+                    [
+                        'user_id' => $record->user_id,
+                        'message' => $notice_mess,
+                    ],
                 ],
-                [
-                    'user_id' => $this->getMasterID(),
-                    'message' => $notice_mess,
-                ],
-            ],
-        )->delay(now()->addMinutes(2));
+            )->delay(now()->addMinutes(0));
 
-        /*
-         * Client notice
-         */
-        TelegramNotice::dispatch(
-            $this->business_db,
-            $this->chat_id,
-            $record_id,
-            __('Напоминание. Вы записаны на услугу') . ' "' . $service_name . '". Начало ' . Carbon::parse($this->getDate())->format("d.m.Y") . ' в ' . $this->getTime(),
-            $this->getDate(),
-            $this->getTime(),
-            $this->token
-        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->subHour());
+            $time = Carbon::createFromFormat('Y-m-d H:i:s', $record->date . " " . $record->time . ':00', 'Europe/Kiev');
 
-        /*
-         * Client feedback
-         */
-//        TelegramFeedBack::dispatch(
-//            $this->business_db,
-//            $this->chat_id,
-//            $record_id,
-//            $this->token
-//        )->delay(Carbon::parse($this->getDate() . " " . $this->getTime())->addDay());
+            $remind1Time = new Carbon($time);
+            $remind2Time = new Carbon($time);
+            $feedbackTime = new Carbon($time);
 
-        ConnectService::dbConnect($this->business_db);
+            $remind1Time->subHours(config('params.memoBefore'));
+            $remind2Time = self::checkNight($remind2Time->subDay() );
+            $feedbackTime = self::checkNight($feedbackTime->addDay() );
+
+Log::info('Константы', [config('params.memoBefore'), config('params.nightBeginHour'), config('params.nightEndHour') ]);
+Log::info('Уведомления',['Запись' => $time,
+                         '1-e уведомление' => $remind1Time,
+                         '2-e уведомление' => $remind2Time,
+                         'фидбек' => $feedbackTime]);
+
+            /*
+             * Client notice
+             */
+            TelegramNotice::dispatch(
+                $request->business_db,
+                $client->chat_id,
+                $record->id,
+                __('Напоминание. Вы записаны на услугу') . ' "' . $service_name . '". Начало ' . Carbon::parse($record->date)->format("d.m.Y") . ' в ' . $record->time,
+                $record->date,
+                $record->time,
+                $request->token
+            )->delay($remind1Time);
+
+
+            if ($remind2Time > Carbon::now()) {
+                TelegramNotice::dispatch(
+                    $request->business_db,
+                    $client->chat_id,
+                    $record->id,
+                    __('Напоминание. Вы записаны на услугу') . ' "' . $service_name . '". Начало ' . Carbon::parse($record->date)->format("d.m.Y") . ' в ' . $record->time,
+                    $record->date,
+                    $record->time,
+                    $request->token
+                )->delay($remind2Time);
+            }
+            /*
+             * Client feedback
+             */
+            TelegramFeedBack::dispatch(
+                $request->business_db,
+                $client->chat_id,
+                $record->id,
+                $request->token
+            )->delay($feedbackTime);
+
+
+        }
+        catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]], 500);
+        }
+        ConnectService::dbConnect($request->business_db);
+        return response()->json(['ok' => 'Запись создана']);
+
     }
+    private static function checkNight(Carbon $time): Carbon
+    {
+        // Проверка на ночное время. Если уведомление выпадает на ночь - переносим на утро.
+        if ($time->hour >= config('params.nightBeginHour') ){
+            $time->setHour(config('params.nightBeginHour'))->setMinutes(0);
+        }
+        else if ($time->hour < config('params.nightEndHour')){
+            $time->setHours(config('params.nightEndHour'));
+        }
+        return $time;
+    }
+
 
     /**
      * @param $price

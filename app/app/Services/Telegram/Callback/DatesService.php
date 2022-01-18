@@ -57,10 +57,14 @@ class DatesService extends CallbackQuery
         }
 
         $days = [];
+        $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00'));
         foreach (ServiceTimetable::getDays() as $day) //name of the days of the week
+        {
             $days[] = ['text' => $day, 'callback_data' => '-'];
+        }
         $dates[] = $days;
 
+        /** @var Service $service */
         $service = Service::find($service_id);
 
         $i = 1;
