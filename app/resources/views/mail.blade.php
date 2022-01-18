@@ -95,7 +95,7 @@
                         </option>
                         @if (isset($types))
                             @foreach($types as $type)
-                                <option value="{{$type->id}}">{{$type->type}}</option>
+                                <option value="{{$type->id}}">{{$type->name}}</option>
                             @endforeach
                         @else
                             <option value="">
@@ -109,7 +109,7 @@
                         </option>
                         @if (isset($types))
                             @foreach($types as $type)
-                                <option value="{{$type->id}}">{{$type->type}}</option>
+                                <option value="{{$type->id}}">{{$type->name}}</option>
                             @endforeach
                         @else
                             <option value="">
