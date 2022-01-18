@@ -405,8 +405,12 @@ class TelegramAPI
             'record_id'  => $record->id,
         ]);
 
+
+
         if ($record && $status) {
             $this->user->last_service = $service->id;
+            $recordsCount = Record::where('telegram_user_id', $this->user->id)->whereBetween('date', [date('Y').'-'.date('m').'-01', date('Y').'-'.date('m').'-31'])->count();
+            $this->user->frequency = (int)$recordsCount;
             if (isset($this->user->records) && !$this->user->records->isEmpty()) {
                 $duplicates = $this->user->records->toBase()->duplicates('service_id');
                 $max = ['count' => 0, 'id' => 0];
@@ -421,8 +425,8 @@ class TelegramAPI
             }
             if ($bonus == 0 && $service->bonus && $online_pay == true) {
                 $this->user->bonus += $service->bonus;
-                $this->user->save();
             }
+            $this->user->save();
 
 
             $this->createRecordNotice($service->name, $record->id);

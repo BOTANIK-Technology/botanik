@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mail;
+use App\Models\Record;
+use App\Models\TelegramUser;
 use App\Models\TypeService;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
@@ -58,6 +60,19 @@ class MailController extends Controller
 
     public function createConfirm(Request $request): JsonResponse
     {
+        /**
+         * if first send in mounth, check frequency
+         */
+        $isFirst = Mail::where('created_at', 'like', date('Y')."-".date('m')."-%")->count();
+        if($isFirst == 0){
+            $telegramUsers = TelegramUser::all();
+            foreach ($telegramUsers as $tUser) {
+                $recordsCount = Record::where('telegram_user_id', $tUser->id)->whereBetween('date', [date('Y').'-'.date('m').'-01', date('Y').'-'.date('m').'-31'])->count();
+                $tUser->frequency = (int)$recordsCount;
+                $tUser->save();
+            }
+        }
+
         $validator = \Validator::make($request->all(), [
             'title'            => 'required|string|min:1|max:255',
             'text'             => 'required|string|min:1',

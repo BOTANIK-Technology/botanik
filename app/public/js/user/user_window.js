@@ -24,7 +24,7 @@ let CreateUserWindow = function () {
         for (let i = 0; i < serviceCount; i++) {
             this.setCurrentData(i);
             this.satAdminCurrentData(i);
-            sleep(1000);
+            sleep(2000);
         }
     }
     function sleep(ms) {

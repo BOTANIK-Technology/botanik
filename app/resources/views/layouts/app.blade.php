@@ -25,7 +25,7 @@
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     @phone <link href="{{ asset('css/main-phone.css') }}" rel="stylesheet"> @endphone
     @guest
-        <!-- Don't log user... -->
+    <!-- Don't log user... -->
     @else
         <!-- Logged user... -->
         @role('owner')
@@ -152,14 +152,33 @@
     </footer>
 
     <script>
-        function playSound(filename){
+        function playSound(filename) {
             // var mp3Source = '<source src="' + filename + '.mp3" type="audio/mpeg">';
             // var embedSource = '<embed hidden="true" autostart="true" loop="false" src="' + filename +'.mp3">';
             // document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + mp3Source + embedSource + '</audio>';
 
-            const audio = new Audio(filename+'.mp3');
+            const audio = new Audio('/'+filename+'.mp3');
             audio.play();
         }
+
+        setInterval(function () {
+            $(document).ready(function() {
+                $.ajax({
+                    url: 'notice-event',
+                    dataType: 'json',
+                    method: 'post',
+                    data:{
+                        "_token": $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function(data) {
+                        for (item in data) {
+                            toastr.info(data[item].message);
+                            playSound('notification_sound_sys');
+                        }
+                    }
+                });
+            });
+        },5000)
     </script>
 
 </body>
