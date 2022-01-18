@@ -152,6 +152,17 @@
     </footer>
 
     <script>
+
+        function playSound(filename) {
+            // var mp3Source = '<source src="' + filename + '.mp3" type="audio/mpeg">';
+            // var embedSource = '<embed hidden="true" autostart="true" loop="false" src="' + filename +'.mp3">';
+            // document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + mp3Source + embedSource + '</audio>';
+
+            const audio = new Audio('/'+filename+'.mp3');
+            audio.play();
+        }
+
+
         setInterval(function () {
             $(document).ready(function() {
                 $.ajax({
@@ -164,18 +175,14 @@
                     success: function(data) {
                         for (item in data) {
                             toastr.info(data[item].message);
-                            function playSound(filename){
-                                // var mp3Source = '<source src="' + filename + '.mp3" type="audio/mpeg">';
-                                // var embedSource = '<embed hidden="true" autostart="true" loop="false" src="' + filename +'.mp3">';
-                                // document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + mp3Source + embedSource + '</audio>';
 
-                                const audio = new Audio(filename+'.mp3');
-                                audio.play();
-                            }
+                            playSound('notification_sound_sys');
                         }
                     }
+                });
             });
-            },10000);
+        },5000)
+
     </script>
 
 </body>
