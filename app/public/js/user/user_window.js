@@ -2,6 +2,9 @@ let CreateUserWindow = function () {
     let isInit = true;
     this.token = null;
 
+    let allServiceList = {};
+    let allAddressList = {};
+
     this.slug = null;
 
     this.address = null;
@@ -11,7 +14,8 @@ let CreateUserWindow = function () {
     this.init = function () {
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
-        this.initAllServices();
+        this.loadAllServices();
+        // this.initAllServices();
         // document.querySelector('input[name="role"]);
 
         window.setTimeout(toggleServices, 10);
@@ -19,16 +23,14 @@ let CreateUserWindow = function () {
     }
 
     this.initAllServices = function () {
+
+
         let serviceCount = document.getElementById('service-count').getAttribute('data-count');
         console.log('count: ', serviceCount);
         for (let i = 0; i < serviceCount; i++) {
             this.setCurrentData(i);
             this.satAdminCurrentData(i);
-            sleep(2000);
         }
-    }
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 
@@ -58,7 +60,7 @@ let CreateUserWindow = function () {
                 service.value = value;
             }
             let service_id = Number(service.value);
-            console.log(service);
+
             this.loadAddresses(num, service_id);
             if (!isInit) {
                 this.saveCurrentData(num);
@@ -74,51 +76,102 @@ let CreateUserWindow = function () {
         this.saveAdminCurrentData(num);
     }
 
-    this.loadServices = function (num, service_type_id, value=null) {
+    this.loadAllServices = function () {
+        let _this = this;
         this.post({
-            url: '/api/services_list',
-            data: {
-                service_type_id: service_type_id
-            },
-            success: function (response) {
-                if (response.result === "OK") {
-                    let cnt = '<option class="placeholder" value="0" selected>Выберите услугy</option>';
-                    for (let serv in response.services) {
-                        cnt += "<option value='" + response.services[serv].id + "'>" + response.services[serv].name + "</option>";
-                    }
-                    let services = document.querySelector('#service-' + num);
-                    services.innerHTML = cnt;
-                    document.querySelector('#service-' + num).classList.remove('hide');
-                    if(value) {
-                        services.value = value;
-                    }
-                }
+            url: '/api/services_list', success: function (response) {
+                console.log(response.services);
+                allServiceList =  response.services;
+                _this.loadAllAddresses();
             }
         });
     }
 
-    this.loadAddresses = function (num, service_id, value=null) {
+    this.loadAllAddresses = function () {
         let _this = this;
         this.post({
             url: '/api/services_addresses',
-            data: {
-                service_id: service_id
-            },
             success: function (response) {
-                if (response.result === "OK") {
-                    let cnt = '<option class="placeholder" value="0" selected>Выберите адрес</option>';
-                    for (let addr in response.addresses) {
-                        cnt += "<option value='" + response.addresses[addr][0].id + "'>" + response.addresses[addr][0].address + "</option>";
-                    }
-                    let address = document.querySelector('#address-' + num);
-                    address.innerHTML = cnt;
-                    document.querySelector('#address-' + num).classList.remove('hide');
-                    if(value) {
-                        address.value = value;
-                    }
-                }
+                console.log(response.addresses);
+                allAddressList =  response.addresses;
+                _this.initAllServices();
             }
         });
+    }
+
+    this.loadServices = function (num, service_type_id, value=null) {
+        let cnt = '<option class="placeholder" value="0" selected>Выберите услугy</option>';
+
+        let servL = allServiceList[service_type_id];
+
+        for (let serv in servL) {
+            cnt += "<option value='" + servL[serv].id + "'>" + servL[serv].name + "</option>";
+        }
+        let services = document.querySelector('#service-' + num);
+        services.innerHTML = cnt;
+        document.querySelector('#service-' + num).classList.remove('hide');
+        if(value) {
+            services.value = value;
+        }
+
+
+        // this.post({
+        //     url: '/api/services_list',
+        //     data: {
+        //         service_type_id: service_type_id
+        //     },
+        //     success: function (response) {
+        //         if (response.result === "OK") {
+        //             let cnt = '<option class="placeholder" value="0" selected>Выберите услугy</option>';
+        //             for (let serv in response.services) {
+        //                 cnt += "<option value='" + response.services[serv].id + "'>" + response.services[serv].name + "</option>";
+        //             }
+        //             let services = document.querySelector('#service-' + num);
+        //             services.innerHTML = cnt;
+        //             document.querySelector('#service-' + num).classList.remove('hide');
+        //             if(value) {
+        //                 services.value = value;
+        //             }
+        //         }
+        //     }
+        // });
+    }
+
+    this.loadAddresses = function (num, service_id, value=null) {
+        let cnt = '<option class="placeholder" value="0" selected>Выберите адрес</option>';
+        let addrL = allAddressList[service_id];
+
+        for (let addr in addrL) {
+            cnt += "<option value='" + addrL[addr][0].id + "'>" + addrL[addr][0].address + "</option>";
+        }
+        let address = document.querySelector('#address-' + num);
+        address.innerHTML = cnt;
+        document.querySelector('#address-' + num).classList.remove('hide');
+        if(value) {
+            address.value = value;
+        }
+
+        // let _this = this;
+        // this.post({
+        //     url: '/api/services_addresses',
+        //     data: {
+        //         service_id: service_id
+        //     },
+        //     success: function (response) {
+        //         if (response.result === "OK") {
+        //             let cnt = '<option class="placeholder" value="0" selected>Выберите адрес</option>';
+        //             for (let addr in response.addresses) {
+        //                 cnt += "<option value='" + response.addresses[addr][0].id + "'>" + response.addresses[addr][0].address + "</option>";
+        //             }
+        //             let address = document.querySelector('#address-' + num);
+        //             address.innerHTML = cnt;
+        //             document.querySelector('#address-' + num).classList.remove('hide');
+        //             if(value) {
+        //                 address.value = value;
+        //             }
+        //         }
+        //     }
+        // });
     }
 
     this.saveCurrentData = function (num) {

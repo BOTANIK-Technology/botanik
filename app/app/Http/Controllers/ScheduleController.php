@@ -351,7 +351,7 @@ class ScheduleController extends Controller
     {
         $addresses = [];
         $service_id = $request->service_id;
-        if($service_id > 0) {
+        if($service_id) {
             $ids = Service::query()
                 ->where('id', $service_id)
                 ->join('services_addresses', 'services.id', '=', 'services_addresses.service_id')
@@ -362,6 +362,22 @@ class ScheduleController extends Controller
                     ->where('id', $item['address_id'])
                     ->get(['id', 'address'])
                     ->toArray();
+            }
+        }
+        else {
+            $services = Service::all();
+            foreach ($services as $service){
+                $ids = Service::query()
+                    ->where('id', $service->id)
+                    ->join('services_addresses', 'services.id', '=', 'services_addresses.service_id')
+                    ->get('services_addresses.address_id')
+                    ->toArray();
+                foreach ($ids as $item) {
+                    $addresses[$service->id][] = Address::query()
+                        ->where('id', $item['address_id'])
+                        ->get(['id', 'address'])
+                        ->toArray();
+                }
             }
         }
         return response()->json(["result" => "OK", "addresses" => $addresses]);
@@ -382,6 +398,16 @@ class ScheduleController extends Controller
                 ->get()
                 ->toArray();
 
+        }
+        else {
+            $types = TypeService::all();
+            foreach ($types as $type) {
+                $services[$type->id] = Service::query()
+                    ->where('type_service_id', $type->id)
+                    ->select('id', 'name')
+                    ->get()
+                    ->toArray();
+            }
         }
         return response()->json(["result" => "OK", "services" => $services]);
     }
