@@ -18,7 +18,9 @@ class PersonalRecords extends CallbackQuery
     private function getRecords ()
     {
         if (!isset($this->user->records) || $this->user->records->isEmpty())
+        {
             return parent::buildInlineKeyboard();
+        }
 
         $records = [];
         foreach ($this->user->records as $k => $record)

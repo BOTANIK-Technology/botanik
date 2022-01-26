@@ -47,7 +47,7 @@ class PersonalRecord extends CallbackQuery
             return parent::buildInlineKeyboard();
 
         $buttons[] = [['text' => 'Удалить','callback_data' => 'PersonalRecordDelete_'.$record->id]];
-        $buttons[] = [['text' => 'Редактировать','callback_data' => 'PersonalRecordEdit_'.$record->id]];
+//        $buttons[] = [['text' => 'Редактировать','callback_data' => 'PersonalRecordEdit_'.$record->id]];
 
         return parent::buildInlineKeyboard($buttons);
 
