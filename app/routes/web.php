@@ -112,6 +112,7 @@ Route::group(
                 Route::post('/services_addresses', [App\Http\Controllers\ScheduleController::class, 'getAddresses'])->name('api.services_addresses');
                 Route::post('/services_masters', [App\Http\Controllers\ScheduleController::class, 'getMasters'])->name('api.services_masters');
                 Route::post('/services_list', [App\Http\Controllers\ScheduleController::class, 'getServices'])->name('api.services_list');
+                Route::post('/calendar', [App\Http\Controllers\ScheduleController::class, 'getCalendar'])->name('api.calendar');
             }
         );
 

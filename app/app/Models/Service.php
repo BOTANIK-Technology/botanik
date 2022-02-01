@@ -104,6 +104,14 @@ class Service extends Model
     /**
      * @return HasOne
      */
+    public function type()
+    {
+        return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
+    }
+
+    /**
+     * @return HasOne
+     */
     public function prepayment(): HasOne
     {
         return $this->hasOne(Prepayment::class);

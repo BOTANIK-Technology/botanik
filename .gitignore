@@ -8,7 +8,7 @@
 /app/public/storage
 /app/public/adm.php
 /app/storage/*.key
-/app/vendor
+
 /app/.env
 /app/.env.backup
 /app/.phpunit.result.cache

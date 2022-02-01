@@ -18,10 +18,15 @@ let ScheduleWindow = function() {
         this.service = document.querySelector('#service');
         this.address = document.querySelector('#address');
         this.master  = document.querySelector('#master');
+        this.month  = document.querySelector('#month');
 
         this.service.addEventListener('change', function() {
             _this.loadAddresses();
             _this.loadMasters();
+            _this.loadMonth();
+        });
+        this.master.addEventListener('change', function() {
+            _this.loadMonth();
         });
     }
 
@@ -66,6 +71,27 @@ let ScheduleWindow = function() {
                     _this.master.innerHTML = cnt;
                     let lblEl = document.querySelector('#master_label');
                     lblEl.style.display = 'block';
+                }
+            }
+        });
+    }
+
+    this.loadMonth = function() {
+        let _this = this;
+        let month = this.month;
+        let service_id = this.service.value;
+        let master_id = this.master.value;
+
+        this.post({
+            url: '/api/calendar',
+            data: {
+                month: month,
+                service_id: service_id,
+                master_id: master_id
+            },
+            success: function(response) {
+                if(response.result === "OK") {
+                    console.log(response);
                 }
             }
         });

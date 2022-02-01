@@ -56,7 +56,7 @@ trait Timetable
         '24 hours',
     ];
 
-    private static array $mouths = [
+    private static array $months = [
         'january' => 'январь',
         'february' => 'февраль',
         'march' => 'март',
@@ -118,7 +118,7 @@ trait Timetable
      */
     public static function getMonths(): Collection
     {
-        return collect(self::$mouths);
+        return collect(self::$months);
     }
 
     /**
@@ -126,7 +126,7 @@ trait Timetable
      */
     public static function getMonthsEn(): Collection
     {
-        return collect(array_keys(self::$mouths));
+        return collect(array_keys(self::$months));
     }
 
     /**
@@ -134,7 +134,7 @@ trait Timetable
      */
     public static function getMonthsRu(): array
     {
-        return array_values(self::$mouths);
+        return array_values(self::$months);
     }
 
     /**

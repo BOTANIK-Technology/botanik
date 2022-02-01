@@ -1,6 +1,6 @@
 <div class="mouth-select flex justify-content-between align-self-center">
     <a href="{{route('schedule', ['business' => $slug, 'current_month' => $prev_month, 'current_type' => $current_type, 'date' => $date])}}">{!! file_get_contents(public_path('images/prev.svg')) !!}</a>
-    <span class="month">{{$mouths[$current_month]}}</span>
+    <span class="month">{{$months[$current_month]}}</span>
     <a href="{{route('schedule', ['business' => $slug, 'current_month' => $next_month, 'current_type' => $current_type, 'date' => $date])}}">{!! file_get_contents(public_path('images/next.svg')) !!}</a>
 </div>
 

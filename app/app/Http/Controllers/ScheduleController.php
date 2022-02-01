@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace app\Http\Controllers;
 
+use App\app\Helpers\DatesHelper;
 use App\Facades\ConnectService;
 use App\Jobs\SendNotice;
-use App\Jobs\TelegramFeedBack;
 use App\Jobs\TelegramNotice;
 use App\Models\Address;
 use App\Models\Payment;
@@ -22,6 +22,7 @@ use App\Models\TypeService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class ScheduleController extends Controller
@@ -50,7 +51,7 @@ class ScheduleController extends Controller
     {
         $user = Auth::user();
         $this->params['slug'] = $request->route()->parameter('business');
-        $this->params['mouths'] = UserTimetable::getMonths();
+        $this->params['months'] = UserTimetable::getMonths();
         $this->params['current_month'] = $request->has('current_month') ? $request->input('current_month') : mb_strtolower(Carbon::now()->format('F'));
         $this->params['next_month'] = mb_strtolower( Carbon::parse($this->params['current_month'])->addMonth()->format('F') );
         $this->params['prev_month'] = mb_strtolower( Carbon::parse($this->params['current_month'])->subMonth()->format('F') );
@@ -63,7 +64,12 @@ class ScheduleController extends Controller
         }
 
         if ($user->hasRole('admin', 'owner')) {
-            $records = Record::whereDate('date', Carbon::parse($this->params['date']))->get()->toArray();
+            $records = Record::whereDate('date', Carbon::parse($this->params['date']))
+                ->whereHas('service', function($q) use ($request){
+                    return $q->where('type_service_id', $request->current_type);
+                })
+                ->get();
+
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
             $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
@@ -80,7 +86,7 @@ class ScheduleController extends Controller
 
             $types = Service::where('id', $s)->pluck('type_service_id')->toArray();
             $schedule = UserTimetable::userSchedule($user, Carbon::parse($this->params['date']));
-            $records = Record::where('user_id', $user->id)->whereDate( 'date', Carbon::parse($this->params['date']) )->get()->toArray();
+            $records = Record::where('user_id', $user->id)->whereDate( 'date', Carbon::parse($this->params['date']) )->get();
             $this->params['types'] = $types;
             $this->params['current_type'] = $request->has('current_type') ? $request->input('current_type') : $types[0];
             $this->params['schedule'] = $schedule['times'] ?? false;
@@ -127,6 +133,7 @@ class ScheduleController extends Controller
                 $this->params['create_services'] = Service::all();
                 $this->params['create_users'] = User::all();
                 $this->params['create_addresses'] = Address::all();
+                $this->params['months'] = Address::all();
                 break;
             case 'edit':
             case 'view':
@@ -434,6 +441,17 @@ class ScheduleController extends Controller
             }
         }
         return response()->json(["result" => "OK", "masters" => $masters]);
+    }
+
+    public function getCalendar(Request $request)
+    {
+        $month = $request->month;
+        $master_id = $request->master_id;
+        $service_id = $request->service_id;
+        $address_id = $request->address_id;
+
+        $dates = DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
+        return $dates;
     }
 
 }
