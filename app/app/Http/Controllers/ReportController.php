@@ -17,7 +17,7 @@ class ReportController extends Controller
      *
      * @var array
      */
-    public $params = [];
+    public array $params = [];
 
     /**
      * View name

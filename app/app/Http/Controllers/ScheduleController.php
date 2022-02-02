@@ -32,7 +32,7 @@ class ScheduleController extends Controller
      *
      * @var array
      */
-    public $params = [];
+    public array $params = [];
 
     /**
      * View name
@@ -49,10 +49,11 @@ class ScheduleController extends Controller
      */
     public function setParams(Request $request)
     {
+        parent::setParams($request);
         $user = Auth::user();
         $this->params['slug'] = $request->route()->parameter('business');
         $this->params['months'] = UserTimetable::getMonths();
-        $this->params['current_month'] = $request->has('current_month') ? $request->input('current_month') : mb_strtolower(Carbon::now()->format('F'));
+
         $this->params['next_month'] = mb_strtolower( Carbon::parse($this->params['current_month'])->addMonth()->format('F') );
         $this->params['prev_month'] = mb_strtolower( Carbon::parse($this->params['current_month'])->subMonth()->format('F') );
         $this->params['current_day'] = $request->has('current_day') ? $request->input('current_day') : Carbon::now()->format('d');

@@ -25,7 +25,7 @@ class UserController extends Controller
      *
      * @var array
      */
-    public $params = [];
+    public array $params = [];
 
     /**
      * View name
@@ -41,6 +41,7 @@ class UserController extends Controller
      */
     public function setParams(Request $request)
     {
+        parent::setParams($request);
         $this->params['slug'] = $request->route()->parameter('business');
         isset($request->sort) ? $this->params['sort'] = $request->sort : $this->params['sort'] = 'master';
         isset($request->load) ? $this->params['load'] = $request->load : $this->params['load'] = 15;

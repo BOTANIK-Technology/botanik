@@ -6,6 +6,30 @@ document.body.addEventListener('mouseup', function() {
     --mouseDown;
 });
 
+// Привязка события к конкретному элементу
+function bindEvent(element, type, handler) {
+    if(element.addEventListener) {
+        element.addEventListener(type, handler, false);
+    } else {
+        element.attachEvent('on'+type, handler);
+    }
+}
+
+// Привязка события к выборке элементов
+function bindEventAll(NodeList, type, handler) {
+    for (let i = 0; i < NodeList.length; ++i) {
+        let element = NodeList[i];
+        bindEvent(element, type, handler);
+    }
+}
+
+let monthElements = document.querySelectorAll('#month_picker option');
+bindEventAll(monthElements, 'click', function (){
+    let currentLocation = window.location;
+console.log(currentLocation);
+});
+
+
 let checkboxes = document.getElementsByClassName('checkbox');
 Object.keys(checkboxes).forEach((el) => {
     checkboxes[el].addEventListener('mousedown', function () {

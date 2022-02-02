@@ -8,6 +8,7 @@ use App\Models\ServiceTimetable;
 use App\Models\TypeService;
 use App\Models\Address;
 use App\Models\Service;
+use App\Models\UserTimetable;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,12 +19,7 @@ use Illuminate\View\View;
 
 class ServiceController extends Controller
 {
-    /**
-     * Default params for view
-     *
-     * @var array
-     */
-    public $params = [];
+
 
     /**
      * View name
@@ -40,6 +36,8 @@ class ServiceController extends Controller
      */
     public function setParams(Request $request)
     {
+        parent::setParams( $request);
+
         $this->params['countService'] = Service::count();
         $this->params['countTypes'] = TypeService::count();
         $this->params['countAddresses'] = Address::count();
@@ -50,6 +48,8 @@ class ServiceController extends Controller
         $this->params['load'] = $request->get('load', 10);
         $this->params['load_types'] = $request->get('load_types', 10);
         $this->params['load_addresses'] = $request->get('load_addresses', 10);
+
+
     }
 
     /**
@@ -107,8 +107,6 @@ class ServiceController extends Controller
                 $this->params['view_service'] = Service::find($id);
                 break;
             case 'timetable':
-                $this->params['times'] = ServiceTimetable::getHours();
-                $this->params['days'] = ServiceTimetable::getDays();
                 $this->params['service_id'] = $request->service_id;
 
                 if ($serviceRequest) {

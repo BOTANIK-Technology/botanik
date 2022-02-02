@@ -12,7 +12,7 @@ class SupportController extends Controller
      * Params for view.
      * @var array
      */
-    public $params = [];
+    public array $params = [];
 
     /**
      * View name.
