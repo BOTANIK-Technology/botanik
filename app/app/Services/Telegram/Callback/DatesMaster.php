@@ -3,6 +3,7 @@
 namespace App\Services\Telegram\Callback;
 
 
+use App\Helpers\DatesHelper;
 use App\Models\User;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
@@ -92,7 +93,7 @@ class DatesMaster extends CallbackQuery
 //        }
 //        $date[] = $master_days;
 
-        $date = \App\app\Services\DatesHelper::MasterDates($master_id, parent::getServiceID(), parent::getAddressID(), $month);
+        $date = DatesHelper::MasterDates($master_id, parent::getServiceID(), parent::getAddressID(), $month);
         return parent::buildInlineKeyboard($date);
     }
 

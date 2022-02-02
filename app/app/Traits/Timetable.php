@@ -299,7 +299,7 @@ trait Timetable
      */
     public static function getCurrentMonthBot(): array
     {
-        $start = new Carbon('first monday of this month');
+        $start = new Carbon('first day of this month');
         $end = Carbon::now()->endOfMonth();
         return self::generateDateRangeBot($start, $end);
     }

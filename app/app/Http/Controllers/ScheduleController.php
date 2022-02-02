@@ -2,7 +2,7 @@
 
 namespace app\Http\Controllers;
 
-use App\app\Helpers\DatesHelper;
+use App\Helpers\DatesHelper;
 use App\Facades\ConnectService;
 use App\Jobs\SendNotice;
 use App\Jobs\TelegramNotice;
@@ -59,6 +59,8 @@ class ScheduleController extends Controller
         $this->params['days'] = UserTimetable::getDaysOfMonth($this->params['current_month']);
         $this->params['date'] = $request->has('date') ? $request->input('date') : Carbon::now()->format('Y-m-d');
 
+
+
         if (isset($request->modal)) {
             $this->params['modal'] = $request->modal;
         }
@@ -92,6 +94,8 @@ class ScheduleController extends Controller
             $this->params['schedule'] = $schedule['times'] ?? false;
             $this->params['address'] = $schedule['address'] ?? false;
         }
+
+
         $this->params['records'] = $records;
 
     }
@@ -445,12 +449,16 @@ class ScheduleController extends Controller
 
     public function getCalendar(Request $request)
     {
-        $month = $request->month;
+        $month = explode('_', $request->month);
+        if ($month){
+            $month = $month[0];
+        }
         $master_id = $request->master_id;
         $service_id = $request->service_id;
         $address_id = $request->address_id;
 
         $dates = DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
+//        $this->params['masterDates'] = $dates;
         return $dates;
     }
 

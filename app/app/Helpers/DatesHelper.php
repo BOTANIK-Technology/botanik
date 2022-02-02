@@ -1,17 +1,19 @@
 <?php
 
-namespace App\app\Helpers;
+namespace App\Helpers;
 
 use App\Models\User;
 use App\Models\UserTimetable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
 
 class DatesHelper
 {
-    public static function masterDates($master_id, $service_id, $address_id, $month)
+    public static function masterDates($master_id, $service_id, $address_id, $monthButton)
     {
-        switch ($month) {
+
+        switch ($monthButton) {
             case 'DateNext':
                 $first_day = new Carbon('first day of next month');
                 $date[] = [
@@ -53,8 +55,8 @@ class DatesHelper
         $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00'));
 
         foreach ($month as $k => $day) {
-
-            if (UserTimetable::isWorkDay($master, $address_id, $service_id, Carbon::parse($k), $first_day)) {
+            $isWork = UserTimetable::isWorkDay($master, $address_id, $service_id, Carbon::parse($k), $first_day);
+            if ($isWork) {
                 $master_days[] = ['text' => $day, 'callback_data' => 'Time_'.$k];
             } else {
                 $master_days[] = ['text' => ' ', 'callback_data' => '-'];
