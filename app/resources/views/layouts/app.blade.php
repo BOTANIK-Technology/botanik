@@ -184,6 +184,7 @@
         },5000)
 
     </script>
+@yield('modal-styles')
 
 </body>
 </html>
