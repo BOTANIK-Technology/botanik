@@ -6,6 +6,17 @@ document.body.addEventListener('mouseup', function() {
     mouseDown = false;
 });
 
+let month = document.getElementById('month_picker');
+let year = document.getElementById('year_picker');
+month.addEventListener('change', () => {
+    window.location.replace(CURRENT_URL + '?current_month=' + month.value + '&current_year=' + year.value);
+});
+year.addEventListener('change', () => {
+    window.location.replace(CURRENT_URL + '?current_month=' + month.value + '&current_year=' + year.value);
+});
+
+
+
 // Привязка события к конкретному элементу
 function bindEvent(element, type, handler) {
     if(element.addEventListener) {
@@ -23,11 +34,11 @@ function bindEventAll(NodeList, type, handler) {
     }
 }
 
-let monthElements = document.querySelectorAll('#month_picker option');
-bindEventAll(monthElements, 'click', function (){
-    let currentLocation = window.location;
-console.log(currentLocation);
-});
+// let monthElements = document.querySelectorAll('#month_picker option');
+// bindEventAll(monthElements, 'click', function (){
+//     let currentLocation = window.location;
+// console.log(currentLocation);
+// });
 
 
 let checkboxes = document.getElementsByClassName('checkbox');

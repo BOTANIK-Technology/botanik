@@ -5,14 +5,14 @@
 <div class="timetable_box">
     <div class="timetable_box-head">
         <div class="timetable_box-fields">
-            <select id="month_picker" class="timetable_box-select">
+            <select id="month_picker" class="timetable_box-select" >
                 @foreach($allMonth as $key => $month)
                     <option value="{{$key}}" {{$current_month == $key ? 'selected' : ''}}>{{$month}}</option>
                 @endforeach
             </select>
-            <select id="year_picker" class="timetable_box-select">
+            <select id="year_picker" class="timetable_box-select" >
                 @foreach($yearList as $year)
-                    <option value="{{$year}}" {{date('Y') == $year ? 'selected' : ''}}>{{$year}}</option>
+                    <option value="{{$year}}" {{$current_year == $year ? 'selected' : ''}}>{{$year}}</option>
                 @endforeach
             </select>
         </div>
@@ -24,12 +24,12 @@
     <div class="timetable_box-wrap">
         <div class="timetable_box-table timetable grid">
             <div class="row-1 border-right-main border-bottom-main day"></div>
-            @foreach($daysMonth as $key => $day)
+            @foreach($allMonthDays[$current_year][$current_month] as $key => $day)
 {{--                <div class="{{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week-end' : ''}}">--}}
-                    <div class="day border-bottom-main user-select-none cnt border-right {{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week_end' : ''}}"
+                    <div class="day-row day border-bottom-main user-select-none cnt border-right {{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week_end' : ''}}"
                          style="grid-column:{{$loop->index+2}}">
-                        <p>{{$daysWeek[strtolower($day['day']) ]}}</p>
-                        <p><strong>{{$day['number']}}</strong></p>
+                        <p class="week_day_cell">{{$daysWeek[strtolower($day['day']) ]}}</p>
+                        <p class="number_cell"><strong>{{$day['number']}}</strong></p>
                     </div>
                     @foreach($times as $time)
                         <div id="{{$key}}-{{$time}}"

@@ -25,11 +25,13 @@ class Controller extends BaseController
     public function setParams(Request $request)
     {
         $this->params['current_month'] = $request->has('current_month') ? $request->input('current_month') : mb_strtolower(Carbon::now()->format('F'));
+        $this->params['current_year'] = $request->has('current_year') ? $request->input('current_year') : mb_strtolower(Carbon::now()->format('Y'));
 
         $this->params['daysWeek'] = ServiceTimetable::getDays();
         $this->params['daysMonth'] = UserTimetable::getFullDaysOfMonth($this->params['current_month']);
         $this->params['allMonth'] = UserTimetable::getMonthList();
         $this->params['times'] = ServiceTimetable::getHours();
         $this->params['yearList'] = ServiceTimetable::getYearList();
+        $this->params['allMonthDays'] = ServiceTimetable::getAllMonthDays();
     }
 }

@@ -21,6 +21,7 @@ class CreateTimetablesTable extends Migration
             $table->integer('address_id');
             $table->integer('year');
             $table->string('month');
+            $table->json('schedule');
             $table->timestamps();
 
         });

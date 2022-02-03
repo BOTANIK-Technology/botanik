@@ -135,6 +135,7 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
 
         let calendar = document.getElementById('calendar-'+id);
 
+
         /**
          * Get cooked inputs
          */
@@ -205,7 +206,7 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
                 }
                 html += '<span>' + day + '. ' + timetable[time][0] + ' - ' + timetable[time][timetable[time].length-1] + '</span>';
             });
-            calendar.innerHTML = '<div class="abbr-tt color flex direction-column">' + html + '</div>';
+         //   calendar.innerHTML = '<div class="abbr-tt color flex direction-column">' + html + '</div>';
         }
 
         /**

@@ -20,10 +20,9 @@
         "laravel/ui": "^3.0",
         "phpoffice/phpspreadsheet": "^1.15",
         "telegram-bot/api": "^2.3",
+        "googee/entity": "^2.3.1",
         "ext-curl": "*",
-        "ext-pdo": "*",
-        "ext-http": "*",
-      "ext-mysql_xdevapi": "*"
+        "ext-pdo": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",

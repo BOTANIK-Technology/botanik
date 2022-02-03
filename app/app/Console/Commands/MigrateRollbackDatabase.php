@@ -22,15 +22,6 @@ class MigrateRollbackDatabase extends Command
      */
     protected $description = 'Rollback migration on business database';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.

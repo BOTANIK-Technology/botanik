@@ -245,6 +245,11 @@ Route::group(
                      */
                     Route::get('/reviews/{modal?}/{id?}', [App\Http\Controllers\FeedbackController::class, 'index'])->name('review');
 
+                    /**
+                     * Timetable route
+                     */
+                    Route::post('/timetable', [App\Http\Controllers\TimetablesController::class, 'create'])->name('timetable.create');
+
                     Route::group(['middleware' => 'package:pro'], function () {
 
                         /**

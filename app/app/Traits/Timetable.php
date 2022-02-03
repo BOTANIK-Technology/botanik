@@ -8,8 +8,7 @@ use Carbon\CarbonInterval;
 use DatePeriod;
 use Exception;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
-use Jenssegers\Date\Date;
+use Illuminate\Support\Facades\Date;
 
 trait Timetable
 {
@@ -122,6 +121,18 @@ trait Timetable
         return $res;
     }
 
+    public static function getAllMonthDays(): array
+    {
+        $years = self::getYearList();
+        $res = [];
+        foreach ($years as $year) {
+            foreach (array_keys(self::$months) as $month) {
+                $res[$year][$month] = self::getFullDaysOfMonth($month, $year);
+            }
+        }
+        return $res;
+    }
+
     public static function getYearList(): array
     {
         return [
@@ -222,12 +233,14 @@ trait Timetable
         }
 
         if ($d_index) {
-            for ($date = $start_date; $date->lte($end_date); $date->addDay())
+            for ($date = $start_date; $date->lte($end_date); $date->addDay()) {
                 $dates[$date->format('d')] = $date->format($format);
+            }
         }
         else {
-            for ($date = $start_date; $date->lte($end_date); $date->addDay())
+            for ($date = $start_date; $date->lte($end_date); $date->addDay()) {
                 $dates[] = $date->format($format);
+            }
         }
 
         return $dates;
@@ -324,15 +337,17 @@ trait Timetable
     /**
      * @param string $start
      * @param string $end
-     * @return \Date
+     * @return \Illuminate\Support\Carbon
      */
-    public static function getCurrentStart($start = 'this', $end = 'next'): \Date
+    public static function getCurrentStart($start = 'this', $end = 'next')
     {
         $mondays = self::getMondays($start, $end);
         $arr = [];
         foreach ($mondays as $monday)
+        {
             $arr[] = $monday;
-        return \Date::parse($arr[count($arr) - 1]);
+        }
+        return Date::parse($arr[count($arr) - 1]);
     }
 
     /**
@@ -387,13 +402,19 @@ trait Timetable
     }
 
     /**
-     * @param string $month
+     * @param string|null $month
+     * @param null $year
      * @return array
      */
-    public static function getFullDaysOfMonth(string $month = ''): array
+    public static function getFullDaysOfMonth(string $month = null, $year = null): array
     {
-        $start = new Carbon('first day of ' . $month);
-        $end = Carbon::parse($start->toDateString())->endOfMonth();
+        $date = new Carbon();
+        $date->setYear($year ?? strtolower(date('Y') ));
+        $date->setMonth(Carbon::createFromFormat('F', $month ?? date('F'))->month );
+
+
+        $start = Carbon::parse($date)->firstOfMonth();
+        $end = Carbon::parse($date)->endOfMonth();
 
         return self::generateFullDateRange($start, $end);
     }
