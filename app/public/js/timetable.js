@@ -1,9 +1,9 @@
-let mouseDown = 0;
+let mouseDown = false;
 document.body.addEventListener('mousedown', function() {
-    ++mouseDown;
+    mouseDown = true;
 });
 document.body.addEventListener('mouseup', function() {
-    --mouseDown;
+    mouseDown = false;
 });
 
 // Привязка события к конкретному элементу
@@ -31,7 +31,9 @@ console.log(currentLocation);
 
 
 let checkboxes = document.getElementsByClassName('checkbox');
+
 Object.keys(checkboxes).forEach((el) => {
+
     checkboxes[el].addEventListener('mousedown', function () {
         checkboxes[el].classList.toggle('checked');
     });
