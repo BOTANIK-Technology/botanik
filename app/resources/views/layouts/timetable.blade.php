@@ -25,12 +25,12 @@
         <div class="timetable_box-table timetable grid">
             <div class="row-1 border-right-main border-bottom-main day"></div>
             @foreach($daysMonth as $key => $day)
-            <div class="day border-bottom-main user-select-none cnt {{$loop->index+2 == 8 ? '' : 'border-right'}}" style="grid-column:{{$loop->index+2}}">
+            <div class="day border-bottom-main user-select-none cnt border-right" style="grid-column:{{$loop->index+2}}">
                 <p>{{$daysWeek[strtolower($day['day']) ]}}</p>
                 <p><b>{{$day['number']}}</b></p>
             </div>
             @foreach($times as $time)
-            <div id="{{$key}}-{{$time}}" class="checkbox user-select-none {{$loop->index+2 == 2 ? '' : 'border-top'}} {{$loop->parent->index+2 == 8 ? '' : 'border-right'}}" style="grid-column:{{$loop->parent->index+2}};grid-row:{{$loop->index+2}}" data-day="{{$key}}" data-time="{{$time}}">
+            <div id="{{$key}}-{{$time}}" class="checkbox user-select-none {{$loop->index+2 == 2 ? '' : 'border-top'}} border-right" style="grid-column:{{$loop->parent->index+2}};grid-row:{{$loop->index+2}}" data-day="{{$key}}" data-time="{{$time}}">
             </div>
             @endforeach
             @endforeach
