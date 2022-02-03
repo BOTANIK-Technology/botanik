@@ -4,6 +4,13 @@
 
 <button id="select-all" class="btn">{{__('Выбрать всё')}}</button>
 <button id="clear-all" class="btn btn-warning">{{__('Очистить всё')}}</button>
+<div class="year_input">
+    <select id="year_picker">
+        @foreach($yearList as $year)
+            <option value="{{$year}}" {{date('Y') == $year ? 'selected' : ''}}>{{$year}}</option>
+        @endforeach
+    </select>
+</div>
 <div class="month_input">
     <select id="month_picker">
         @foreach($allMonth as $key => $month)

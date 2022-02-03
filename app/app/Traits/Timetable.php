@@ -106,15 +106,30 @@ trait Timetable
         'sunday'    => 'ВС'
     ];
 
-    public static function getMonthList($current)
+    public static function getMonthList($current = null)
     {
-        $res = [];
-        foreach (self::$months as $key => $name) {
-            if (Carbon::parse($current)->lessThanOrEqualTo(Carbon::parse($key))) {
-                $res[$key] = $name;
+        if ($current) {
+            $res = [];
+            foreach (self::$months as $key => $name) {
+                if (Carbon::parse($current)->lessThanOrEqualTo(Carbon::parse($key))) {
+                    $res[$key] = $name;
+                }
             }
         }
+        else {
+            $res = self::$months;
+        }
         return $res;
+    }
+
+    public static function getYearList(): array
+    {
+        return [
+            date('Y'),
+            date('Y', strtotime('+1 year')),
+            date('Y', strtotime('+2 year')),
+            date('Y', strtotime('+3 year')),
+        ];
     }
 
     /**

@@ -30,5 +30,6 @@ class Controller extends BaseController
         $this->params['daysMonth'] = UserTimetable::getFullDaysOfMonth($this->params['current_month']);
         $this->params['allMonth'] = UserTimetable::getMonthList($this->params['current_month']);
         $this->params['times'] = ServiceTimetable::getHours();
+        $this->params['yearList'] = ServiceTimetable::getYearList();
     }
 }
