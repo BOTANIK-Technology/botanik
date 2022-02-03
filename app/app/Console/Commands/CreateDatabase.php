@@ -23,15 +23,6 @@ class CreateDatabase extends Command
      */
     protected $description = 'Create a new database';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.
@@ -48,17 +39,17 @@ class CreateDatabase extends Command
 
             Log::debug('connection', [$connection, DB::connection($connection)]);
 
-            $hasDb = DB::connection($connection)->select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "."'".$dbname."'");
+            $hasDb = DB::connection($connection)->select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = " . "'" . $dbname . "'");
 
-            if(empty($hasDb)) {
-                DB::connection($connection)->select('CREATE DATABASE '. $dbname.' '.'CHARACTER SET utf8 COLLATE utf8_general_ci');
+            if (empty($hasDb)) {
+                DB::connection($connection)->select('CREATE DATABASE ' . $dbname . ' ' . 'CHARACTER SET utf8 COLLATE utf8_general_ci');
                 $this->info("Database '$dbname' created for '$connection' connection");
             }
             else {
                 $this->info("Database $dbname already exists for $connection connection");
             }
         }
-        catch (\Exception $e){
+        catch (\Exception $e) {
             $this->error($e->getMessage());
         }
     }

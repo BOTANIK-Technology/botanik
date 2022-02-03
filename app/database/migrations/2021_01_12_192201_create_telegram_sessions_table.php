@@ -38,6 +38,6 @@ class CreateTelegramSessionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('client_sessions');
+        Schema::dropIfExists('telegram_sessions');
     }
 }
