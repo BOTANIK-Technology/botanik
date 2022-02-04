@@ -1,5 +1,5 @@
 @section('scripts')
-    <script src="{{asset('js/cookie.min.js')}}"></script>
+    <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let saveData = "{{request()->get('savedata', 0)}}";
         if (!saveData){

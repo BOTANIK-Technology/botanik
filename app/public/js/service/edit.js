@@ -16,6 +16,7 @@ if (document.querySelector('.modal-edit') !== null && typeof ids !== 'undefined'
             }
         });
     }
+    }
 
     function addressesVal (id) {
         let addresses = document.getElementsByName('addresses-'+id+'[]');

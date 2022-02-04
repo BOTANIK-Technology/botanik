@@ -4,7 +4,7 @@
     </script>
     <script src="{{asset('js/user/page.js')}}"></script>
 
-    <script src="{{asset('js/cookie.min.js')}}"></script>
+    <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let checked = [];
         @if (isset($checked) )

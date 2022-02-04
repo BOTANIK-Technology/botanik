@@ -1,5 +1,5 @@
 @section('scripts')
-    <script src="{{asset('js/cookie.min.js')}}"></script>
+    <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let note = '{{Auth::user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';

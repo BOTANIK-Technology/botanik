@@ -1,5 +1,5 @@
 @section('scripts')
-    <script src="{{asset('js/cookie.min.js')}}"></script>
+    <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         @if($view_service)
         let ids = ['{{$view_service->id}}'];
@@ -147,13 +147,12 @@
                 </div>
 
                 <div class="row-10 col-2 align-self-center">
-                    <button
-                        id="calendar-{{$view_service->id}}"
+                    <a
                         class="background-none calendar-a"
-                        data-href="{{route('window.service', ['business' => $slug, 'load' => $load, 'type_id' => $view_service_type->id, 'service_id' => $view_service->id, 'modal' => 'timetable'])}}"
+                        href="{{route('window.service', ['business' => $slug, 'type_id' => $view_service_type->id, 'service_id' => $view_service->id, 'modal' => 'timetable'])}}"
                     >
                         <div class="calendar-icon"></div>
-                    </button>
+                    </a>
                 </div>
 
                 <div class="row-11 col-2 grid intervals">

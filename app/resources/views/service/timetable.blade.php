@@ -3,13 +3,7 @@
         let id = '{{$service_id ?? ''}}';
     </script>
     <script src="{{asset('js/service/page.js')}}"></script>
-    <script src="{{asset('js/cookie.min.js')}}"></script>
-    <script>
-        let checked = @json($checked);
-        for (let item in checked) {
-            setCookie(item, JSON.stringify(checked[item]));
-        }
-    </script>
+    <script src="{{asset('js/cookie.js')}}"></script>
     <script src="{{asset('js/timetable.js')}}"></script>
     <script src="{{asset('js/service/timetable.js')}}"></script>
 @endsection

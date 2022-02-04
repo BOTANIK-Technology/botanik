@@ -1,9 +1,17 @@
 function getCookie(name) {
-    if(! localStorage.data){
-        localStorage.data = JSON.stringify({name: ""});
+    let storData;
+    if(!localStorage.data ){
+        storData = {};
+        localStorage.data = JSON.stringify(storData);
     }
-    let data = JSON.parse(localStorage.data);
-    return data[name];
+    storData = JSON.parse(localStorage.data);
+    console.log(name, 'before', storData[name], Object.keys(storData), (name in storData ) );
+    if (!(name in storData)) {
+        storData[name] = {};
+        localStorage.data = JSON.stringify(storData);
+    }
+    console.log(name, 'after', storData[name]);
+    return storData[name];
 
 }
 
@@ -15,7 +23,7 @@ function setCookie(name, value, options = {}) {
 
     data[name] = value;
     localStorage.data = JSON.stringify(data);
-    return;
+    return data;
 
 
 }

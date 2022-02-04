@@ -1,21 +1,37 @@
 @section('critical-scripts')
     <link href="{{ asset('css/timetable.css') }}" rel="stylesheet">
+    <script>
+        // Загружаем данные из базы
+        let init = () => {
+            let checked = @json($checked);
+            for (let item in checked) {
+                setCookie(item, JSON.stringify(checked[item]));
+            }
+        }
+        init();
+
+    </script>
 @endsection
 
 <div class="timetable_box">
     <div class="timetable_box-head">
         <div class="timetable_box-fields">
-            <select id="month_picker" class="timetable_box-select" >
+            <select id="month_picker" class="timetable_box-select">
                 @foreach($allMonth as $key => $month)
                     <option value="{{$key}}" {{$current_month == $key ? 'selected' : ''}}>{{$month}}</option>
                 @endforeach
             </select>
-            <select id="year_picker" class="timetable_box-select" >
+            <select id="year_picker" class="timetable_box-select">
                 @foreach($yearList as $year)
                     <option value="{{$year}}" {{$current_year == $year ? 'selected' : ''}}>{{$year}}</option>
                 @endforeach
             </select>
         </div>
+        <div class="timetable_box-btns">
+            <button id="save_month" class="timetable_box-btn btn btn-info">{{__('Сохранить')}}</button>
+        </div>
+
+
         <div class="timetable_box-btns">
             <button id="select-all" class="timetable_box-btn btn">{{__('Выбрать всё')}}</button>
             <button id="clear-all" class="timetable_box-btn btn btn-warning">{{__('Очистить всё')}}</button>
@@ -25,21 +41,22 @@
         <div class="timetable_box-table timetable grid">
             <div class="row-1 border-right-main border-bottom-main day"></div>
             @foreach($allMonthDays[$current_year][$current_month] as $key => $day)
-{{--                <div class="{{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week-end' : ''}}">--}}
-                    <div class="day-row day border-bottom-main user-select-none cnt border-right {{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week_end' : ''}}"
-                         style="grid-column:{{$loop->index+2}}">
-                        <p class="week_day_cell">{{$daysWeek[strtolower($day['day']) ]}}</p>
-                        <p class="number_cell"><strong>{{$day['number']}}</strong></p>
+                {{--                <div class="{{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week-end' : ''}}">--}}
+                <div
+                    class="day-row day border-bottom-main user-select-none cnt border-right {{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week_end' : ''}}"
+                    style="grid-column:{{$loop->index+2}}">
+                    <p class="week_day_cell">{{$daysWeek[strtolower($day['day']) ]}}</p>
+                    <p class="number_cell"><strong>{{$day['number']}}</strong></p>
+                </div>
+                @foreach($times as $time)
+                    <div id="{{$key}}-{{$time}}"
+                         class="checkbox user-select-none {{$loop->index+2 == 2 ? '' : 'border-top'}} {{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week_end' : ''}} border-right"
+                         style="grid-column:{{$loop->parent->index+2}};grid-row:{{$loop->index+2}}"
+                         data-day="{{$key}}"
+                         data-time="{{$time}}">
                     </div>
-                    @foreach($times as $time)
-                        <div id="{{$key}}-{{$time}}"
-                             class="checkbox user-select-none {{$loop->index+2 == 2 ? '' : 'border-top'}} {{$day['day'] == 'Saturday' || $day['day'] == 'Sunday' ? 'week_end' : ''}} border-right"
-                             style="grid-column:{{$loop->parent->index+2}};grid-row:{{$loop->index+2}}"
-                             data-day="{{$key}}"
-                             data-time="{{$time}}">
-                        </div>
-{{--                </div>--}}
-            @endforeach
+                    {{--                </div>--}}
+                @endforeach
             @endforeach
             @foreach($times as $time)
                 <div class="timetable_box-time border-right-main border-top col-1 time user-select-none cnt"
@@ -51,11 +68,13 @@
 @section('modal-styles')
     <style>
         .timetable .user-select-none.week_end {
-            background-color: lightblue;
+            background-color: rgba(173, 216, 230, .2);
         }
+
         .timetable .user-select-none.week_end.checked {
             background-color: #084887;
         }
+
         .timetable_box {
             display: -webkit-box;
             display: -ms-flexbox;
@@ -128,6 +147,7 @@
         .timetable_box-btn#select-all:last-child {
             margin-right: 0;
         }
+
 
         .timetable_box-fields {
             display: -webkit-box;
@@ -217,6 +237,10 @@
             position: -webkit-sticky;
             position: sticky;
             left: 0;
+        }
+
+        .btn-info {
+            color: black;
         }
     </style>
 

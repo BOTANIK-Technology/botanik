@@ -1,3 +1,4 @@
+/*
 let timeBtn = document.getElementById('time-confirm');
 if (timeBtn) {
 
@@ -33,3 +34,4 @@ if (timeBtn) {
     });
 
 }
+*/
