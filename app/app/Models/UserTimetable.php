@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
-use \App\Traits\Timetable;
+use \App\Traits\TimetableTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Log;
 use function PHPUnit\Framework\greaterThanOrEqual;
@@ -27,7 +27,7 @@ use function PHPUnit\Framework\greaterThanOrEqual;
 class UserTimetable extends Model
 {
 
-    use HasFactory, Timetable;
+    use HasFactory, TimetableTrait;
 
     protected $fillable = [
         'monday',

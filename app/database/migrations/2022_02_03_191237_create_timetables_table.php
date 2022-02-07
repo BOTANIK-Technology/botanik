@@ -16,9 +16,9 @@ class CreateTimetablesTable extends Migration
     {
         Schema::create('timetables', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->integer('address_id');
+            $table->integer('address_id')->nullable();
             $table->integer('year');
             $table->string('month');
             $table->json('schedule');

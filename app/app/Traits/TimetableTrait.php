@@ -10,7 +10,7 @@ use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 
-trait Timetable
+trait TimetableTrait
 {
     /**
      * @var array

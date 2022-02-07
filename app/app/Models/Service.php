@@ -120,9 +120,9 @@ class Service extends Model
     /**
      * @return HasOne
      */
-    public function timetable (): HasOne
+    public function timetable (): HasMany
     {
-        return $this->hasOne(ServiceTimetable::class);
+        return $this->hasMany(ServiceTimetable::class);
     }
 
     /**
@@ -175,24 +175,33 @@ class Service extends Model
     }
 
     /**
-     * @param array $timetable
+     * @param array $timeTable
      */
-    public function attachTimetable($timetable = []) : void
+    public function attachTimetable(array $timeTable = []) : void
     {
-        $table = new ServiceTimetable();
-        foreach ($timetable as $day => $time)
-            $table->$day = json_encode($time);
-        $this->timetable()->save($table);
+        foreach ($timeTable as $year => $monthTable){
+            foreach ($monthTable as $month => $schedule){
+                ServiceTimetable::create([
+                   'service_id' => $this->id,
+                   'year' => $year,
+                   'month' => $month,
+                   'schedule' => $schedule
+                ]);
+            }
+        }
     }
 
     /**
      * @param array $timetable
      * @throws Exception
      */
-    public function updateTimetable($timetable = []) : void
+    public function updateTimetable(array $timetable = []) : void
     {
-        if (isset($this->timetable))
-            $this->timetable->delete();
+        if ($this->timetable) {
+            foreach ($this->timetable as $tableRecord) {
+                $tableRecord->delete();
+            }
+        }
         $this->attachTimetable($timetable);
     }
 

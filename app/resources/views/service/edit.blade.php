@@ -1,19 +1,23 @@
 @section('scripts')
+    <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
+        let ids = [];
         @if($view_service)
-        let ids = ['{{$view_service->id}}'];
-        @else
-        let ids = false;
+            ids = ['{{$view_service->id}}'];
         @endif
-
-        let timeTables = @json($timetables);
-        console.log(Object.keys(timeTables).length, timeTables)
-        if (Object.keys(timeTables).length) {
-            for (let item in timeTables) {
-                setCookie(item, JSON.stringify(timeTables[item]));
+        let currentYear = '{{$current_year}}';
+        let currentMonth = '{{$current_month}}';
+        // Загружаем данные из базы
+        let init = () => {
+            const timeTables = @json($timetables);
+            if (Object.keys(timeTables).length) {
+                for (let item in timeTables) {
+                    setCookie(item, timeTables[item]);
+                }
             }
         }
+        init();
     </script>
     <script src="{{asset('js/service/page.js')}}"></script>
     <script src="{{asset('js/requests.js')}}"></script>
@@ -72,7 +76,6 @@
                     <input id="service-name-{{$view_service->id}}" class="inp" type="text"
                            value="{{$view_service->name}}" placeholder="{{__('Введите название')}}">
                 </div>
-
 
 
                 <div class="row-3 col-2 align-self-start">
@@ -147,10 +150,12 @@
                 </div>
 
                 <div class="row-10 col-2 align-self-center">
-                    <a
-                        class="background-none calendar-a"
-                        href="{{route('window.service', ['business' => $slug, 'type_id' => $view_service_type->id, 'service_id' => $view_service->id, 'modal' => 'timetable'])}}"
-                    >
+                    <a class="background-none calendar-a"
+                       href="{{route('window.service', [
+                                'business' => $slug,
+                                  'service_id' => $view_service->id,
+                                   'modal' => 'timetable'
+                   ])}}">
                         <div class="calendar-icon"></div>
                     </a>
                 </div>

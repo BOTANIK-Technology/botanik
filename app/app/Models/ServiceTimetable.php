@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use App\Traits\Timetable;
-use Barryvdh\LaravelIdeHelper\Eloquent;
+
+use App\Traits\TimetableTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -19,19 +17,10 @@ use Illuminate\Support\Facades\Log;
  * @method static Builder|ServiceTimetable newQuery()
  * @method static Builder|ServiceTimetable query()
  */
-class ServiceTimetable extends Model
+class ServiceTimetable extends Timetables
 {
-    use HasFactory, Timetable;
+    use HasFactory, TimetableTrait;
 
-    protected $guarded = ['id'];
-
-    /**
-     * @return BelongsTo
-     */
-    public function service(): BelongsTo
-    {
-        return $this->belongsTo(Service::class);
-    }
 
     /**
      * @param Carbon $date
@@ -74,7 +63,7 @@ class ServiceTimetable extends Model
         if (!$booked_array) {
             $booked_array = [];
         }
-        Log::info('Service Booked', $booked_array);
+
         // массив-карта слотов мастера
         $timeMap = [];
         $masterEndSlot = count($times) - 1;
@@ -97,7 +86,6 @@ class ServiceTimetable extends Model
         if ($duration % 30) {
             $serviceSlotsCount++;
         }
-        Log::info('Service-servise: ', [$duration, $serviceSlotsCount]);
 
         // Перебираем все созданные услуги и отмечаем недоступные из-них слоты
         foreach ($booked_array as $book => $bookDuration) {

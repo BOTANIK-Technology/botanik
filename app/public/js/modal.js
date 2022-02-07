@@ -6,7 +6,7 @@ function closeError(id = 'error-modal') {
     document.getElementById(id).remove();
 }
 function closeModal(event, id = 'modal', href = false) {
-    removeClass(app, 'bg-blur');
+    app.classList.remove('bg-blur');
     let refresh = document.getElementById('refresh-'+id);
     if (refresh) {
         if (href !== false)
@@ -22,35 +22,8 @@ if (close_modal.length > 0) {
         close_modal[k].addEventListener('click', closeModal)
     });
 }
-function addClass (obj, add) {
-    if (obj.classList) {
-        obj.classList.forEach((cl) => {
-            if (cl === add) return false;
-        });
-        obj.classList.add(add);
-        return true;
-    }
-    return false;
-}
-function removeClass (obj, remove) {
-    if (obj.classList) {
-        obj.classList.forEach((cl) => {
-            if (cl === remove) {
-                obj.classList.remove(remove);
-                return true;
-            }
-        });
-    }
-    return false;
-}
 
-function isArray(obj) {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-}
 
-function isObject(obj) {
-    return obj === Object(obj);
-}
 
 function inputActive(input) {
     if (isArray(input))
@@ -64,8 +37,10 @@ function inputActive(input) {
     }
     else {
         input.addEventListener('change', function () {
-            if (this.value.length > 0) addClass(this, 'active');
-            else removeClass(this, 'active');
+            if (this.value.length > 0) {
+                this.classList.add('active');
+            }
+            else this.classList.remove(this, 'active');
         });
     }
 }
@@ -74,18 +49,24 @@ function selectActive() {
     let selects = document.getElementsByTagName('select');
     Object.keys(selects).forEach((el) => {
         selects[el].addEventListener('focus', function () {
-            addClass(selects[el],'active');
+            selects[el].classlist.add('active');
         });
         selects[el].addEventListener('blur', function () {
-            removeClass(selects[el],'active');
+            selects[el].classlist.remove('active');
         });
     });
 }
 
-if(modal.length)addClass(app, 'bg-blur');
-else removeClass(app, 'bg-blur');
+if(modal.length){
+    app.classList.add('bg-blur');
+}
+else {
+    app.classList.remove('bg-blur');
+}
 
-if(document.getElementById('modal-empty'))removeClass(app, 'bg-blur');
+if(document.getElementById('modal-empty')){
+    app.classList.remove('bg-blur');
+}
 
 
 let loadMore = document.querySelector('.load-block');

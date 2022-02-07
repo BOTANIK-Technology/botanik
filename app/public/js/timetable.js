@@ -5,7 +5,19 @@ document.body.addEventListener('mousedown', function () {
 document.body.addEventListener('mouseup', function () {
     mouseDown = false;
 });
-let isSaved = true;
+
+
+const changeSavedButton = function (savedState) {
+    let mButton = document.getElementById('save_month');
+    if (savedState) {
+        mButton.classList.add('saved');
+        mButton.textContent = 'Сохранено';
+    } else {
+        mButton.classList.remove('saved');
+        mButton.textContent = 'Сохранить';
+    }
+}
+changeSavedButton(true)
 
 
 let month = document.getElementById('month_picker');
@@ -13,70 +25,29 @@ let year = document.getElementById('year_picker');
 let saveMonth = document.getElementById('save_month');
 
 
-
-let showFromStorage = function(yearVal, monthVal) {
-    let checkedArray = {};
-    if (id) {
-        checkedArray = getCookie('checked-' + id);
-    } else {
-        checkedArray = getCookie('checked');
-    }
-    if (checkedArray) {
-    console.log(checkedArray, Object.keys(checkedArray), yearVal.value, monthVal.value);
-        if (! (yearVal.value in checkedArray) ) {
-            checkedArray[yearVal.value] = {};
-        }
-        if (monthVal.value in checkedArray[yearVal.value]) {
-            checkedArray = checkedArray[yearVal.value][monthVal.value];
-            for (let dateEl in checkedArray) {
-                for (let timeEl of checkedArray[dateEl]) {
-                    let cell = document.getElementById(dateEl + '-' + timeEl);
-                    if (cell) cell.classList.add('checked')
-                }
+const showFromStorage = function (yearVal, monthVal, idVal) {
+    let timetable = getCookie('timetable-' + idVal);
+    if (timetable && yearVal in timetable && monthVal in timetable[yearVal]) {
+        let checkedArray = timetable[yearVal][monthVal];
+        for (let dateEl in checkedArray) {
+            for (let timeEl of checkedArray[dateEl]) {
+                let cell = document.getElementById(dateEl + '-' + timeEl);
+                if (cell) cell.classList.add('checked')
             }
         }
     }
 }
-showFromStorage(year, month);
+showFromStorage(year.value, month.value, id);
 
 let timeBtn = document.getElementById('time-confirm');
 timeBtn.addEventListener('click', function () {
-    saveMonthAction();
+    saveMonthAction(id);
     closeModal();
 });
 
-
-
-
-month.addEventListener('change', () => {
-    window.location.replace(CURRENT_URL + '?current_month=' + month.value + '&current_year=' + year.value);
-});
-year.addEventListener('change', () => {
-    window.location.replace(CURRENT_URL + '?current_month=' + month.value + '&current_year=' + year.value);
-});
-
 saveMonth.addEventListener('click', () => {
-    saveMonthAction();
+    saveMonthAction(id);
 });
-
-
-// Привязка события к конкретному элементу
-function bindEvent(element, type, handler) {
-    if (element.addEventListener) {
-        element.addEventListener(type, handler, false);
-    } else {
-        element.attachEvent('on' + type, handler);
-    }
-}
-
-// Привязка события к выборке элементов
-function bindEventAll(NodeList, type, handler) {
-    for (let i = 0; i < NodeList.length; ++i) {
-        let element = NodeList[i];
-        bindEvent(element, type, handler);
-    }
-}
-
 
 let checkboxes = document.getElementsByClassName('checkbox');
 
@@ -84,7 +55,7 @@ Object.keys(checkboxes).forEach((el) => {
 
     checkboxes[el].addEventListener('mousedown', function () {
         checkboxes[el].classList.toggle('checked');
-        isSaved = false;
+        changeSavedButton(false);
 
     });
     checkboxes[el].addEventListener('mouseover', function () {
@@ -106,10 +77,10 @@ clr.addEventListener('click', function () {
     });
 })
 
-let saveMonthAction = () => {
+const saveMonthAction = (id) => {
     let allCookies;
     if (id) {
-        allCookies =getCookie('timetable-' + id);
+        allCookies = getCookie('timetable-' + id);
     } else {
         allCookies = getCookie('timetable');
     }
@@ -123,32 +94,36 @@ let saveMonthAction = () => {
             cookies[times[el].dataset.day].push(times[el].dataset.time);
         }
     });
-
-    if (!allCookies) {
+    if (!allCookies || !Object.keys(allCookies).length) {
         allCookies = {};
     }
+
     let indexYear = year.value;
+    let indexMonth = month.value;
+
+
     if (!(indexYear in allCookies)) {
         allCookies[indexYear] = {};
     }
 
-    allCookies[indexYear][month.value] = cookies;
+    allCookies[indexYear][indexMonth] = cookies;
 
-    if (Object.keys(allCookies).length ) {
+    if (Object.keys(allCookies).length) {
         if (id !== '') {
-            setCookie('timetable-' + id, allCookies, {'path': COOKIE_URL});
-            setCookie('checkedCell-' + id, allCookies, {'path': COOKIE_URL});
+            setCookie('timetable-' + id, allCookies);
+            setCookie('checked-' + id, allCookies);
         } else {
-            setCookie('timetable', allCookies, {'path': COOKIE_URL});
-            setCookie('checked', allCookies, {'path': COOKIE_URL});
+            setCookie('timetable', allCookies);
+            setCookie('checked', allCookies);
         }
     } else {
         if (id !== '') {
-            deleteCookie('timetable-' + id, COOKIE_URL);
-            deleteCookie('checkedCell-' + id, COOKIE_URL);
+            deleteCookie('timetable-' + id);
+            deleteCookie('checked-' + id);
         } else {
-            deleteCookie('timetable', COOKIE_URL);
-            deleteCookie('checked', COOKIE_URL);
+            deleteCookie('timetable');
+            deleteCookie('checked');
         }
     }
+    changeSavedButton(true);
 }

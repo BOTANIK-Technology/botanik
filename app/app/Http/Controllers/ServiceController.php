@@ -152,14 +152,11 @@ class ServiceController extends Controller
 
         if (!$view_service->timetable)
             return;
-
-        $days = ServiceTimetable::getDaysEn();
         $timetable = [];
-        foreach ($days as $day) {
-            if (!is_null($view_service->timetable->$day)) {
-                $timetable[$day] = json_decode($view_service->timetable->$day);
-            }
+        foreach ($view_service->timetable as $item) {
+            $timetable[$item->year][$item->month] = $item->schedule;
         }
+
 
         switch ($checked) {
             case false:
@@ -167,7 +164,7 @@ class ServiceController extends Controller
 //                setcookie('timetable-'.$view_service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
                 break;
             case true:
-                $this->params['checked']['checked-' . $view_service->id] = ServiceTimetable::getChecked($timetable);
+                $this->params['checked']['checked-' . $view_service->id] = $timetable;
 //                setcookie('checked-'.$view_service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
                 break;
         }
@@ -308,7 +305,9 @@ class ServiceController extends Controller
             $service->rewriteAddresses($request->input('addresses'));
 
             if ($request->has('timetable'))
+            {
                 $service->updateTimetable($request->input('timetable'));
+            }
 
             if ($request->prepay) {
                 $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
@@ -318,9 +317,13 @@ class ServiceController extends Controller
             }
 
             if (!empty($request->input('quantity')) && !empty($request->input('message')))
+            {
                 $service->updateGroup(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
+            }
             else
+            {
                 if (isset($service->group)) $service->group->delete();
+            }
 
             return response()->json(['ok' => true]);
         } catch (Exception $e) {
@@ -365,7 +368,7 @@ class ServiceController extends Controller
             'bonuspay' => 'required|boolean',
         ];
         $data = $request->all();
-        if ($data['prepay'] == true) {
+        if (isset($data['prepay']) && $data['prepay'] == true) {
             $rules['prepay_message'] = 'required|string';
             $rules['prepay_card'] = 'required|string';
         } else {

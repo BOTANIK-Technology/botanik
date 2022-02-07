@@ -11,7 +11,7 @@
 @section('modal')
     @component('modal')
 
-        @slot('header')
+{{--        @slot('header')--}}
 {{--            @if (isset($type_id))--}}
 {{--                <a href="{{route('window.service', ['business' => $slug, 'modal' => 'edit', 'id' => $type_id, 'load' => $load])}}"><div class="back-icon"></div></a>--}}
 {{--            @else--}}

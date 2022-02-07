@@ -59,8 +59,6 @@ if (addService) {
      */
     let inputs = getCookie('inputs');
     if (inputs && inputs !== 'undefined') {
-
-        inputs = JSON.parse(inputs);
         document.getElementById('service-name').value = inputs.name;
         document.getElementById('service-type').value = inputs.type;
          // document.getElementById('range').value = inputs.range;

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
@@ -57,17 +58,11 @@ class Timetables extends Model
      */
     protected $fillable = [
         'user_id',
-
         'service_id',
-
         'address_id',
-
         'year',
-
         'month',
-
         'schedule',
-
     ];
 
     /**
@@ -85,7 +80,6 @@ class Timetables extends Model
      * @var array
      */
     protected $casts = [
-
         'schedule' => 'array'
     ];
 
@@ -99,10 +93,17 @@ class Timetables extends Model
         'year' => [],
 
         'month' => [],
-
-        'schedule' => []
-
     ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
+    }
+
+
 
 
 }

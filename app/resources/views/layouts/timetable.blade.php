@@ -1,19 +1,5 @@
 @section('critical-scripts')
     <link href="{{ asset('css/timetable.css') }}" rel="stylesheet">
-    <script>
-        // Загружаем данные из базы
-        let init = () => {
-            let checked = @json($checked);
-            console.log(checked);
-            if (checked.length) {
-                for (let item in checked) {
-                    setCookie(item, JSON.stringify(checked[item]));
-                }
-            }
-        }
-        init();
-
-    </script>
 @endsection
 
 <div class="timetable_box">
@@ -244,6 +230,10 @@
 
         .btn-info {
             color: black;
+        }
+
+        .saved {
+            color: green;
         }
     </style>
 
