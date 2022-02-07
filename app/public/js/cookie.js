@@ -5,12 +5,12 @@ function getCookie(name) {
         localStorage.data = JSON.stringify(storData);
     }
     storData = JSON.parse(localStorage.data);
-    console.log(name, 'before', storData[name], Object.keys(storData), (name in storData ) );
+
     if (!(name in storData)) {
         storData[name] = {};
         localStorage.data = JSON.stringify(storData);
     }
-    console.log(name, 'after', storData[name]);
+
     return storData[name];
 
 }

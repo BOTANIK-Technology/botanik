@@ -4,8 +4,11 @@
         // Загружаем данные из базы
         let init = () => {
             let checked = @json($checked);
-            for (let item in checked) {
-                setCookie(item, JSON.stringify(checked[item]));
+            console.log(checked);
+            if (checked.length) {
+                for (let item in checked) {
+                    setCookie(item, JSON.stringify(checked[item]));
+                }
             }
         }
         init();

@@ -5,6 +5,9 @@ document.body.addEventListener('mousedown', function () {
 document.body.addEventListener('mouseup', function () {
     mouseDown = false;
 });
+let isSaved = true;
+
+
 let month = document.getElementById('month_picker');
 let year = document.getElementById('year_picker');
 let saveMonth = document.getElementById('save_month');
@@ -19,14 +22,14 @@ let showFromStorage = function(yearVal, monthVal) {
         checkedArray = getCookie('checked');
     }
     if (checkedArray) {
+    console.log(checkedArray, Object.keys(checkedArray), yearVal.value, monthVal.value);
         if (! (yearVal.value in checkedArray) ) {
             checkedArray[yearVal.value] = {};
         }
-        if (monthVal.value in checkedArray) {
+        if (monthVal.value in checkedArray[yearVal.value]) {
             checkedArray = checkedArray[yearVal.value][monthVal.value];
             for (let dateEl in checkedArray) {
                 for (let timeEl of checkedArray[dateEl]) {
-                    console.log(dateEl + ' ' + timeEl);
                     let cell = document.getElementById(dateEl + '-' + timeEl);
                     if (cell) cell.classList.add('checked')
                 }
@@ -74,12 +77,6 @@ function bindEventAll(NodeList, type, handler) {
     }
 }
 
-// let monthElements = document.querySelectorAll('#month_picker option');
-// bindEventAll(monthElements, 'click', function (){
-//     let currentLocation = window.location;
-// console.log(currentLocation);
-// });
-
 
 let checkboxes = document.getElementsByClassName('checkbox');
 
@@ -87,6 +84,8 @@ Object.keys(checkboxes).forEach((el) => {
 
     checkboxes[el].addEventListener('mousedown', function () {
         checkboxes[el].classList.toggle('checked');
+        isSaved = false;
+
     });
     checkboxes[el].addEventListener('mouseover', function () {
         if (mouseDown) checkboxes[el].classList.toggle('checked');
@@ -124,7 +123,6 @@ let saveMonthAction = () => {
             cookies[times[el].dataset.day].push(times[el].dataset.time);
         }
     });
-    console.log(allCookies, cookies);
 
     if (!allCookies) {
         allCookies = {};
@@ -135,8 +133,6 @@ let saveMonthAction = () => {
     }
 
     allCookies[indexYear][month.value] = cookies;
-
-console.log(allCookies);
 
     if (Object.keys(allCookies).length ) {
         if (id !== '') {
