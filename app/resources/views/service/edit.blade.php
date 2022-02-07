@@ -2,10 +2,6 @@
     <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
-        let ids = [];
-        @if($view_service)
-            ids = ['{{$view_service->id}}'];
-        @endif
         let currentYear = '{{$current_year}}';
         let currentMonth = '{{$current_month}}';
         // Загружаем данные из базы
@@ -150,7 +146,7 @@
                 </div>
 
                 <div class="row-10 col-2 align-self-center">
-                    <a class="background-none calendar-a"
+                    <a id="calendar" class="background-none calendar-a"
                        href="{{route('window.service', [
                                 'business' => $slug,
                                   'service_id' => $view_service->id,
@@ -185,8 +181,8 @@
                 </div>
 
                 <div class="row-1 col-3 align-self-start text-align-center">
-                    <button type="button" id="edit-{{$view_service->id}}" data-service="{{$view_service->id}}"
-                            class="btn-primary" name="save-service">
+                    <button type="button" id="save-service" data-service="{{$view_service->id}}"
+                            class="btn-primary" >
                         {{ __('Сохранить') }}
                     </button>
                 </div>

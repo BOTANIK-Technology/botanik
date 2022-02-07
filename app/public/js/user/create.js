@@ -25,12 +25,12 @@ if (addUserBtn) {
         let Request = postRequest(createRoute+'/add-user', send);
         Request.onload = function() {
             if (Request.status >= 200 && Request.status < 400) {
-                deleteCookie('input', COOKIE_URL);
+                deleteCookie('input');
                 for (let i = 0; i < countService; i++) {
-                    deleteCookie('timetable-'+i, COOKIE_URL);
-                    deleteCookie('checked-'+i, COOKIE_URL);
-                    deleteCookie('user_data-'+i, COOKIE_URL);
-                    deleteCookie('admin_data-'+i, COOKIE_URL);
+                    deleteCookie('timetable-'+i);
+                    deleteCookie('checked-'+i);
+                    deleteCookie('user_data-'+i);
+                    deleteCookie('admin_data-'+i);
                 }
                 if (note && note.length)
                     closeModal(false, 'modal', note);

@@ -1,13 +1,20 @@
 @section('scripts')
+    <script src="{{asset('js/functions.js')}}"></script>
+    <script src="{{asset('js/cookie.js')}}"></script>
+    <script>
+        let currentYear = '{{$current_year}}';
+        let currentMonth = '{{$current_month}}';
+    </script>
     <script src="{{asset('js/service/page.js')}}"></script>
     <script src="{{asset('js/requests.js')}}"></script>
-    <script src="{{asset('js/cookie.js')}}"></script>
     <script src="{{asset('js/service/create.js')}}"></script>
 @endsection
 
 @section('modal')
     @component('modal')
-
+        @slot('class')
+            modal-create
+        @endslot
         @if ($addresses)
             <div id="more-addresses" class="hide">
                 <select id="more-addresses-select" name="addresses[]">
@@ -77,12 +84,6 @@
                 @endif
             </div>
 
-{{--            <div class="checkboxes grid intervals row-4 col-2">--}}
-{{--                @foreach($intervals as $interval)--}}
-{{--                    <input id="interval-{{$interval->id}}" type="radio" name="interval" value="{{$interval->id}}">--}}
-{{--                    <label for="interval-{{$interval->id}}" class="user-select-none">{{$interval->name}}</label>--}}
-{{--                @endforeach--}}
-{{--            </div>--}}
 
             {{-- Длительность --}}
             <div class="checkboxes grid hours row-4 col-2"  >
@@ -101,7 +102,7 @@
                     @php($minutes += 5)
                 @endwhile
             </div>
-            {{-- /Длительность --}}
+            {{-- / Длительность --}}
 
             {{-- Интервал --}}
             <div class="checkboxes grid hours row-6 col-2"  >
@@ -120,11 +121,7 @@
                     @php($minutes += 5)
                 @endwhile
             </div>
-            {{-- /Интервал --}}
-
-{{--            <div class="row-8 col-2">--}}
-{{--                <input id="range" class="inp" type="text" placeholder="{{__('Введите интервал посещений в минутах')}}">--}}
-{{--            </div>--}}
+            {{-- / Интервал --}}
 
             <div class="row-8 col-2">
                 <input id="price" class="inp" type="text" placeholder="{{__('Введите сумму')}}">
@@ -204,7 +201,7 @@
 
         @slot('buttons')
             <div class="line margin"></div>
-            <button type="button" id="add-service" class="btn-primary">
+            <button type="button" id="save-service" class="btn-primary">
                 {{ __('Создать') }}
             </button>
             <a href="{{route('service', ['business' => $slug, 'load' => $load])}}" id="refresh-modal"></a>

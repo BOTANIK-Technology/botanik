@@ -26,8 +26,15 @@ let saveMonth = document.getElementById('save_month');
 
 
 const showFromStorage = function (yearVal, monthVal, idVal) {
-    let timetable = getCookie('timetable-' + idVal);
-    if (timetable && yearVal in timetable && monthVal in timetable[yearVal]) {
+    let timetable;
+    if(idVal) {
+        timetable = getCookie('timetable-' + idVal);
+    }
+    else {
+        timetable = getCookie('timetable');
+    }
+
+    if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
         let checkedArray = timetable[yearVal][monthVal];
         for (let dateEl in checkedArray) {
             for (let timeEl of checkedArray[dateEl]) {

@@ -1,21 +1,13 @@
-let addService = document.getElementById('add-service');
-if (addService) {
-
+if (document.querySelector('.modal-create') ) {
+    setInitialData();
     //styles
     inputActive(document.getElementsByClassName('inp'));
-    selectActive();
 
     let svg = document.getElementById('add-icon').innerHTML;
-    let calendar = document.getElementById('calendar');
 
-    let addressSelector = document.getElementById('more-addresses');
+
     let addressSelectorSelect = document.getElementById('more-addresses-select');
     let moreBtn = document.getElementById('include-address');
-    let addressesBlock = document.getElementById('addresses');
-    function addressSelectors () {return document.getElementsByName('addresses[]')}
-    function addAddressSelector () {
-        addressesBlock.insertAdjacentHTML('beforeEnd', addressSelector.innerHTML)
-    }
 
     function issetTimetable() {
         let timetable = getCookie('timetable');
@@ -42,14 +34,14 @@ if (addService) {
 
     let groupBlock = document.getElementById('group-service');
     function groupOff () {
-        addClass(groupBlock, 'hide');
+        groupBlock.classList.add('hide');
         document.getElementById('quantity').value = '';
         document.getElementById('message').value = '';
     }
 
     let prepayBlock = document.getElementById('prepay-service');
     function prepayOff () {
-        addClass(prepayBlock, 'hide');
+        prepayBlock.classList.add('hide');
         document.getElementById('card').value = '';
         document.getElementById('prepay-message').value = '';
     }
@@ -74,13 +66,6 @@ if (addService) {
         document.getElementById('card').value = inputs.prepay_card;
 
         let selectors = addressSelectors();
-        if (selectors.length < inputs.addresses.length) {
-            for (let i = selectors.length; i < inputs.addresses.length; i++) {
-                addAddressSelector();
-            }
-        }
-        selectors = addressSelectors();
-        setValues(selectors, inputs.addresses);
 
         setChecked(document.getElementsByName('group'), inputs.grouped);
         setChecked(document.getElementsByName('durationHours'), inputs.durationHours);
@@ -114,41 +99,6 @@ if (addService) {
         return getCheckedVal(document.getElementsByName(name));
     }
 
-    function groupVal () {
-        return getCheckedVal(document.getElementsByName('group'));
-    }
-
-    function getCheckedVal(objects) {
-        let val = '';
-        Object.keys(objects).forEach((el) => {
-            if (objects[el].checked) val = objects[el].value;
-        });
-        return val;
-    }
-
-    function send () {
-        return {
-            'name': document.getElementById('service-name').value,
-            'type': document.getElementById('service-type').value,
-            'addresses': addressesVal(),
-            'durationHours': checkedByNameVal('durationHours'),
-            'durationMinutes': checkedByNameVal('durationMinutes'),
-            'intervalHours': checkedByNameVal('intervalHours'),
-            'intervalMinutes': checkedByNameVal('intervalMinutes'),
-
-            'price': document.getElementById('price').value,
-            'bonus': document.getElementById('bonus').value,
-            'grouped': groupVal(),
-            'quantity': document.getElementById('quantity').value,
-            'message': document.getElementById('message').value,
-            'prepay': document.getElementById('prepay').checked,
-            'cashpay': document.getElementById('cashpay').checked,
-            'onlinepay': document.getElementById('onlinepay').checked,
-            'bonuspay': document.getElementById('bonuspay').checked,
-            'prepay_message': document.getElementById('prepay-message').value,
-            'prepay_card': document.getElementById('card').value,
-        }
-    }
 
     /**
      * Add type
@@ -170,7 +120,7 @@ if (addService) {
                 Request.onload = function() {
                     if (Request.status >= 200 && Request.status < 400) {
                         let response = JSON.parse(Request.response);
-                        removeClass(typesList, 'none');
+                        typesList.classList.remove('none');
                         typesList.insertAdjacentHTML(
                             'beforeEnd',
                             '<option value="'+ response.id +'">' +
@@ -204,7 +154,7 @@ if (addService) {
                 Request.onload = function() {
                     if (Request.status >= 200 && Request.status < 400) {
                         let response = JSON.parse(Request.response);
-                        removeClass(addrsList, 'none');
+                        addrsList.classList.remove('none');
                         addrsList.insertAdjacentHTML(
                             'beforeEnd',
                             '<option value="'+ response.id +'">' +
@@ -235,106 +185,30 @@ if (addService) {
     }
 
 
-    /**
-     * Timetable cookie
-     */
-    let timetable = getCookie('timetable');
-    if (timetable && timetable !== 'undefined') {
-        timetable = JSON.parse(timetable);
-        let html = '';
-        Object.keys(timetable).forEach((time) => {
-            let day;
-            switch (time) {
-                case 'monday':
-                    day = 'ПН';
-                    break;
-                case 'tuesday':
-                    day = 'ВТ';
-                    break;
-                case 'wednesday':
-                    day = 'СР';
-                    break;
-                case 'thursday':
-                    day = 'ЧТ';
-                    break;
-                case 'friday':
-                    day = 'ПТ';
-                    break;
-                case 'saturday':
-                    day = 'СБ';
-                    break;
-                case 'sunday':
-                    day = 'ВС';
-            }
-            html += '<span>' + day + '. ' + timetable[time][0] + ' - ' + timetable[time][timetable[time].length-1] + '</span>';
-        });
-        calendar.innerHTML = '<div class="abbr-tt color flex direction-column">' + html + '</div>';
-    }
-
-    /**
-     * Calendar
-     */
-    calendar.addEventListener('click', function () {
-        setCookie('inputs', JSON.stringify(send()), {'path':COOKIE_URL});
-        window.location.href = this.dataset.href;
-    });
 
     /**
      * Group
      */
     let groupBtns = document.getElementsByName('group');
     if (groupVal() == 0) groupOff();
-    else removeClass(groupBlock, 'hide');
+    else groupBlock.classList.remove('hide');
     Object.keys(groupBtns).forEach((el) => {
         groupBtns[el].addEventListener('change', function () {
             if (this.value == 0) groupOff();
-            else removeClass(groupBlock, 'hide');
+            else groupBlock.classList.remove('hide');
         })
     });
 
     let prepayBtn = document.querySelector('#prepay');
     if (!prepayBtn.checked) prepayOff();
-    else removeClass(prepayBlock, 'hide');
+    else prepayBlock.classList.remove('hide');
     prepayBtn.addEventListener('change', function () {
         if (this.checked)
-            removeClass(prepayBlock, 'hide');
+            prepayBlock.classList.remove('hide');
         else
             prepayOff()
     });
 
-    /*
-     * Create service
-     */
-    addService.addEventListener('click', function () {
-        let data = send();
-        if (issetTimetable())
-            data.timetable = getTimetable();
-        let Request = postRequest(CURRENT_URL+'/add-service', data);
-        Request.onload = function() {
-            if (Request.status >= 200 && Request.status < 400) {
-                deleteCookie('inputs', COOKIE_URL);
-                deleteCookie('timetable', COOKIE_URL);
-                deleteCookie('checked', COOKIE_URL);
-                closeModal();
-            } else {
-                showErrors(Request.response)
-            }
-        };
 
-    });
-
-    /**
-     * Close
-     */
-    let close = document.getElementsByClassName('close');
-    if (close.length > 0) {
-        Object.keys(close).forEach((k) => {
-            close[k].addEventListener('click', function () {
-                deleteCookie('inputs', COOKIE_URL);
-                deleteCookie('timetable', COOKIE_URL);
-                deleteCookie('checked', COOKIE_URL);
-            })
-        });
-    }
 }
 

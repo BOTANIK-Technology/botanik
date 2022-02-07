@@ -289,6 +289,9 @@ class ServiceController extends Controller
         try {
             /** @var Service $service */
             $service = Service::find($request->id);
+            if(!$service){
+                $service = new Service();
+            }
             $service->type_service_id = $request->input('type');
             $service->name = $request->input('name');
 
