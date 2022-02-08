@@ -87,7 +87,7 @@
                         @endforeach
                     </div>
                     <div id="more-address-{{$view_service->id}}" class="row-2 col-3 flex more-address">
-                        <button id="include-address-{{$view_service->id}}" data-id="{{$view_service->id}}"
+                        <button id="include-address" data-id="{{$view_service->id}}"
                                 class="include-address color">
                             <div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес к услуге')}}</button>
                     </div>
@@ -145,16 +145,22 @@
                            placeholder="{{__('Введите количество')}}">
                 </div>
 
-                <div class="row-10 col-2 align-self-center">
+                <div class="row-10 col-2 align-self-center calendar-block">
                     <a id="calendar" class="background-none calendar-a"
                        href="{{route('window.service', [
                                 'business' => $slug,
                                   'service_id' => $view_service->id,
                                    'modal' => 'timetable'
-                   ])}}">
+                    ])}}">
                         <div class="calendar-icon"></div>
                     </a>
+                    <div class="filled-months">
+                        @foreach($usedMonths as $month)
+                            <p>{{$month}}</p>
+                        @endforeach
+                    </div>
                 </div>
+
 
                 <div class="row-11 col-2 grid intervals">
                     <input id="group-1-{{$view_service->id}}" type="radio" name="group-{{$view_service->id}}"
@@ -182,7 +188,7 @@
 
                 <div class="row-1 col-3 align-self-start text-align-center">
                     <button type="button" id="save-service" data-service="{{$view_service->id}}"
-                            class="btn-primary" >
+                            class="btn-primary">
                         {{ __('Сохранить') }}
                     </button>
                 </div>
@@ -238,6 +244,17 @@
 
     @endcomponent
     <style>
+.calendar-block {
+    display: flex;
+}
+.filled-months {
+    max-width: 210px;
+    margin-left: 30px;
+}
+.filled-months p {
+    display: inline-block;
+    margin-right: 15px;
+}
 
     </style>
 @endsection

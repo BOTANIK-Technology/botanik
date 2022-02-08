@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\TimetableTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -22,6 +24,8 @@ use Illuminate\Support\Carbon;
  */
 class Timetables extends Model
 {
+
+    use HasFactory, TimetableTrait;
 
     /**
      * The table associated with the model.

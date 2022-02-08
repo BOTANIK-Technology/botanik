@@ -19,8 +19,6 @@ use Illuminate\Support\Facades\Log;
  */
 class ServiceTimetable extends Timetables
 {
-    use HasFactory, TimetableTrait;
-
 
     /**
      * @param Carbon $date

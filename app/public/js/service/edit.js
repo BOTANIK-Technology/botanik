@@ -9,47 +9,31 @@ if (document.querySelector('.modal-edit') ) {
 
 
 
-   function issetTimetable(id) {
-        let timetable = getCookie('timetable-' + id);
-        console.log(id, timetable);
-        return !!(timetable && timetable !== 'undefined' && timetable.length);
-    }
-
-    function getTimetable(id) {
-        let timetable = getCookie('timetable-' + id);
-        return timetable;
-    }
-
-    function setValues(objects, values) {
-        Object.keys(objects).forEach((k) => {
-            if (values[k])
-                objects[k].value = values[k];
-        });
-    }
-
-    function setChecked(objects, value) {
-        Object.keys(objects).forEach((el) => {
-            if (objects[el].value == value) objects[el].checked = 'checked';
-        });
-    }
-
-
+   // function issetTimetable(id) {
+   //      let timetable = getCookie('timetable-' + id);
+   //      console.log(id, timetable);
+   //      return !!(timetable && timetable !== 'undefined' && timetable.length);
+   //  }
+   //
+   //  function getTimetable(id) {
+   //      let timetable = getCookie('timetable-' + id);
+   //      return timetable;
+   //  }
+   //
+   //  function setValues(objects, values) {
+   //      Object.keys(objects).forEach((k) => {
+   //          if (values[k])
+   //              objects[k].value = values[k];
+   //      });
+   //  }
+   //
+   //  function setChecked(objects, value) {
+   //      Object.keys(objects).forEach((el) => {
+   //          if (objects[el].value == value) objects[el].checked = 'checked';
+   //      });
+   //  }
 
 
-    function checkedByNameVal(name) {
-        return getCheckedVal(document.getElementsByName(name));
-    }
-
-
-    /**
-     * Add more addresses
-     */
-    let include = document.getElementsByClassName('include-address');
-    Object.keys(include).forEach((btn) => {
-        include[btn].addEventListener('click', function () {
-            addAddressSelector(include[btn].dataset.id);
-        });
-    });
 
 
     /**

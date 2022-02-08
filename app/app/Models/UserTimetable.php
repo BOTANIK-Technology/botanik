@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-use Eloquent;
+
+
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
-use \App\Traits\TimetableTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Log;
-use function PHPUnit\Framework\greaterThanOrEqual;
 
 /**
  * App\Models\Timetable
@@ -21,13 +18,11 @@ use function PHPUnit\Framework\greaterThanOrEqual;
  * @method static Builder|UserTimetable newModelQuery()
  * @method static Builder|UserTimetable newQuery()
  * @method static Builder|UserTimetable query()
- * @mixin Eloquent
  * @property-read Service $service
  */
-class UserTimetable extends Model
+class UserTimetable extends Timetables
 {
 
-    use HasFactory, TimetableTrait;
 
     protected $fillable = [
         'monday',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Interval;
 use App\Models\ServiceAddress;
 use App\Models\ServiceTimetable;
+use App\Models\Timetables;
 use App\Models\TypeService;
 use App\Models\Address;
 use App\Models\Service;
@@ -36,7 +37,7 @@ class ServiceController extends Controller
      */
     public function setParams(Request $request)
     {
-        parent::setParams( $request);
+        parent::setParams($request);
 
         $this->params['countService'] = Service::count();
         $this->params['countTypes'] = TypeService::count();
@@ -48,8 +49,6 @@ class ServiceController extends Controller
         $this->params['load'] = $request->get('load', 10);
         $this->params['load_types'] = $request->get('load_types', 10);
         $this->params['load_addresses'] = $request->get('load_addresses', 10);
-
-
     }
 
     /**
@@ -111,7 +110,7 @@ class ServiceController extends Controller
 
                 if ($serviceRequest) {
                     $this->params['type_id'] = $serviceRequest->type_service_id;
-                    $this->setTimetableCookies($serviceRequest, true);
+                    $this->setTimetableCookies($serviceRequest);
                 }
                 break;
             case 'view':
@@ -145,29 +144,25 @@ class ServiceController extends Controller
     }
 
 
-    private function setTimetableCookies($view_service, $checked = false)
+    private function setTimetableCookies($view_service)
     {
-        if (!$view_service)
+        if (!$view_service) {
             return;
+        }
 
-        if (!$view_service->timetable)
+        if (!$view_service->timetable) {
             return;
+        }
         $timetable = [];
+        $months = [];
         foreach ($view_service->timetable as $item) {
             $timetable[$item->year][$item->month] = $item->schedule;
+            $months[] = Timetables::getMonthList()[$item->month];
         }
 
+        $this->params['timetables']['timetable-' . $view_service->id] = $timetable;
+        $this->params['usedMonths'] = $months;
 
-        switch ($checked) {
-            case false:
-                $this->params['timetables']['timetable-' . $view_service->id] = $timetable;
-//                setcookie('timetable-'.$view_service->id, json_encode($timetable), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
-                break;
-            case true:
-                $this->params['checked']['checked-' . $view_service->id] = $timetable;
-//                setcookie('checked-'.$view_service->id, json_encode(ServiceTimetable::getChecked($timetable)), ['samesite' => 'Lax', 'path' => '/'.$slug.'/services/']);
-                break;
-        }
     }
 
     /**
@@ -179,7 +174,8 @@ class ServiceController extends Controller
         try {
             $type = TypeService::create(['type' => $request->service]);
             return response()->json(['id' => $type->id, 'type' => $type->type], 201);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -193,7 +189,8 @@ class ServiceController extends Controller
         try {
             $address = Address::create(['address' => $request->address]);
             return response()->json(['id' => $address->id, 'address' => $address->address], 201);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -207,7 +204,8 @@ class ServiceController extends Controller
     {
         try {
             Service::find($id)->delete();
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
 
@@ -244,17 +242,25 @@ class ServiceController extends Controller
             $type->services()->save($service);
             $service->attachAddresses($request->input('addresses'));
 
-            if ($request->has('timetable'))
+            if ($request->has('timetable')) {
                 $service->attachTimetable($request->input('timetable'));
+            }
 
-            if ($request->prepay)
-                $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
+            if ($request->prepay) {
+                $service->updatePrepayment([
+                    'card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')
+                ]);
+            }
 
-            if (!empty($request->input('quantity')) && !empty($request->input('message')))
-                $service->group()->create(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
+            if (!empty($request->input('quantity')) && !empty($request->input('message'))) {
+                $service->group()->create([
+                    'quantity' => $request->input('quantity'), 'message' => $request->input('message')
+                ]);
+            }
 
             return response()->json(['ok' => true]);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -289,7 +295,7 @@ class ServiceController extends Controller
         try {
             /** @var Service $service */
             $service = Service::find($request->id);
-            if(!$service){
+            if (!$service) {
                 $service = new Service();
             }
             $service->type_service_id = $request->input('type');
@@ -307,29 +313,34 @@ class ServiceController extends Controller
 
             $service->rewriteAddresses($request->input('addresses'));
 
-            if ($request->has('timetable'))
-            {
+            if ($request->has('timetable')) {
                 $service->updateTimetable($request->input('timetable'));
             }
 
             if ($request->prepay) {
-                $service->updatePrepayment(['card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')]);
-            } else {
+                $service->updatePrepayment([
+                    'card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')
+                ]);
+            }
+            else {
                 $service->deletePrepayment();
 
             }
 
-            if (!empty($request->input('quantity')) && !empty($request->input('message')))
-            {
-                $service->updateGroup(['quantity' => $request->input('quantity'), 'message' => $request->input('message')]);
+            if (!empty($request->input('quantity')) && !empty($request->input('message'))) {
+                $service->updateGroup([
+                    'quantity' => $request->input('quantity'), 'message' => $request->input('message')
+                ]);
             }
-            else
-            {
-                if (isset($service->group)) $service->group->delete();
+            else {
+                if (isset($service->group)) {
+                    $service->group->delete();
+                }
             }
 
             return response()->json(['ok' => true]);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage() . ' ' . $e->getLine()]], 500);
         }
     }
@@ -343,7 +354,8 @@ class ServiceController extends Controller
         try {
             Service::find($request->id)->delete();
             return response()->json(['ok' => true]);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]]);
         }
     }
@@ -360,7 +372,7 @@ class ServiceController extends Controller
             'type' => 'required|integer',
             'addresses' => 'required|array',
             'name' => 'required|string',
-//            'interval'  => 'required|integer|min:0|max:24',
+            //            'interval'  => 'required|integer|min:0|max:24',
             'range' => 'integer|min:0',
             'message' => 'nullable|required_with:quantity|string',
             'quantity' => 'nullable|required_with:message|integer|min:2',
@@ -374,7 +386,8 @@ class ServiceController extends Controller
         if (isset($data['prepay']) && $data['prepay'] == true) {
             $rules['prepay_message'] = 'required|string';
             $rules['prepay_card'] = 'required|string';
-        } else {
+        }
+        else {
             $rules['prepay_message'] = 'nullable|string';
             $rules['prepay_card'] = 'nullable|string';
         }
@@ -399,7 +412,9 @@ class ServiceController extends Controller
     {
         $count = ServiceAddress::query()->where('service_id', $data['service_id'])
             ->where('address_id', $data['ddress_id'])->count();
-        if ($count > 0) return false;
+        if ($count > 0) {
+            return false;
+        }
     }
 
 }

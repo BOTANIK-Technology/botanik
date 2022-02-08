@@ -7,30 +7,30 @@ if (document.querySelector('.modal-create') ) {
 
 
     let addressSelectorSelect = document.getElementById('more-addresses-select');
-    let moreBtn = document.getElementById('include-address');
 
-    function issetTimetable() {
-        let timetable = getCookie('timetable');
-        return !!(timetable && timetable !== 'undefined' && timetable.length);
-    }
 
-    function getTimetable() {
-        let timetable = getCookie('timetable');
-        return JSON.parse(timetable);
-    }
-
-    function setValues (objects, values) {
-        Object.keys(objects).forEach((k) => {
-            if (values[k])
-                objects[k].value = values[k];
-        });
-    }
-
-    function setChecked (objects, value) {
-        Object.keys(objects).forEach((el) => {
-            if (objects[el].value === value) objects[el].checked = 'checked';
-        });
-    }
+    // function issetTimetable() {
+    //     let timetable = getCookie('timetable');
+    //     return !!(timetable && timetable !== 'undefined' && timetable.length);
+    // }
+    //
+    // function getTimetable() {
+    //     let timetable = getCookie('timetable');
+    //     return JSON.parse(timetable);
+    // }
+    //
+    // function setValues (objects, values) {
+    //     Object.keys(objects).forEach((k) => {
+    //         if (values[k])
+    //             objects[k].value = values[k];
+    //     });
+    // }
+    //
+    // function setChecked (objects, value) {
+    //     Object.keys(objects).forEach((el) => {
+    //         if (objects[el].value === value) objects[el].checked = 'checked';
+    //     });
+    // }
 
     let groupBlock = document.getElementById('group-service');
     function groupOff () {
@@ -44,34 +44,6 @@ if (document.querySelector('.modal-create') ) {
         prepayBlock.classList.add('hide');
         document.getElementById('card').value = '';
         document.getElementById('prepay-message').value = '';
-    }
-
-    /**
-     * Get cooked inputs
-     */
-    let inputs = getCookie('inputs');
-    if (inputs && inputs !== 'undefined') {
-        document.getElementById('service-name').value = inputs.name;
-        document.getElementById('service-type').value = inputs.type;
-         // document.getElementById('range').value = inputs.range;
-        document.getElementById('price').value = inputs.price;
-        document.getElementById('bonus').value = inputs.bonus;
-        document.getElementById('quantity').value = inputs.quantity;
-        document.getElementById('message').value = inputs.message;
-        document.getElementById('prepay').checked = inputs.prepay;
-        document.getElementById('cashpay').checked = inputs.cashpay;
-        document.getElementById('onlinepay').checked = inputs.onlinepay;
-        document.getElementById('bonuspay').checked = inputs.bonuspay;
-        document.getElementById('prepay-message').value = inputs.prepay_message;
-        document.getElementById('card').value = inputs.prepay_card;
-
-        let selectors = addressSelectors();
-
-        setChecked(document.getElementsByName('group'), inputs.grouped);
-        setChecked(document.getElementsByName('durationHours'), inputs.durationHours);
-        setChecked(document.getElementsByName('durationMinutes'), inputs.durationMinutes);
-        setChecked(document.getElementsByName('intervalHours'), inputs.intervalHours);
-        setChecked(document.getElementsByName('intervalMinutes'), inputs.intervalMinutes);
     }
 
     function addressesVal () {
@@ -95,9 +67,7 @@ if (document.querySelector('.modal-create') ) {
         return array;
     }
 
-    function checkedByNameVal (name) {
-        return getCheckedVal(document.getElementsByName(name));
-    }
+
 
 
     /**
@@ -175,14 +145,7 @@ if (document.querySelector('.modal-create') ) {
         })
     });
 
-    /**
-     * Add more addresses
-     */
-    if (moreBtn) {
-        moreBtn.addEventListener('click', function () {
-            addAddressSelector();
-        });
-    }
+
 
 
 

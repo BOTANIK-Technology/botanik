@@ -211,6 +211,19 @@ function prepayOff(prepayBlock, id) {
 function intervalVal(id) {
     return getCheckedVal(document.getElementsByName('interval' + suffix(id)))
 }
+function checkedByNameVal (name) {
+    return getCheckedVal(document.getElementsByName(name));
+}
+
+/**
+ * Add more addresses
+ */
+let moreBtn = document.getElementById('include-address');
+if (moreBtn) {
+    moreBtn.addEventListener('click', function () {
+        addAddressSelector(id);
+    });
+}
 
 
 /**
