@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\SendMail;
 use App\Models\Notice;
 use App\Models\Service;
+use App\Models\Timetables;
 use App\Models\TypeService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -49,13 +50,18 @@ class UserController extends Controller
         if ($this->params['sort'] == 'moder' && Auth::user()->hasRole('owner')) {
             $this->params['table'] = User::where('status', 0)->take($this->params['load'])->get();
             $this->params['countUsers'] = $this->params['table']->count();
-        } else {
+        }
+        else {
             $role = Role::where('slug', $this->params['sort'])->first();
             $this->params['countUsers'] = $role->users->count();
             $this->params['table'] = $role->users->take($this->params['load']);
         }
-        if ($this->params['table']->isEmpty()) $this->params['table'] = 0;
-        if (isset($request->modal)) $this->params['modal'] = $request->modal;
+        if ($this->params['table']->isEmpty()) {
+            $this->params['table'] = 0;
+        }
+        if (isset($request->modal)) {
+            $this->params['modal'] = $request->modal;
+        }
     }
 
     /**
@@ -76,42 +82,42 @@ class UserController extends Controller
         $this->setParams($request);
         $modal = $request->modal;
 
+        //TODO сделать нормальную проверку на неповторение услуги
+//                $this->params['services'] = Service::withoutTimetable();
+
+        $this->params['services'] = Service::all();
+        $this->params['types_select'] = TypeService::all();
+        $this->params['addresses'] = Address::all();
+
         switch ($modal) {
             case 'create':
-                $this->params['types_select'] = TypeService::all();
-                $this->params['services'] = Service::withoutTimetable() ?? 0;
-                $this->params['addresses'] = Address::all() ?? 0;
-                $this->params['roles'] = [Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()];
+                $this->params['roles'] = [
+                    Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()
+                ];
                 $this->params['moreService'] = $request->moreService ?? 1;
                 break;
+
             case 'delete':
             case 'view':
                 $this->params['user'] = User::find($request->id);
                 break;
+
             case 'edit':
-                $this->params['types_select'] = TypeService::all();
                 $this->params['id'] = $request->id;
                 $this->params['user'] = User::find($this->params['id']);
 
                 $this->setUserCookies($this->params['user']);
                 $this->setTimetableCookies($this->params['user']);
-
-                $this->params['services'] = Service::withoutTimetable();
-
-                $this->params['addresses'] = Address::all();
-
                 $this->params['moreService'] = $request->moreService ?? count($this->params['user']->services);
-
-
                 break;
+
             case 'timetable':
                 $time = new UserTimetable();
                 $this->params['times'] = $time->getHours();
                 $this->params['days'] = $time->getDays();
                 $this->params['id'] = $request->id ?? null;
 
-                if (!is_null($this->params['id']))
-                {
+                if (!is_null($this->params['id'])) {
                     $this->setTimetableCookies(User::find($this->params['id']), true);
                 }
 
@@ -137,11 +143,10 @@ class UserController extends Controller
             foreach ($user->services as $key => $service) {
                 $cookie = [
                     'service_type_id' => $service->type_service_id,
-                    'service_id' => $service->id,
-                    'address_id' => $user->timetables[$key] ? $user->timetables[$key]->address_id : 0,
+                    'service_id'      => $service->id,
+                    'address_id'      => $user->timetables[0] ? $user->timetables[0]->address_id : 0,
                 ];
-                $this->params['userData']['user_data-' . $key] = $cookie;
-//                setcookie('user_data-' . $key, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
+                $this->params['userData']['user_data-' . $service->id] = $cookie;
             }
         }
     }
@@ -151,34 +156,22 @@ class UserController extends Controller
      * @param $slug
      * @param bool $checked
      */
-    private function setTimetableCookies($user, $checked = false)
+    private function setTimetableCookies($user)
     {
         $this->params['timetables'] = [];
-        if (empty($user->timetables))
+        if (empty($user->timetables)) {
             return;
-
-        $days = UserTimetable::getDaysEn();
-        foreach ($user->timetables as $k => $timetable) {
-
-//            if (isset($_COOKIE['timetable-' . $k]))
-//                continue;
-
-
-            $cookie = [];
-            foreach ($days as $day) {
-                if (!is_null($timetable->$day)) {
-                    $cookie[$day] = json_decode($timetable->$day);
-                }
-            }
-
-            if (!$checked) {
-                $this->params['timetables']['timetable-' . $k] = $cookie;
-//                setcookie('timetable-' . $k, json_encode($cookie), ['path' => '/' . $slug . '/users/', 'samesite' => 'Lax']);
-            } else {
-                $this->params['checked']['checked-' . $k] = UserTimetable::getChecked($cookie);
-//                setcookie('checked-' . $k, json_encode(UserTimetable::getChecked($cookie)), ['samesite' => 'Lax', 'path' => '/' . $slug . '/users/']);
-            }
         }
+
+        $timetable = [];
+        $months = [];
+        foreach ($user->timetables as $item) {
+            $timetable[$item->year][$item->month] = $item->schedule;
+            $months[$item->service_id][] = Timetables::getMonthList()[$item->month];
+
+            $this->params['timetables']['timetable-' . $item->service_id] = $timetable;
+        }
+        $this->params['usedMonths'] = $months;
     }
 
     /**
@@ -189,20 +182,27 @@ class UserController extends Controller
     {
         $validator = $this->validateUser($request);
 
-        if ($validator->fails())
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 405);
+        }
 
         try {
             $role = Role::where('slug', $request->role)->first();
-        } catch (Exception $e) {
-            return response()->json(['errors' => ['admin' => __('Выбранная роль не доступна.'), 'message' => $e->getMessage()]], 405);
+        }
+        catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'admin' => __('Выбранная роль не доступна.'), 'message' => $e->getMessage()
+                ]
+            ], 405);
         }
 
         $services = [];
         if ($role->slug == 'master') {
             $services = User::relationServicesAddresses($request->services, $request->addresses);
-            if (!is_array($services))
+            if (!is_array($services)) {
                 return response()->json(['errors' => ['admin' => $services]], 405);
+            }
         }
 
         try {
@@ -210,10 +210,10 @@ class UserController extends Controller
             $root = \Auth::user();
 
             $array = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password' => bcrypt($request->password),
+                'name'       => $request->name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
+                'password'   => bcrypt($request->password),
                 'created_by' => $root->id,
                 'updated_by' => $root->id,
             ];
@@ -225,7 +225,7 @@ class UserController extends Controller
                     [
                         [
                             'role_slug' => 'owner',
-                            'message' => __('Администратор') . ' ' . '<b>' . $root->name . '</b>' . ' ' . __('хочет добавить') . ' ' . $role->name . 'а <b>' . $array['name'] . '</b>',
+                            'message'   => __('Администратор') . ' ' . '<b>' . $root->name . '</b>' . ' ' . __('хочет добавить') . ' ' . $role->name . 'а <b>' . $array['name'] . '</b>',
                         ],
                     ]
                 );
@@ -234,8 +234,9 @@ class UserController extends Controller
             $user = User::create($array);
             $user->roles()->attach($role);
 
-            if ($role->slug == 'master')
+            if ($role->slug == 'master') {
                 $user->attachCustom('services', $services);
+            }
 
             $user->attachTimetables($request->timetables, $request->addresses, $services);
             $user->attachCustom('addresses', $request->addresses);
@@ -252,8 +253,13 @@ class UserController extends Controller
 
             return response()->json(['ok' => true], 200);
 
-        } catch (Exception $e) {
-            return response()->json(['errors' => ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]], 500);
+        }
+        catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()
+                ]
+            ], 500);
         }
     }
 
@@ -265,20 +271,23 @@ class UserController extends Controller
     {
         $validator = $this->validateUser($request, false);
 
-        if ($validator->fails())
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 405);
+        }
 
         try {
             $role = Role::where('slug', $request->role)->first();
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['admin' => __('Выбранная роль не доступна.')]], 405);
         }
 
         $services = [];
         if ($role->slug == 'master') {
             $services = User::relationServicesAddresses($request->services, $request->addresses);
-            if (!is_array($services))
+            if (!is_array($services)) {
                 return response()->json(['errors' => ['admin' => $services]], 405);
+            }
         }
 
 
@@ -287,14 +296,15 @@ class UserController extends Controller
             $root = \Auth::user();
 
             $array = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
+                'name'       => $request->name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
                 'updated_by' => $root->id,
             ];
 
-            if (!empty($request->password))
+            if (!empty($request->password)) {
                 $array['password'] = bcrypt($request->password);
+            }
 
             $user = User::find($request->id);
             $user->update($array);
@@ -302,8 +312,9 @@ class UserController extends Controller
             $user->roles()->detach($user->getIds('roles'));
             $user->roles()->attach($role);
 
-            if ($role->slug == 'master')
+            if ($role->slug == 'master') {
                 $user->attachCustom('services', $services, true);
+            }
 
             $user->timetables()->delete();
             $user->attachTimetables($request->timetables, $request->addresses, $services);
@@ -312,7 +323,8 @@ class UserController extends Controller
 
             return response()->json(['ok' => true], 200);
 
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -345,7 +357,8 @@ class UserController extends Controller
             $user = User::find($request->id);
             $this->params['user'] = $user;
             $this->params['id'] = $request->id;
-        } else {
+        }
+        else {
             $this->params['roles'] = [Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()];
         }
 //        dd($this->params);
@@ -375,11 +388,12 @@ class UserController extends Controller
                     [
                         [
                             'role_slug' => 'owner',
-                            'message' => __('Администратор') . ' ' . '<b>' . $root->name . '</b>' . ' ' . __('хочет удалить') . ' ' . $user->roles[0]->name . 'а <b>' . $user->name . '</b>',
+                            'message'   => __('Администратор') . ' ' . '<b>' . $root->name . '</b>' . ' ' . __('хочет удалить') . ' ' . $user->roles[0]->name . 'а <b>' . $user->name . '</b>',
                         ],
                     ]
                 );
-            } else {
+            }
+            else {
                 Notice::sendNotice(
                     $request->input('business_db'),
                     [
@@ -395,7 +409,8 @@ class UserController extends Controller
 
             return response()->json(['ok' => true], 200);
 
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -468,13 +483,13 @@ class UserController extends Controller
     function validateUser(Request $request, $create = true): Validator
     {
         $rules = [
-            'name' => 'required|string|min:1',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'required|email',
-            'password' => 'nullable|string|min:6|max:25',
-            'role' => 'required|string',
-            'addresses' => 'required|array',
-            'services' => 'nullable|array',
+            'name'       => 'required|string|min:1',
+            'phone'      => 'nullable|string|max:20',
+            'email'      => 'required|email',
+            'password'   => 'nullable|string|min:6|max:25',
+            'role'       => 'required|string',
+            'addresses'  => 'required|array',
+            'services'   => 'nullable|array',
             'timetables' => 'required|array',
         ];
 
@@ -488,7 +503,8 @@ class UserController extends Controller
         $validator->after(function ($validator) use ($request) {
             if (empty($request->addresses)) {
                 $validator->errors()->add('addresses', __('Укажите адрес'));
-            } else {
+            }
+            else {
                 foreach ($request->addresses as $address) {
 
                     if (empty($address)) {
@@ -501,7 +517,8 @@ class UserController extends Controller
 
                 if (empty($request->services)) {
                     $validator->errors()->add('services', __('Укажите услугу'));
-                } else {
+                }
+                else {
                     foreach ($request->services as $address) {
 
                         {
@@ -512,7 +529,8 @@ class UserController extends Controller
                     }
                 }
 
-            } else {
+            }
+            else {
                 $duplicates = collect($request->addresses)->toBase()->duplicates();
                 if ($duplicates->count()) {
                     $validator->errors()->add('addresses', __('Адреса не могут быть продублированы.'));
@@ -522,7 +540,8 @@ class UserController extends Controller
 
             if (empty($request->timetables)) {
                 $validator->errors()->add('addresses', __('Укажите расписание'));
-            } else {
+            }
+            else {
                 foreach ($request->addresses as $key => $item) {
                     if (empty($request->timetables[$key])) {
                         $validator->errors()->add('service', __('Указаны не все расписания'));

@@ -86,7 +86,8 @@
                     </div>
                     @if($sort == 'moder')
                         <div class="flex align-items-center justify-content-center">
-                            <a href="{{route('window.user', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort])}}"><div class="view-icon"></div></a>
+                            <a href="{{route('window.user', ['business' => $slug, 'modal' => 'view', 'id' => $item->id, 'sort' => $sort])}}">
+                                <div class="view-icon"></div></a>
                         </div>
                         <div class="flex align-items-center justify-content-center">
                             <form method="get" action="{{route('manage.confirm', ['business' => $slug, 'sort' => $sort])}}">

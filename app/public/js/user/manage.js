@@ -1,9 +1,7 @@
 function getTimetables() {
     let array = [];
     for (let i = 0; i < countService; i++) {
-        if (typeof (getCookie('timetable-' + i)) !== 'undefined') {
             array.push(JSON.parse(getCookie('timetable-' + i)));
-        }
     }
     return array;
 }
@@ -11,8 +9,8 @@ function getTimetables() {
 function unsetCookies(count) {
     if (!count) return;
     for (let i = 0; i < count; i++) {
-        deleteCookie('timetable-' + i, COOKIE_URL);
-        deleteCookie('checked-' + i, COOKIE_URL);
+        deleteCookie('timetable-' + i);
+        deleteCookie('checked-' + i);
     }
 }
 
@@ -102,11 +100,11 @@ let calendar = document.getElementsByClassName('calendar-a');
 // let serviceOptions = document.getElementById('service-type-99').innerHTML;
 let addedServices = getCookie('service-type');
 
-inputActive([fio, password, phone, email]);
-selectActive();
+// inputActive([fio, password, phone, email]);
+// selectActive();
 
-if (addedServices) {
-    addedServices = JSON.parse(addedServices);
+if (Object.keys(addedServices).length) {
+    console.log(addedServices);
     addedServices.forEach((id) => {
         document.getElementById('service-' + id).insertAdjacentHTML(
             'beforeEnd',
@@ -139,58 +137,24 @@ if (calendar.length) {
     unsetCookies(countService);
 }
 
-let input = getCookie('input');
+let input = getCookie('user');
 if (input) {
-    input = JSON.parse(input);
     fio.value = input.fio;
     phone.value = input.phone;
     email.value = input.email;
     password.value = input.password;
-    addresses = setValues(addressSelects, input.addresses);
-    services = setValues(serviceSelects, input.services);
-    services_types = setValues(serviceTypeSelects, input.service_types);
     master.checked = input.master;
     admin.checked = input.admin;
+for (let serv of input.services){
+    console.log('serv', serv);
+
+
+    addresses = setValues(addressSelects, addresses);
+    services = setValues(serviceSelects, services);
+    services_types = setValues(serviceTypeSelects, service_types);
+}
 }
 
-if (calendar.length) {
-    for (let i = 0; i < countService; i++) {
-        if (calendar[i] !== undefined && calendar[i] && calendar[i] !== 'undefined') {
-            let timetable = getCookie('timetable-' + i);
-            if (timetable) {
-                timetable = JSON.parse(timetable);
-                let html = '';
-                Object.keys(timetable).forEach((time) => {
-                    let day;
-                    switch (time) {
-                        case 'monday':
-                            day = 'ПН';
-                            break;
-                        case 'tuesday':
-                            day = 'ВТ';
-                            break;
-                        case 'wednesday':
-                            day = 'СР';
-                            break;
-                        case 'thursday':
-                            day = 'ЧТ';
-                            break;
-                        case 'friday':
-                            day = 'ПТ';
-                            break;
-                        case 'saturday':
-                            day = 'СБ';
-                            break;
-                        case 'sunday':
-                            day = 'ВС';
-                    }
-                    html += '<span>' + day + '. ' + timetable[time][0] + ' - ' + timetable[time][timetable[time].length - 1] + '</span>';
-                });
-                calendar[i].innerHTML = '<div class="abbr-tt color flex direction-column">' + html + '</div>';
-            }
-        }
-    }
-}
 
 admin.addEventListener('change', function () {
     setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});

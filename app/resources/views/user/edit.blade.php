@@ -11,14 +11,16 @@
         let services = @json($services);
         let addresses = @json($addresses);
         let timeTables = @json($timetables);
+        let user = @json($user);
+        setCookie('user', user );
         for (let item in timeTables) {
-            setCookie(item, JSON.stringify(timeTables[item]) );
+            setCookie(item,timeTables[item] );
         }
-        let userData = @json($userData ?? null);
+        let userData = @json($userData);
         console.log('user data', userData);
         if(userData && Object.keys(userData).length){
             for (let item in userData) {
-                setCookie(item, JSON.stringify(userData[item]));
+                setCookie(item, userData[item]);
             }
         }
 
@@ -37,7 +39,7 @@
         <input type="hidden" id="token_id" name="_token" value="{{ csrf_token() }}">
 
         <div class="flex direction-column add-user">
-            <div><input type="text"  value="{{$user->name}}" placeholder="{{__('Название / ФИО')}}" id="fio"></div>
+            <div><input type="text"  value="{{$user->name}}" placeholder="{{__(' ФИО')}}" id="fio"></div>
             <div><input type="text"  value="{{$user->phone}}" placeholder="{{__('Телефон')}}" id="phone"></div>
             <div><input type="email" value="{{$user->email}}" placeholder="Email" id="email"></div>
             <div><input type="text"  placeholder="Пароль" id="password"></div>
@@ -51,8 +53,10 @@
 
             <div class="line full-width"></div>
 
-            @for($i = 0; $i < $moreService; $i++)
-                <div class="flex direction-column master-only">
+            @foreach($user->services as $service)
+                @php($i = $service->id)
+
+                <div class="flex direction-column">
                     <label class="list-label" for="service-type-{{$i}}">Тип услуги</label>
                     @if ($types)
                         <select id="service-type-{{$i}}" onchange="userWin.changeServiceType({{$i}})"
@@ -71,14 +75,14 @@
                     @endif
                 </div>
 
-                <div id="service-container-{{$i}}" class="flex direction-column master-only">
+                <div id="service-container-{{$i}}" class="flex direction-column ">
                     <label class="list-label" for="service-{{$i}}">Услуга</label>
                     <select class="master-service hide" onchange="userWin.changeService({{$i}});" id="service-{{$i}}"
                             data-id="{{$i}}" name="service-{{$i}}[]">
                     </select>
                 </div>
 
-                <div id="addresses-container-{{$i}}" class="flex direction-column master-only">
+                <div id="addresses-container-{{$i}}" class="flex direction-column">
                     <label class="list-label" for="service-type-{{$i}}">Адрес</label>
                     <select class="master-address hide" onchange="userWin.changeAddress({{$i}});" id="address-{{$i}}"
                             name="address-{{$i}}[]">
@@ -86,7 +90,7 @@
                 </div>
 
 
-                <div id="admin-addresses-{{$i}}" class="flex direction-column admin-only">
+                <div id="admin-addresses-{{$i}}" class="flex direction-column">
                     @if ($addresses)
                         <select onchange="userWin.changeAdminAddress({{$i}});" id="admin-address-{{$i}}"
                                 class="admin-address" name="admin-address-{{$i}}[]">
@@ -104,15 +108,22 @@
                 </div>
                 <div class="flex justify-content-between align-items-center">
                     <span class="calendar">{{__('Расписание')}}</span>
-                    <button
-                        id="calendar-{{$i}}"
-                        class="background-none calendar-a"
-                        data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $i, 'moreService' => $moreService, 'id' => $id])}}"
-                    >
-                        <div class="calendar-icon" title="Выбрать расписание"></div>
-                    </button>
+                    <a id="calendar" class="background-none calendar-a"
+                       href="{{route('window.service', [
+                                'business' => $slug,
+                                  'currentService' => $i,
+                                   'modal' => 'timetable'
+                    ])}}">
+                        <div class="calendar-icon"></div>
+                    </a>
+                    <div class="filled-months">
+{{--                        @foreach($usedMonths[$i] as $month)--}}
+{{--                            <p>{{$month}}</p>--}}
+{{--                        @endforeach--}}
+                    </div>
+
                 </div>
-            @endfor
+            @endforeach
         </div>
         <div class="line"></div>
         @slot('buttons')

@@ -1,13 +1,14 @@
 @section('scripts')
-    <script>
-        let id = '{{$service_id ?? ''}}';
-    </script>
     <script src="{{asset('js/service/page.js')}}"></script>
+    <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
-    <script src="{{asset('js/timetable.js')}}"></script>
+    <script>
+        let id = {{$service_id}};
+    </script>
+    <script src="{{asset('js/service/common.js')}}"></script>
     <script src="{{asset('js/service/timetable.js')}}"></script>
+    <script src="{{asset('js/timetable.js')}}"></script>
 @endsection
-
 @section('modal')
     @component('modal')
 

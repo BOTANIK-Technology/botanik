@@ -1,7 +1,7 @@
 if (document.querySelector('.modal-edit') ) {
     setInitialData(id);
     //styles
-    inputActive(document.getElementsByClassName('inp'));
+    // inputActive(document.getElementsByClassName('inp'));
 
 
     let delBtns = document.getElementsByName('delete-service');
@@ -9,29 +9,7 @@ if (document.querySelector('.modal-edit') ) {
 
 
 
-   // function issetTimetable(id) {
-   //      let timetable = getCookie('timetable-' + id);
-   //      console.log(id, timetable);
-   //      return !!(timetable && timetable !== 'undefined' && timetable.length);
-   //  }
-   //
-   //  function getTimetable(id) {
-   //      let timetable = getCookie('timetable-' + id);
-   //      return timetable;
-   //  }
-   //
-   //  function setValues(objects, values) {
-   //      Object.keys(objects).forEach((k) => {
-   //          if (values[k])
-   //              objects[k].value = values[k];
-   //      });
-   //  }
-   //
-   //  function setChecked(objects, value) {
-   //      Object.keys(objects).forEach((el) => {
-   //          if (objects[el].value == value) objects[el].checked = 'checked';
-   //      });
-   //  }
+
 
 
 

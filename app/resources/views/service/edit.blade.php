@@ -1,23 +1,18 @@
 @section('scripts')
+    <script src="{{asset('js/service/page.js')}}"></script>
     <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let currentYear = '{{$current_year}}';
         let currentMonth = '{{$current_month}}';
-        // Загружаем данные из базы
-        let init = () => {
-            const timeTables = @json($timetables);
-            if (Object.keys(timeTables).length) {
-                for (let item in timeTables) {
-                    setCookie(item, timeTables[item]);
-                }
-            }
-        }
-        init();
+        let id = {{$service_id}};
+        let timetableDB = @json($timetables);
     </script>
-    <script src="{{asset('js/service/page.js')}}"></script>
+
     <script src="{{asset('js/requests.js')}}"></script>
+    <script src="{{asset('js/service/common.js')}}"></script>
     <script src="{{asset('js/service/edit.js')}}"></script>
+
 @endsection
 
 @section('modal')

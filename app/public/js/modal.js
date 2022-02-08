@@ -26,7 +26,8 @@ if (close_modal.length > 0) {
 
 
 function inputActive(input) {
-    if (isArray(input))
+    console.log(input);
+    if (input)
         input.forEach((obj) => {
             inputActive(obj);
         });

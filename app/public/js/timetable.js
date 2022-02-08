@@ -6,32 +6,26 @@ document.body.addEventListener('mouseup', function () {
     mouseDown = false;
 });
 
-
-const changeSavedButton = function (savedState) {
-    let mButton = document.getElementById('save_month');
-    if (savedState) {
-        mButton.classList.add('saved');
-        mButton.textContent = 'Сохранено';
-    } else {
-        mButton.classList.remove('saved');
-        mButton.textContent = 'Сохранить';
-    }
-}
-changeSavedButton(true)
-
-
 let month = document.getElementById('month_picker');
 let year = document.getElementById('year_picker');
-let saveMonth = document.getElementById('save_month');
 
+if (month.value) {
+    month.addEventListener('change', () => {
+        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value);
+    });
+}
 
-const showFromStorage = function (yearVal, monthVal, idVal) {
-    let timetable;
-    if(idVal) {
-        timetable = getCookie('timetable-' + idVal);
-    }
-    else {
-        timetable = getCookie('timetable');
+if(year) {
+    year.addEventListener('change', () => {
+        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value);
+    });
+}
+
+const showFromStorage = function (yearVal, monthVal, idVal = null) {
+    let  timetable = getCookie('timetable' + suffix(idVal) );
+    if (!timetable){
+        timetable = timetableDB;
+        setCookie('timetable' + suffix(idVal), timetable);
     }
 
     if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
@@ -44,17 +38,47 @@ const showFromStorage = function (yearVal, monthVal, idVal) {
         }
     }
 }
-showFromStorage(year.value, month.value, id);
+if (month && year) {
+    showFromStorage(year.value, month.value, id);
+}
+
+
+
+
+const changeSavedButton = function (savedState) {
+    let mButton = document.getElementById('save_month');
+    if(mButton) {
+        if (savedState) {
+            mButton.classList.add('saved');
+            mButton.textContent = 'Сохранено';
+        } else {
+            mButton.classList.remove('saved');
+            mButton.textContent = 'Сохранить';
+        }
+    }
+}
+changeSavedButton(true)
+
+
+
+
+
+
 
 let timeBtn = document.getElementById('time-confirm');
-timeBtn.addEventListener('click', function () {
-    saveMonthAction(id);
-    closeModal();
-});
+if (timeBtn) {
+    timeBtn.addEventListener('click', function () {
+        saveMonthAction(id);
+        closeModal();
+    });
+}
 
-saveMonth.addEventListener('click', () => {
-    saveMonthAction(id);
-});
+let saveMonth = document.getElementById('save_month');
+if(saveMonth) {
+    saveMonth.addEventListener('click', () => {
+        saveMonthAction(id);
+    });
+}
 
 let checkboxes = document.getElementsByClassName('checkbox');
 
@@ -85,12 +109,7 @@ clr.addEventListener('click', function () {
 })
 
 const saveMonthAction = (id) => {
-    let allCookies;
-    if (id) {
-        allCookies = getCookie('timetable-' + id);
-    } else {
-        allCookies = getCookie('timetable');
-    }
+    let allCookies = getCookie('timetable' + suffix(id));
     let cookies = {};
 
     let times = document.getElementsByClassName('checked');
@@ -116,21 +135,10 @@ const saveMonthAction = (id) => {
     allCookies[indexYear][indexMonth] = cookies;
 
     if (Object.keys(allCookies).length) {
-        if (id !== '') {
-            setCookie('timetable-' + id, allCookies);
-            setCookie('checked-' + id, allCookies);
-        } else {
-            setCookie('timetable', allCookies);
-            setCookie('checked', allCookies);
-        }
+            setCookie('timetable' + suffix(id), allCookies);
     } else {
-        if (id !== '') {
-            deleteCookie('timetable-' + id);
-            deleteCookie('checked-' + id);
-        } else {
-            deleteCookie('timetable');
-            deleteCookie('checked');
-        }
+            deleteCookie('timetable' + suffix(id) );
+
     }
     changeSavedButton(true);
 }

@@ -102,7 +102,7 @@ class Service extends Model
     }
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
     public function type()
     {
@@ -118,7 +118,7 @@ class Service extends Model
     }
 
     /**
-     * @return HasOne
+     * @return HasMany
      */
     public function timetable (): HasMany
     {
@@ -128,10 +128,11 @@ class Service extends Model
     /**
      * @return HasMany
      */
-    public function userTimetables (): HasMany
+    public function timetables (): HasMany
     {
-        return $this->hasMany(UserTimetable::class);
+        return $this->hasMany(ServiceTimetable::class);
     }
+
 
     /**
      * @return BelongsTo

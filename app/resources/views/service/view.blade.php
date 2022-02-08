@@ -47,14 +47,11 @@
                     @endif
                     <span class="label">{{__('Расписание')}}</span>
                     @if (isset($view_service->timetable))
-                        <span class="data">
-                            @foreach($view_service->timetable->getDays() as $day => $ru)
-                                @if (!is_null($view_service->timetable->$day))
-                                    @php $val = json_decode($view_service->timetable->$day) @endphp
-                                    <b>{{$ru.'. '.$val[0].' - '.$val[count($val)-1]}}</b><br>
-                                @endif
+                        <div class="filled-months">
+                            @foreach($usedMonths as $month)
+                                <p>{{$month}}</p>
                             @endforeach
-                        </span>
+                        </div>
                     @else
                         <b>{{__('Специалиста')}}</b>
                     @endif

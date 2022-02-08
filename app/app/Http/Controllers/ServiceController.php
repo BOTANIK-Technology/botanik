@@ -60,9 +60,6 @@ class ServiceController extends Controller
         if (!isset($this->params['timetables'])) {
             $this->params['timetables'] = [];
         }
-        if (!isset($this->params['checked'])) {
-            $this->params['checked'] = [];
-        }
         $this->setParams($request);
 
         return view($this->view, $this->params);
@@ -115,7 +112,8 @@ class ServiceController extends Controller
                 break;
             case 'view':
                 $this->params['view_service'] = $serviceView;
-
+                $this->params['service_id'] = $serviceView->id;
+                $this->setTimetableCookies($serviceView);
                 if ($serviceView) {
                     $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
                 }
@@ -125,6 +123,8 @@ class ServiceController extends Controller
                 $this->params['types_select'] = TypeService::all();
                 $this->params['addresses'] = Address::all();
                 $this->params['view_service'] = $serviceView;
+                $this->params['service_id'] = $serviceView->id;
+                $this->setTimetableCookies($serviceView);
 
                 if ($serviceView) {
                     $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
@@ -132,10 +132,6 @@ class ServiceController extends Controller
 
                 if ($this->params['addresses']->isEmpty()) {
                     $this->params['addresses'] = 0;
-                }
-
-                if (!$request->input('no_cookie')) {
-                    $this->setTimetableCookies($serviceView);
                 }
                 break;
         }
@@ -149,13 +145,15 @@ class ServiceController extends Controller
         if (!$view_service) {
             return;
         }
+        $timeTableList = $view_service->timetable()->whereNull('user_id')->get();
 
-        if (!$view_service->timetable) {
+        if (!$timeTableList) {
             return;
         }
         $timetable = [];
         $months = [];
-        foreach ($view_service->timetable as $item) {
+
+        foreach ($timeTableList as $item) {
             $timetable[$item->year][$item->month] = $item->schedule;
             $months[] = Timetables::getMonthList()[$item->month];
         }
@@ -367,20 +365,20 @@ class ServiceController extends Controller
     private function validateService(Request $request)
     {
         $rules = [
-            'price' => 'required|integer|min:1',
-            'bonus' => 'nullable|integer|min:1',
-            'type' => 'required|integer',
+            'price'     => 'required|integer|min:1',
+            'bonus'     => 'nullable|integer|min:1',
+            'type'      => 'required|integer',
             'addresses' => 'required|array',
-            'name' => 'required|string',
+            'name'      => 'required|string',
             //            'interval'  => 'required|integer|min:0|max:24',
-            'range' => 'integer|min:0',
-            'message' => 'nullable|required_with:quantity|string',
-            'quantity' => 'nullable|required_with:message|integer|min:2',
+            'range'     => 'integer|min:0',
+            'message'   => 'nullable|required_with:quantity|string',
+            'quantity'  => 'nullable|required_with:message|integer|min:2',
             'timetable' => 'nullable|array',
-            'prepay' => 'required|boolean',
-            'cashpay' => 'required|boolean',
+            'prepay'    => 'required|boolean',
+            'cashpay'   => 'required|boolean',
             'onlinepay' => 'required|boolean',
-            'bonuspay' => 'required|boolean',
+            'bonuspay'  => 'required|boolean',
         ];
         $data = $request->all();
         if (isset($data['prepay']) && $data['prepay'] == true) {
@@ -415,6 +413,7 @@ class ServiceController extends Controller
         if ($count > 0) {
             return false;
         }
+        return true;
     }
 
 }

@@ -111,7 +111,7 @@ class User extends Authenticatable
      */
     public function services (): BelongsToMany
     {
-        return $this->belongsToMany(Service::class, 'users_services');
+        return $this->belongsToMany(Service::class, 'users_services')->with('timetables');
     }
 
     /**

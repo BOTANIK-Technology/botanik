@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('styles')
     <link href="{{ asset('css/service.css') }}" rel="stylesheet">
 @endsection
