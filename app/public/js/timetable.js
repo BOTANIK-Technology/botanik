@@ -23,7 +23,8 @@ if(year) {
 
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
     let  timetable = getCookie('timetable' + suffix(idVal) );
-    if (!timetable){
+    console.log(timetable, timetableDB);
+    if (!(Object.keys(timetable).length) ){
         timetable = timetableDB;
         setCookie('timetable' + suffix(idVal), timetable);
     }

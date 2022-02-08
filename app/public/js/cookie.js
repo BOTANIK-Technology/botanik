@@ -29,9 +29,11 @@ function setCookie(name, value, options = {}) {
 }
 
 function deleteCookie(name, path = '/') {
-    let data = JSON.parse(localStorage.data);
-    delete data[name];
-    localStorage.data = JSON.stringify(data);
+    if(localStorage.data) {
+        let data = JSON.parse(localStorage.data);
+        delete data[name];
+        localStorage.data = JSON.stringify(data);
+    }
 }
 
 function resetAll() {

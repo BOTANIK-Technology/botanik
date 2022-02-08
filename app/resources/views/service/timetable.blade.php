@@ -3,7 +3,14 @@
     <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
-        let id = {{$service_id}};
+        let id = {{$service_id ?? 0}};
+        let timetableDB;
+        if(id) {
+            timetableDB = @json($timetables ? $timetables['timetable-' . $service_id ] : []);
+        }
+        else {
+            timetableDB = @json([]);
+        }
     </script>
     <script src="{{asset('js/service/common.js')}}"></script>
     <script src="{{asset('js/service/timetable.js')}}"></script>

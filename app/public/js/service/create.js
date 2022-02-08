@@ -1,7 +1,7 @@
 if (document.querySelector('.modal-create') ) {
     setInitialData();
     //styles
-    inputActive(document.getElementsByClassName('inp'));
+    // inputActive(document.getElementsByClassName('inp'));
 
     let svg = document.getElementById('add-icon').innerHTML;
 

@@ -1,12 +1,15 @@
 @section('scripts')
+    <script src="{{asset('js/service/page.js')}}"></script>
     <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
+    <script src="{{asset('js/requests.js')}}"></script>
     <script>
         let currentYear = '{{$current_year}}';
         let currentMonth = '{{$current_month}}';
+        let id = 0;
+        let timetableDB = @json([]);
     </script>
-    <script src="{{asset('js/service/page.js')}}"></script>
-    <script src="{{asset('js/requests.js')}}"></script>
+    <script src="{{asset('js/service/common.js')}}"></script>
     <script src="{{asset('js/service/create.js')}}"></script>
 @endsection
 

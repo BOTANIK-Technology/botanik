@@ -53,7 +53,7 @@ class Service extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['intervalFields', 'rangeFields'];
+    protected $appends = ['intervalFields', 'rangeFields', 'addresses'];
 
     public function getIntervalFieldsAttribute()
     {
@@ -117,20 +117,20 @@ class Service extends Model
         return $this->hasOne(Prepayment::class);
     }
 
-    /**
-     * @return HasMany
-     */
-    public function timetable (): HasMany
-    {
-        return $this->hasMany(ServiceTimetable::class);
-    }
+//    /**
+//     * @return HasMany
+//     */
+//    public function timetable (): HasMany
+//    {
+//        return $this->hasMany(ServiceTimetable::class);
+//    }
 
     /**
      * @return HasMany
      */
-    public function timetables (): HasMany
+    public function timetables(): HasMany
     {
-        return $this->hasMany(ServiceTimetable::class);
+        return $this->hasMany(ServicesTimetables::class);
     }
 
 
@@ -142,13 +142,6 @@ class Service extends Model
         return $this->belongsTo(Interval::class);
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'users_services');
-    }
 
     /**
      * @return HasMany
@@ -178,11 +171,11 @@ class Service extends Model
     /**
      * @param array $timeTable
      */
-    public function attachTimetable(array $timeTable = []) : void
+    public function attachTimetable(array $timeTables = []) : void
     {
-        foreach ($timeTable as $year => $monthTable){
+        foreach ($timeTables as $year => $monthTable){
             foreach ($monthTable as $month => $schedule){
-                ServiceTimetable::create([
+                ServicesTimetables::create([
                    'service_id' => $this->id,
                    'year' => $year,
                    'month' => $month,
@@ -196,14 +189,14 @@ class Service extends Model
      * @param array $timetable
      * @throws Exception
      */
-    public function updateTimetable(array $timetable = []) : void
+    public function updateTimetable(array $timetables = []) : void
     {
-        if ($this->timetable) {
-            foreach ($this->timetable as $tableRecord) {
+        if ($this->timetables) {
+            foreach ($this->timetables as $tableRecord) {
                 $tableRecord->delete();
             }
         }
-        $this->attachTimetable($timetable);
+        $this->attachTimetable($timetables);
     }
 
     /**

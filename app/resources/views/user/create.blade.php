@@ -4,11 +4,7 @@
         let note = '{{Auth::user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';
         let createRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'create'])}}";
-        let timeTables = @json($timetables);
-        console.log('timeTables: ', timeTables);
-        for (let item in timeTables) {
-            setCookie(item, JSON.stringify(timeTables[item]));
-        }
+        let timetableDB = @json([]);
     </script>
     <script src="{{asset('js/user/page.js')}}"></script>
     <script src="{{asset('js/requests.js')}}"></script>

@@ -6,7 +6,6 @@
         let currentYear = '{{$current_year}}';
         let currentMonth = '{{$current_month}}';
         let id = {{$service_id}};
-        let timetableDB = @json($timetables);
     </script>
 
     <script src="{{asset('js/requests.js')}}"></script>

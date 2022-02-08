@@ -121,18 +121,14 @@ class ServiceController extends Controller
             case 'create':
             case 'edit':
                 $this->params['types_select'] = TypeService::all();
-                $this->params['addresses'] = Address::all();
                 $this->params['view_service'] = $serviceView;
-                $this->params['service_id'] = $serviceView->id;
+                $this->params['service_id'] = $serviceView->id ?? 0;
                 $this->setTimetableCookies($serviceView);
 
                 if ($serviceView) {
                     $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
                 }
 
-                if ($this->params['addresses']->isEmpty()) {
-                    $this->params['addresses'] = 0;
-                }
                 break;
         }
 
@@ -145,7 +141,7 @@ class ServiceController extends Controller
         if (!$view_service) {
             return;
         }
-        $timeTableList = $view_service->timetable()->whereNull('user_id')->get();
+        $timeTableList = $view_service->timetables;
 
         if (!$timeTableList) {
             return;

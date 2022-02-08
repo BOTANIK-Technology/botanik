@@ -1,7 +1,7 @@
 function getTimetables() {
     let array = [];
     for (let i = 0; i < countService; i++) {
-            array.push(JSON.parse(getCookie('timetable-' + i)));
+        array.push(JSON.parse(getCookie('timetable-' + i)));
     }
     return array;
 }
@@ -138,6 +138,7 @@ if (calendar.length) {
 }
 
 let input = getCookie('user');
+console.log(input);
 if (input) {
     fio.value = input.fio;
     phone.value = input.phone;
@@ -145,14 +146,12 @@ if (input) {
     password.value = input.password;
     master.checked = input.master;
     admin.checked = input.admin;
-for (let serv of input.services){
-    console.log('serv', serv);
-
-
-    addresses = setValues(addressSelects, addresses);
-    services = setValues(serviceSelects, services);
-    services_types = setValues(serviceTypeSelects, service_types);
-}
+    for (let serv of input.services) {
+        console.log('serv', serv);
+        let addresses = setValues(addressSelects, addresses);
+        let services = setValues(serviceSelects, services);
+        let services_types = setValues(serviceTypeSelects, service_types);
+    }
 }
 
 

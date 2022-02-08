@@ -98,6 +98,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'services'
+    ];
+
+
     /**
      * @return BelongsToMany
      */
@@ -107,19 +112,23 @@ class User extends Authenticatable
     }
 
     /**
-     * @return BelongsToMany
      */
-    public function services (): BelongsToMany
+    public function getServicesAttribute()
     {
-        return $this->belongsToMany(Service::class, 'users_services')->with('timetables');
+       $slots = $this->slots;
+       $res = [];
+       foreach ($slots as $slot){
+           $res[] = $slot->service;
+       }
+       return $res;
     }
 
     /**
      * @return HasMany
      */
-    public function timetables(): HasMany
+    public function slots(): HasMany
     {
-        return $this->hasMany(UserTimetable::class);
+        return $this->hasMany(UsersSlots::class);
     }
 
     /**
