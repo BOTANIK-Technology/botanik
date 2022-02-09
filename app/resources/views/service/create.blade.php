@@ -1,6 +1,5 @@
 @section('scripts')
     <script src="{{asset('js/service/page.js')}}"></script>
-    <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script src="{{asset('js/requests.js')}}"></script>
     <script>

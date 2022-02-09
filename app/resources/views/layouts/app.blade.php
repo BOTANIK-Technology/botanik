@@ -14,6 +14,7 @@
         const SLUG = '{{ $slug ?? '' }}';
         const CURRENT_URL = '{{url()->current()}}';
     </script>
+    <script src="{{asset('js/functions.js')}}"></script>
     @yield('critical-scripts')
 
     <!-- Fonts -->

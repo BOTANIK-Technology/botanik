@@ -60,7 +60,16 @@ const changeSavedButton = function (savedState) {
 }
 changeSavedButton(true)
 
+/**
+ * Close
+ */
 
+if (close.length > 0) {
+    Object.keys(close).forEach((k) => {
+        close[k].removeEventListener('click', clearCloseModal);
+        close[k].addEventListener('click', closeModal);
+    });
+}
 
 
 
