@@ -86,12 +86,12 @@ class UsersSlots extends Model
 
     ];
 
-    public function timeTable(){
+    public function timetables(){
         return $this->hasMany(UsersTimetables::class);
     }
 
     public function service(){
-        return $this->hasMany(Service::class);
+        return $this->hasOne(Service::class, 'id', 'service_id');
     }
 
     public function address(){

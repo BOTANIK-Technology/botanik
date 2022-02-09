@@ -1,17 +1,16 @@
-function getTimetables() {
-    let array = [];
-    for (let i = 0; i < countService; i++) {
-        array.push(getCookie('timetable' + suffix(i)));
-    }
-    return array;
-}
+// function getTimetables() {
+//     let array = [];
+//     for (let i = 0; i < countService; i++) {
+//         array.push(getCookie('timetable'));
+//     }
+//     return array;
+// }
 
-function unsetCookies(count) {
-    if (!count) return;
-    for (let i = 0; i < count; i++) {
+function unsetCookies() {
+        deleteCookie('input');
+        deleteCookie('timetable');
         deleteCookie('user');
         deleteCookie('userData');
-    }
 }
 
 function addressServices(array) {
@@ -110,6 +109,7 @@ if (calendar.length) {
     Object.keys(calendar).forEach((k) => {
         calendar[k].addEventListener('click', function () {
             setCookie('input', getData());
+            setUserData(k);
             //   window.location.href = this.dataset.href;
         });
     });

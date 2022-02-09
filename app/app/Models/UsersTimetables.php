@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
  * @package App\Models
  *
  * @property integer $id
- * @property integer $users_slot_id
+ * @property integer $users_slots_id
  * @property integer $year
  * @property string $month
  * @property string $schedule
@@ -56,7 +56,7 @@ class UsersTimetables extends Model
      */
     protected $fillable = [
 
-        'users_slot_id',
+        'users_slots_id',
 
         'year',
 
@@ -81,12 +81,12 @@ class UsersTimetables extends Model
      * @var array
      */
     protected $casts = [
-
+        'schedule' => 'array'
     ];
 
     const RuleList = [
 
-        'users_slot_id' => [],
+        'users_slots_id' => [],
 
         'year' => [],
 

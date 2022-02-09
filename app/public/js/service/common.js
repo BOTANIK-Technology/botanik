@@ -1,12 +1,12 @@
 function addressSelectors(idVal = null) {
-    return document.getElementsByName('addresses' + suffix(idVal) + '[]');
+    return document.getElementsByName('addresses[]');
 }
 
 function addAddressSelector(idVal = null) {
     let options = document.getElementById('address').innerHTML;
 
     let addressesBlock = document.getElementById('addresses' + suffix(idVal));
-    addressesBlock.insertAdjacentHTML('beforeEnd', '<select class="address" name="addresses' + suffix(idVal) + '[]">' + options + '</select>')
+    addressesBlock.insertAdjacentHTML('beforeEnd', '<select class="address" name="addresses[]">' + options + '</select>')
 
 }
 
@@ -28,8 +28,8 @@ if (close.length > 0) {
 
 
 function unsetCookies(idVal) {
-    deleteCookie('inputs' + suffix(idVal));
-    deleteCookie('timetable' + suffix(idVal));
+    deleteCookie('inputs');
+    deleteCookie('timetable');
 }
 
 
@@ -64,7 +64,7 @@ function send(idVal = null) {
         'intervalHours': checkedByNameVal('intervalHours'),
         'intervalMinutes': checkedByNameVal('intervalMinutes'),
 
-        'timetable': getCookie('timetable' + suffix(idVal)),
+        'timetable': getCookie('timetable'),
 
         'price': document.getElementById('price' + suffix(idVal)).value,
         'bonus': document.getElementById('bonus' + suffix(idVal)).value,
@@ -81,7 +81,7 @@ function send(idVal = null) {
 }
 
 function addressesVal(idVal = null) {
-    let addresses = document.getElementsByName('addresses' + suffix(idVal) + '[]');
+    let addresses = document.getElementsByName('addresses[]');
 
     let array = [];
     Object.keys(addresses).forEach((el) => {
@@ -123,16 +123,16 @@ function setValues(objects, values) {
     });
 }
 
-function issetTimetable(id) {
-    let timetable = getCookie('timetable-' + id);
-    console.log(id, timetable);
-    return !!(timetable && timetable !== 'undefined' && timetable.length);
-}
+// function issetTimetable(id) {
+//     let timetable = getCookie('timetable-' + id);
+//     console.log(id, timetable);
+//     return !!(timetable && timetable !== 'undefined' && timetable.length);
+// }
 
-function getTimetable(id) {
-    let timetable = getCookie('timetable-' + id);
-    return timetable;
-}
+// function getTimetable(id) {
+//     let timetable = getCookie('timetable-' + id);
+//     return timetable;
+// }
 
 
 
@@ -143,7 +143,7 @@ function setChecked(objects, value) {
 }
 
 const setInitialData = (idVal) => {
-    let inputs = getCookie('inputs' + suffix(idVal));
+    let inputs = getCookie('inputs');
     if (inputs && Object.keys(inputs).length) {
         document.getElementById('service-name' + suffix(idVal)).value = inputs.name;
         document.getElementById('service-type' + suffix(idVal)).value = inputs.type;
@@ -249,7 +249,7 @@ if (moreBtn) {
 let calendar = document.getElementById('calendar');
 if (calendar) {
     calendar.addEventListener('click', function () {
-        setCookie('inputs' + suffix(id), send(id));
+        setCookie('inputs', send(id));
         window.location.href = this.dataset.href;
     });
 }

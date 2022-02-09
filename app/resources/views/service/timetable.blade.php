@@ -4,6 +4,7 @@
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let id = {{$service_id ?? 0}};
+        let currentService = 0;
         let timetableDB;
         if(id) {
             timetableDB = @json($timetables ? $timetables['timetable-' . $service_id ] : []);

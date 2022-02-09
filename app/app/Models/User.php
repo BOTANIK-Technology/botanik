@@ -102,6 +102,11 @@ class User extends Authenticatable
         'services'
     ];
 
+    public function timetables()
+    {
+        return $this->hasManyThrough(UsersTimetables::class, UsersSlots::class, );
+    }
+
 
     /**
      * @return BelongsToMany
@@ -302,11 +307,11 @@ class User extends Authenticatable
                     'updated_at' => date('Y-m-d H:i:s')
                 ]
             );
-            UsersTimetables::where('users_slot_id', $slot->id)->delete();
+            UsersTimetables::where('users_slots_id', $slot->id)->delete();
             foreach ($timestables[$key] as $year => $monthTable){
                 foreach ($monthTable as $month => $table){
                     UsersTimetables::create([
-                       'users_slot_id' => $slot->id,
+                       'users_slots_id' => $slot->id,
                        'year' => $year,
                        'month' => $month,
                        'schedule' => json_encode($table)

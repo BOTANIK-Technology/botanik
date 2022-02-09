@@ -13,8 +13,6 @@ let CreateUserWindow = function () {
     this.master = null;
 
     this.init = function () {
-        console.log('init');
-
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
         this.loadAllServices();
@@ -24,7 +22,6 @@ let CreateUserWindow = function () {
 
     this.initAllServices = function () {
         let uData = getCookie('userData');
-console.log('initAllServices', uData);
         for (let i in uData) {
             console.log(i);
             this.setCurrentData(i);
@@ -46,6 +43,7 @@ console.log('initAllServices', uData);
             this.loadServices(num, service_type_id);
             if (!isInit) {
                 this.saveCurrentData(num);
+                setUserData(num);
             }
         }
     }
@@ -65,16 +63,19 @@ console.log('initAllServices', uData);
             this.loadAddresses(num, service_id);
             if (!isInit) {
                 this.saveCurrentData(num);
+                setUserData(num);
             }
         }
     }
 
     this.changeAddress = function (num) {
         this.saveCurrentData(num);
+        setUserData(num);
     }
 
     this.changeAdminAddress = function (num) {
         this.saveAdminCurrentData(num);
+        setUserData(num);
     }
 
     this.loadAllServices = function () {
@@ -108,6 +109,7 @@ console.log('initAllServices', uData);
             cnt += "<option value='" + servL[serv].id + "'>" + servL[serv].name + "</option>";
         }
         let services = document.querySelector('#service' + suffix(num));
+        console.log('#service' + suffix(num), services);
         if (services) {
             services.innerHTML = cnt;
             document.querySelector('#service' + suffix(num)).classList.remove('hide');
@@ -156,21 +158,21 @@ console.log('initAllServices', uData);
         let data = {
             address_id: address_id
         };
-        setCookie('admin_data' + suffix(num), JSON.stringify(data));
+        setCookie('admin_data', data);
     }
 
     this.setCurrentData = function (num) {
         let data = getUserData(num);
-        console.log(num, data);
+        console.log('setCurrentData', num, data);
         if (Object.keys('data').length) {
             if (data.service_type_id) {
+                let type = document.getElementById('service-type' + suffix(num));
+                type.value = data.service_type_id;
                 this.loadServices(num, data.service_type_id, data.service_id)
-
             }
             if (data.service_id) {
                 this.loadAddresses(num, data.service_id, data.address_id)
             }
-
             isInit = false;
         }
     }

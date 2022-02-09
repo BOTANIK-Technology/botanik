@@ -11,18 +11,13 @@
         let editRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $id])}}";
         let services = @json($services);
         let addresses = @json($addresses);
-        let timeTables = @json($timetables);
 
-        @if($user)
-        setCookie('user', @json($user));
-        @endif
+       if(! Object.keys(getCookie('user') ).length) {
+           setCookie('user', @json($user));
+       }
 
-        @if($userData)
-        setCookie('userData', @json($userData));
-        @endif
-
-        for (let item in timeTables) {
-            setCookie(item, timeTables[item]);
+        if(! getCookie('userData').length) {
+            setCookie('userData', @json($userData));
         }
 
 
@@ -56,7 +51,8 @@
 
             <div class="line full-width"></div>
 
-            @for($i = 0; $i <= $moreService; $i++)
+            @for($i = 0; $i < $moreService; $i++)
+
                 <div class="flex direction-column master-only">
                     <label class="list-label" for="service-type-{{$i}}">Тип услуги</label>
                     @if ($types)
@@ -111,17 +107,20 @@
                     <span class="calendar">{{__('Расписание')}}</span>
                     <a id="calendar" class="background-none calendar-a"
                        href="{{route('window.user', [
-                                'business' => $slug,
-                                'id' => $user->id,
-                                  'currentService' => $i,
-                                   'modal' => 'timetable'
+                            'business' => $slug,
+                            'id' => $user->id,
+                            'currentService' => $i,
+							 'moreService' => $moreService,
+                            'modal' => 'timetable'
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>
                     <div class="filled-months">
-                        {{--                        @foreach($usedMonths[$i] as $month)--}}
-                        {{--                            <p>{{$month}}</p>--}}
-                        {{--                        @endforeach--}}
+                        @if(isset($usedMonths[$i]))
+                            @foreach($usedMonths[$i] as $month)
+                                <p>{{$month}}</p>
+                            @endforeach
+                        @endif
                     </div>
 
                 </div>

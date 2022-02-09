@@ -1,6 +1,7 @@
 @section('scripts')
     <script>
         let id = '{{$id}}';
+        let currentService = {{$currentService}}
     </script>
     <script src="{{asset('js/user/page.js')}}"></script>
 
@@ -8,7 +9,7 @@
     <script>
         let timetableDB;
         if(id) {
-            timetableDB = @json($timetables ? $timetables['timetable-' . $service_id ] : []);
+            timetableDB = @json($timetables);
         }
         else {
             timetableDB = @json([]);
@@ -33,10 +34,10 @@
                 {{ __('Подтвердить') }}
             </button>
             @if (isset($id))
-                <a href="{{route('addService', ['business' => $slug, 'modal' => 'edit', 'id' => $id, 'sort' => $sort, 'moreService' => $moreService, 'load' => $load, 'savedata' => 1])}}"
+                <a href="{{route('addService', ['business' => $slug, 'modal' => 'edit', 'id' => $id, 'moreService' => $moreService])}}"
                    id="refresh-modal"></a>
             @else
-                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 'new', 'sort' => $sort, 'moreService' => $moreService, 'load' => $load, 'savedata' => 1])}}"
+                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 'new','moreService' => $moreService])}}"
                    id="refresh-modal"></a>
             @endif
         @endslot

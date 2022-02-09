@@ -20,7 +20,7 @@ class ModifyUserTimetablesTable extends Migration
 
         Schema::create('users_timetables', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('users_slot_id')->constrained()->onDelete('cascade');
+            $table->foreignId('users_slots_id')->constrained()->onDelete('cascade');
             $table->integer('year');
             $table->string('month');
             $table->json('schedule');

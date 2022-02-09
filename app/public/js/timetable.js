@@ -11,24 +11,24 @@ let year = document.getElementById('year_picker');
 
 if (month.value) {
     month.addEventListener('change', () => {
-        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value);
+        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value + '&currentService=' + currentService);
     });
 }
 
-if(year) {
+if (year) {
     year.addEventListener('change', () => {
-        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value);
+        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value + '&currentService=' + currentService);
     });
 }
 
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
-    let  timetable = getCookie('timetable' + suffix(idVal) );
-    console.log(timetable, timetableDB);
-    if (!(Object.keys(timetable).length) ){
-        timetable = timetableDB;
-        setCookie('timetable' + suffix(idVal), timetable);
-    }
+    let timetable = getCookie('timetable');
 
+    if (!(Object.keys(timetable).length)) {
+        timetable = timetableDB;
+        setCookie('timetable', timetable);
+    }
+    timetable = timetable[currentService];
     if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
         let checkedArray = timetable[yearVal][monthVal];
         for (let dateEl in checkedArray) {
@@ -44,11 +44,9 @@ if (month && year) {
 }
 
 
-
-
 const changeSavedButton = function (savedState) {
     let mButton = document.getElementById('save_month');
-    if(mButton) {
+    if (mButton) {
         if (savedState) {
             mButton.classList.add('saved');
             mButton.textContent = 'Сохранено';
@@ -72,9 +70,6 @@ if (close.length > 0) {
 }
 
 
-
-
-
 let timeBtn = document.getElementById('time-confirm');
 if (timeBtn) {
     timeBtn.addEventListener('click', function () {
@@ -84,7 +79,7 @@ if (timeBtn) {
 }
 
 let saveMonth = document.getElementById('save_month');
-if(saveMonth) {
+if (saveMonth) {
     saveMonth.addEventListener('click', () => {
         saveMonthAction(id);
     });
@@ -120,7 +115,8 @@ clr.addEventListener('click', function () {
 
 
 const saveMonthAction = (id) => {
-    let allCookies = getCookie('timetable' + suffix(id));
+    let allCookies = getCookie('timetable');
+    serviceTimetable = allCookies[currentService];
     let cookies = {};
 
     let times = document.getElementsByClassName('checked');
@@ -131,24 +127,26 @@ const saveMonthAction = (id) => {
             cookies[times[el].dataset.day].push(times[el].dataset.time);
         }
     });
-    if (!allCookies || !Object.keys(allCookies).length) {
-        allCookies = {};
+    if (!serviceTimetable || !Object.keys(serviceTimetable).length) {
+        serviceTimetable = {};
     }
 
     let indexYear = year.value;
     let indexMonth = month.value;
 
 
-    if (!(indexYear in allCookies)) {
-        allCookies[indexYear] = {};
+    if (!(indexYear in serviceTimetable)) {
+        serviceTimetable[indexYear] = {};
     }
 
-    allCookies[indexYear][indexMonth] = cookies;
+    serviceTimetable[indexYear][indexMonth] = cookies;
 
-    if (Object.keys(allCookies).length) {
-            setCookie('timetable' + suffix(id), allCookies);
+    if (Object.keys(serviceTimetable).length) {
+
+        allCookies[currentService] = serviceTimetable;
+        setCookie('timetable', allCookies);
     } else {
-            deleteCookie('timetable' + suffix(id) );
+        deleteCookie('timetable');
 
     }
     changeSavedButton(true);

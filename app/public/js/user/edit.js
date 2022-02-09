@@ -7,7 +7,7 @@ if (editUserBtn) {
             'phone': data.phone,
             'email': data.email,
             'password': data.password,
-            'timetables': [getCookie('timetable' + suffix(id))],
+            'timetables': getCookie('timetable')
         };
 
         if (master.checked) {
@@ -22,7 +22,7 @@ if (editUserBtn) {
         let Request = postRequest(editRoute+'/edit-user', send);
         Request.onload = function() {
             if (Request.status >= 200 && Request.status < 400) {
-             //   closeModal();
+                closeModal();
             } else {
                 showErrors(Request.response);
             }

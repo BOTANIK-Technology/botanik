@@ -56,6 +56,7 @@ class UserController extends Controller
             $this->params['countUsers'] = $role->users->count();
             $this->params['table'] = $role->users->take($this->params['load']);
         }
+
         if ($this->params['table']->isEmpty()) {
             $this->params['table'] = 0;
         }
@@ -70,6 +71,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+
         return $this->getView($request);
     }
 
@@ -103,30 +105,37 @@ class UserController extends Controller
                 break;
 
             case 'edit':
-                $this->params['id'] = $request->id;
-                $this->params['user'] = User::find($this->params['id']);
+                $this->params['id'] = $request->id ?? null;
+                /** @var User $user */
+                $user = User::find($this->params['id']);
 
+                $this->params['user'] = $user;
+                $this->params['moreService'] = $request->moreService ?? count($user->services);
 
-                $this->setUserCookies($this->params['user']);
-                $this->setTimetableCookies($this->params['user']);
-                $this->params['user']['admin'] = $this->params['user']->hasRole(Role::ROLE_ADMIN_SLUG) || $this->params['user']->hasRole(Role::ROLE_OWNER_SLUG);
-                $this->params['moreService'] = $request->moreService ?? count($this->params['user']->services);
+                $this->setUserCookies($user);
+                $this->setTimetableCookies($user);
+
+                $this->params['user']['admin'] = $user->hasRole(Role::ROLE_ADMIN_SLUG) || $user->hasRole(Role::ROLE_OWNER_SLUG);
+
                 break;
 
             case 'timetable':
+                $this->params['id'] = $request->id ?? null;
+                /** @var User $user */
+                $user = User::find($this->params['id']);
                 $time = new UserTimetable();
                 $this->params['times'] = $time->getHours();
                 $this->params['days'] = $time->getDays();
-                $this->params['id'] = $request->id ?? null;
+
 
                 if (!is_null($this->params['id'])) {
-                    $this->setTimetableCookies(User::find($this->params['id']), true);
+                    $this->setTimetableCookies($user);
                 }
-
-                $this->params['moreService'] = intval($request->moreService);
+                $this->params['user'] = $user;
+                $this->params['moreService'] = $request->moreService ?? count($user->services);
                 $this->params['currentService'] = intval($request->currentService);
                 $this->params['user'] = User::find($this->params['id']);
-                $this->setUserCookies($this->params['user']);
+                $this->setUserCookies($user);
                 break;
             case 'note':
                 break;
@@ -149,7 +158,7 @@ class UserController extends Controller
                     'service_id'      => $slot->service_id,
                     'address_id'      => $slot->address_id
                 ];
-                $this->params['userData'][$slot->id] = $cookie;
+                $this->params['userData'][] = $cookie;
             }
         }
     }
@@ -162,17 +171,18 @@ class UserController extends Controller
     private function setTimetableCookies($user)
     {
         $this->params['timetables'] = [];
-        if (empty($user->timetables)) {
+        if (empty($user->slots)) {
             return;
         }
 
-        $timetable = [];
         $months = [];
-        foreach ($user->timetables as $item) {
-            $timetable[$item->year][$item->month] = $item->schedule;
-            $months[$item->service_id][] = Timetables::getMonthList()[$item->month];
-
-            $this->params['timetables']['timetable-' . $item->service_id] = $timetable;
+        foreach ($user->slots as $key => $slot) {
+            $timetable = [];
+            foreach($slot->timetables as $item) {
+                $timetable[$item->year][$item->month] = json_decode($item->schedule);
+                $months[$key][] = $item->year . '-' . Timetables::getMonthList()[$item->month];
+            }
+            $this->params['timetables'][$key] = $timetable;
         }
         $this->params['usedMonths'] = $months;
     }
@@ -362,6 +372,7 @@ class UserController extends Controller
             $user = User::find($request->id);
             $this->params['user'] = $user;
             $this->params['id'] = $user->id;
+            $this->setTimetableCookies($user);
             $this->setUserCookies($user);
         }
         else {
