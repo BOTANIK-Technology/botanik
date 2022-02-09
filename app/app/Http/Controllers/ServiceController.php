@@ -151,10 +151,10 @@ class ServiceController extends Controller
 
         foreach ($timeTableList as $item) {
             $timetable[$item->year][$item->month] = $item->schedule;
-            $months[] = Timetables::getMonthList()[$item->month];
+            $months[] = $item->year . '-' . Timetables::getMonthList()[$item->month];
         }
 
-        $this->params['timetables']['timetable-' . $view_service->id] = $timetable;
+        $this->params['timetables'][0] = $timetable;
         $this->params['usedMonths'] = $months;
 
     }

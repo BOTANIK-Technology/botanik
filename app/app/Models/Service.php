@@ -196,7 +196,7 @@ class Service extends Model
                 $tableRecord->delete();
             }
         }
-        $this->attachTimetable($timetables);
+        $this->attachTimetable($timetables[0]);
     }
 
     /**

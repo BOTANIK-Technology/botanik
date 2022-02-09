@@ -71,7 +71,7 @@
                     <div id="addresses-{{$view_service->id}}" class="addresses">
                         @foreach($view_service->addresses as $address)
                             <select id="address-{{$view_service->id}}" class="address"
-                                    name="addresses-{{$view_service->id}}[]">
+                                    name="addresses[]">
                                 @foreach($addresses as $add)
                                     <option value="{{$add->id}}"
                                             @if ($address->id == $add->id) selected @endif>{{$add->address}}</option>

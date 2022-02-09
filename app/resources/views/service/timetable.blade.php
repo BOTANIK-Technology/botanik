@@ -1,13 +1,12 @@
 @section('scripts')
     <script src="{{asset('js/service/page.js')}}"></script>
-    <script src="{{asset('js/functions.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let id = {{$service_id ?? 0}};
         let currentService = 0;
         let timetableDB;
         if(id) {
-            timetableDB = @json($timetables ? $timetables['timetable-' . $service_id ] : []);
+            timetableDB = @json($timetables ? $timetables : []);
         }
         else {
             timetableDB = @json([]);
