@@ -106,8 +106,10 @@ class UserController extends Controller
                 $this->params['id'] = $request->id;
                 $this->params['user'] = User::find($this->params['id']);
 
+
                 $this->setUserCookies($this->params['user']);
                 $this->setTimetableCookies($this->params['user']);
+                $this->params['user']['admin'] = $this->params['user']->hasRole(Role::ROLE_ADMIN_SLUG) || $this->params['user']->hasRole(Role::ROLE_OWNER_SLUG);
                 $this->params['moreService'] = $request->moreService ?? count($this->params['user']->services);
                 break;
 
@@ -132,21 +134,22 @@ class UserController extends Controller
                 abort(404);
         }
 
+
         return $this->index($request);
 
     }
 
     private function setUserCookies($user)
     {
-        $this->params['user_data'] = [];
+        $this->params['userData'] = [];
         if ($user) {
-            foreach ($user->services as $key => $service) {
+            foreach ($user->slots as $slot) {
                 $cookie = [
-                    'service_type_id' => $service->type_service_id,
-                    'service_id'      => $service->id,
-                    'address_id'      => $user->timetables[0] ? $user->timetables[0]->address_id : 0,
+                    'service_type_id' => $slot->service->type_service_id,
+                    'service_id'      => $slot->service_id,
+                    'address_id'      => $slot->address_id
                 ];
-                $this->params['userData']['user_data-' . $service->id] = $cookie;
+                $this->params['userData'][$slot->id] = $cookie;
             }
         }
     }
@@ -282,13 +285,13 @@ class UserController extends Controller
             return response()->json(['errors' => ['admin' => __('Выбранная роль не доступна.')]], 405);
         }
 
-        $services = [];
-        if ($role->slug == 'master') {
-            $services = User::relationServicesAddresses($request->services, $request->addresses);
-            if (!is_array($services)) {
-                return response()->json(['errors' => ['admin' => $services]], 405);
-            }
-        }
+//        $services = $request->services;
+//        if ($role->slug == 'master') {
+//            $services = User::relationServicesAddresses($request->services, $request->addresses);
+//            if (!is_array($services)) {
+//                return response()->json(['errors' => ['admin' => $services]], 405);
+//            }
+//        }
 
 
         try {
@@ -306,6 +309,7 @@ class UserController extends Controller
                 $array['password'] = bcrypt($request->password);
             }
 
+            /** @var User $user */
             $user = User::find($request->id);
             $user->update($array);
 
@@ -313,13 +317,13 @@ class UserController extends Controller
             $user->roles()->attach($role);
 
             if ($role->slug == 'master') {
-                $user->attachCustom('services', $services, true);
+                $user->updateSlots( $request->services, $request->addresses, $request->timetables);
             }
 
-            $user->timetables()->delete();
-            $user->attachTimetables($request->timetables, $request->addresses, $services);
-
-            $user->attachCustom('addresses', $request->addresses, true);
+//            $user->timetables()->delete();
+//            $user->attachTimetables($request->timetables, $request->addresses, $services);
+//
+//            $user->attachCustom('addresses', $request->addresses, true);
 
             return response()->json(['ok' => true], 200);
 
@@ -336,7 +340,7 @@ class UserController extends Controller
         $this->setTimetableCookies($this->params['user']);
         $this->params['services'] = Service::withoutTimetable();
         $this->params['addresses'] = Address::all();
-        $this->params['moreService'] = $request->moreService ?? count($this->params['user']->addresses);
+        $this->params['moreService'] = $request->moreService ?? count($this->params['user']->slots);
 
         $this->setParams($request);
         $html = view($this->view, $this->params)->render();
@@ -351,17 +355,20 @@ class UserController extends Controller
     {
         $this->params['services'] = Service::withoutTimetable();
         $this->params['addresses'] = Address::all();
-        $this->params['moreService'] = intval($request->moreService);
+
+
 
         if ($request->modal == 'edit') {
             $user = User::find($request->id);
             $this->params['user'] = $user;
-            $this->params['id'] = $request->id;
+            $this->params['id'] = $user->id;
+            $this->setUserCookies($user);
         }
         else {
             $this->params['roles'] = [Role::where('slug', 'admin')->first(), Role::where('slug', 'master')->first()];
         }
-//        dd($this->params);
+        $this->params['moreService'] = intval($request->moreService);
+
         return $this->getView($request);
     }
 
@@ -471,6 +478,7 @@ class UserController extends Controller
             $this->params['timetables'] = [];
         }
         $this->setParams($request);
+
         return view($this->view, $this->params);
     }
 

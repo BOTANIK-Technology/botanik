@@ -53,7 +53,7 @@ class Service extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['intervalFields', 'rangeFields', 'addresses'];
+    protected $appends = ['intervalFields', 'rangeFields'];
 
     public function getIntervalFieldsAttribute()
     {

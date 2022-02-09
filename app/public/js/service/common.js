@@ -114,12 +114,7 @@ function groupVal(idVal = null) {
     return getCheckedVal(document.getElementsByName('group' + suffix(idVal)))
 }
 
-const suffix = (idVal) => {
-    if (idVal) {
-        return '-' + idVal;
-    }
-    return '';
-}
+
 
 function setValues(objects, values) {
     Object.keys(objects).forEach((k) => {

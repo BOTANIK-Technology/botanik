@@ -96,7 +96,7 @@ class UsersTimetables extends Model
 
     ];
 
-    public function userSlot()
+    public function slot()
     {
         return $this->hasOne(UsersSlots::class);
     }

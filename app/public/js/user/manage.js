@@ -1,7 +1,7 @@
 function getTimetables() {
     let array = [];
     for (let i = 0; i < countService; i++) {
-        array.push(JSON.parse(getCookie('timetable-' + i)));
+        array.push(getCookie('timetable' + suffix(i)));
     }
     return array;
 }
@@ -9,8 +9,8 @@ function getTimetables() {
 function unsetCookies(count) {
     if (!count) return;
     for (let i = 0; i < count; i++) {
-        deleteCookie('timetable-' + i);
-        deleteCookie('checked-' + i);
+        deleteCookie('user');
+        deleteCookie('userData');
     }
 }
 
@@ -24,43 +24,6 @@ function addressServices(array) {
     return returned;
 }
 
-function getValues(array) {
-    let returned = [];
-    array.forEach((select) => {
-        Object.keys(select).forEach((value) => {
-            returned.push(select[value].value)
-        });
-    });
-    return returned;
-}
-
-function setValues(selects, values) {
-    let j = 0;
-    selects.forEach((select) => {
-        Object.keys(select).forEach((k) => {
-            select[k].value = values[j];
-            j++;
-        });
-    });
-}
-
-function getData() {
-    let data = {
-        'fio': fio.value,
-        'phone': phone.value,
-        'email': email.value,
-        'password': password.value,
-        'addresses': getValues(addressSelects),
-        'services': getValues(serviceSelects),
-    };
-
-    if (master.checked)
-        data.master = 'checked';
-    else if (admin.checked)
-        data.admin = 'checked';
-
-    return data;
-}
 
 function toggleServices() {
     let addTypeBtn = document.getElementById('add-type');
@@ -97,7 +60,6 @@ let password = document.getElementById('password');
 let phone = document.getElementById('phone');
 let email = document.getElementById('email');
 let calendar = document.getElementsByClassName('calendar-a');
-// let serviceOptions = document.getElementById('service-type-99').innerHTML;
 let addedServices = getCookie('service-type');
 
 // inputActive([fio, password, phone, email]);
@@ -115,72 +77,107 @@ if (Object.keys(addedServices).length) {
     });
 }
 
-let serviceTypeSelects = [];
-let serviceSelects = [];
-let addressSelects = [];
-let adminAddressSelects = [];
-for (let i = 0; i < countService; i++) {
-    serviceTypeSelects.push(document.getElementsByName('service-type-' + i + '[]'));
-    serviceSelects.push(document.getElementsByName('service-' + i + '[]'));
-    addressSelects.push(document.getElementsByName('address-' + i + '[]'));
-    adminAddressSelects.push(document.getElementsByName('admin-address-' + i + '[]'));
+function getData() {
+    let serviceTypeSelects = [];
+    let serviceSelects = [];
+    let addressSelects = [];
+
+
+    serviceTypeSelects.push(document.getElementsByClassName('master-service-type'));
+    serviceSelects.push(document.getElementsByClassName('master-service'));
+    addressSelects.push(document.getElementsByClassName('master-address'));
+
+    let data = {
+        'fio': fio.value,
+        'phone': phone.value,
+        'email': email.value,
+        'password': password.value,
+        'addresses': getValues(addressSelects),
+        'services': getValues(serviceSelects),
+        'types': getValues(serviceTypeSelects),
+    };
+
+    if (master.checked)
+        data.master = 'checked';
+    else if (admin.checked)
+        data.admin = 'checked';
+
+    return data;
 }
+
 
 if (calendar.length) {
     Object.keys(calendar).forEach((k) => {
         calendar[k].addEventListener('click', function () {
-            setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
-            window.location.href = this.dataset.href;
+            setCookie('input', getData());
+            //   window.location.href = this.dataset.href;
         });
     });
 } else {
     unsetCookies(countService);
 }
 
-let input = getCookie('user');
-console.log(input);
-if (input) {
-    fio.value = input.fio;
-    phone.value = input.phone;
-    email.value = input.email;
-    password.value = input.password;
-    master.checked = input.master;
-    admin.checked = input.admin;
-    for (let serv of input.services) {
-        console.log('serv', serv);
-        let addresses = setValues(addressSelects, addresses);
-        let services = setValues(serviceSelects, services);
-        let services_types = setValues(serviceTypeSelects, service_types);
+function setUserData(data, num) {
+    let uData = getCookie('userData');
+    if (!uData) {
+        uData = [];
     }
+    uData[num] = data;
+    setCookie('userData', uData);
+}
+
+function getUserData(num) {
+    num = parseInt(num);
+    let uData = getCookie('userData');
+    return uData[num];
 }
 
 
+let input = getCookie('user');
+
+if (input) {
+    fio.value = input.name;
+    phone.value = input.phone;
+    email.value = input.email;
+    password.value = input.password || '';
+    master.checked = !input.admin;
+    admin.checked = input.admin;
+}
+
+toggleServices();
+
 admin.addEventListener('change', function () {
-    setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
+    setCookie('input', getData());
     toggleServices()
 });
 master.addEventListener('change', function () {
-    setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
+    setCookie('input', getData());
     toggleServices()
 });
 
 document.getElementById('add-type').addEventListener('click', function () {
-    setCookie('input', JSON.stringify(getData()), {'path': COOKIE_URL});
+    setCookie('input', getData());
     window.location.href = this.dataset.href;
 });
 
+
+const clearCloseModal = () => {
+    unsetCookies(id);
+    closeModal();
+}
+
+/**
+ * Close
+ */
 let close = document.getElementsByClassName('close');
 if (close.length > 0) {
     Object.keys(close).forEach((k) => {
-        close[k].addEventListener('click', function () {
-            deleteCookie('input', COOKIE_URL);
-            for (let i = 0; i < countService; i++) {
-                deleteCookie('timetable-' + i, COOKIE_URL);
-                deleteCookie('checked-' + i, COOKIE_URL);
-            }
-        })
+        close[k].removeEventListener('click', closeModal);
+        close[k].addEventListener('click', clearCloseModal);
     });
 }
+
+
 
 
 

@@ -54,9 +54,8 @@ class UsersSlots extends Model
      * @var array
      */
     protected $fillable = [
-
+        'user_id',
         'service_id',
-
         'address_id',
 
     ];

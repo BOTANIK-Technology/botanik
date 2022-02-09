@@ -6,13 +6,14 @@
 
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
-        let checked = [];
-        @if (isset($checked) )
-            checked = @json($checked);
-        @endif
-            for (let item in checked) {
-            setCookie(item, JSON.stringify(checked[item]));
+        let timetableDB;
+        if(id) {
+            timetableDB = @json($timetables ? $timetables['timetable-' . $service_id ] : []);
         }
+        else {
+            timetableDB = @json([]);
+        }
+
     </script>
     <script src="{{asset('js/timetable.js')}}"></script>
     <script src="{{asset('js/user/timetable.js')}}"></script>

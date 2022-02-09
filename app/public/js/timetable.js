@@ -107,16 +107,17 @@ Object.keys(checkboxes).forEach((el) => {
 let all = document.querySelector('#select-all');
 all.addEventListener('click', function () {
     Object.keys(checkboxes).forEach((el) => {
-        addClass(checkboxes[el], 'checked')
+        checkboxes[el].classList.add('checked')
     });
 })
 
 let clr = document.querySelector('#clear-all');
 clr.addEventListener('click', function () {
     Object.keys(checkboxes).forEach((el) => {
-        removeClass(checkboxes[el], 'checked')
+        checkboxes[el].classList.remove('checked')
     });
 })
+
 
 const saveMonthAction = (id) => {
     let allCookies = getCookie('timetable' + suffix(id));

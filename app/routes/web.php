@@ -231,6 +231,7 @@ Route::group(
 
                     Route::get('/users/window/{modal}/{id?}', [App\Http\Controllers\UserController::class, 'window'])->name('window.user');
                     Route::get('/users/window/{modal}/{id?}/{moreService?}', [App\Http\Controllers\UserController::class, 'addService'])->name('addService');
+
                     Route::post('/users/window/create/add-user', [App\Http\Controllers\UserController::class, 'addUser']);
                     Route::post('/users/window/delete/{id}/confirm', [App\Http\Controllers\UserController::class, 'deleteUser']);
 

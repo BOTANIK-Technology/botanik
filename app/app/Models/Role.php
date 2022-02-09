@@ -21,6 +21,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Role extends Model
 {
+    const ROLE_MASTER_SLUG = 'master';
+    const ROLE_ADMIN_SLUG = 'admin';
+    const ROLE_OWNER_SLUG = 'owner';
     use HasFactory;
 
     /**

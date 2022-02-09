@@ -2,6 +2,7 @@ let CreateUserWindow = function () {
     let isInit = true;
     this.token = null;
 
+
     let allServiceList = {};
     let allAddressList = {};
 
@@ -12,29 +13,30 @@ let CreateUserWindow = function () {
     this.master = null;
 
     this.init = function () {
+        console.log('init');
+
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
         this.loadAllServices();
         // this.initAllServices();
         // document.querySelector('input[name="role"]);
-
-        window.setTimeout(toggleServices, 10);
-
     }
 
     this.initAllServices = function () {
-        console.log(services);
-        for (let i in userData) {
-            if(userData[i]) {
-                this.setCurrentData(userData[i]);
-                this.satAdminCurrentData(userData[i]);
-            }
+        let uData = getCookie('userData');
+console.log('initAllServices', uData);
+        for (let i in uData) {
+            console.log(i);
+            this.setCurrentData(i);
+            this.satAdminCurrentData(i);
+
         }
     }
 
 
     this.changeServiceType = function (num) {
-        let serviceType = document.querySelector('#service-type-' + num);
+        let serviceType = document.querySelector('#service-type' + suffix(num));
+
         if (serviceType && serviceType.value) {
             let option = serviceType.querySelector('option.placeholder');
             if (option) {
@@ -49,7 +51,7 @@ let CreateUserWindow = function () {
     }
 
     this.changeService = function (num, value = null) {
-        let service = document.querySelector('#service-' + num);
+        let service = document.querySelector('#service' + suffix(num));
         if (service.value || value) {
             let option = service.querySelector('option.placeholder');
             if (option) {
@@ -79,7 +81,7 @@ let CreateUserWindow = function () {
         let _this = this;
         this.post({
             url: '/api/services_list', success: function (response) {
-                console.log(response.services);
+
                 allServiceList = response.services;
                 _this.loadAllAddresses();
             }
@@ -91,7 +93,6 @@ let CreateUserWindow = function () {
         this.post({
             url: '/api/services_addresses',
             success: function (response) {
-                console.log(response.addresses);
                 allAddressList = response.addresses;
                 _this.initAllServices();
             }
@@ -106,11 +107,13 @@ let CreateUserWindow = function () {
         for (let serv in servL) {
             cnt += "<option value='" + servL[serv].id + "'>" + servL[serv].name + "</option>";
         }
-        let services = document.querySelector('#service-' + num);
-        services.innerHTML = cnt;
-        document.querySelector('#service-' + num).classList.remove('hide');
-        if (value) {
-            services.value = value;
+        let services = document.querySelector('#service' + suffix(num));
+        if (services) {
+            services.innerHTML = cnt;
+            document.querySelector('#service' + suffix(num)).classList.remove('hide');
+            if (value) {
+                services.value = value;
+            }
         }
     }
 
@@ -121,19 +124,21 @@ let CreateUserWindow = function () {
         for (let addr in addrL) {
             cnt += "<option value='" + addrL[addr][0].id + "'>" + addrL[addr][0].address + "</option>";
         }
-        let address = document.querySelector('#address-' + num);
-        address.innerHTML = cnt;
-        document.querySelector('#address-' + num).classList.remove('hide');
-        if (value) {
-            address.value = value;
+        let address = document.querySelector('#address' + suffix(num));
+        if (address) {
+            address.innerHTML = cnt;
+            document.querySelector('#address' + suffix(num)).classList.remove('hide');
+            if (value) {
+                address.value = value;
+            }
         }
 
     }
 
     this.saveCurrentData = function (num) {
-        let serviceType = document.querySelector('#service-type-' + num);
-        let service = document.querySelector('#service-' + num);
-        let address = document.querySelector('#address-' + num);
+        let serviceType = document.querySelector('#service-type' + suffix(num));
+        let service = document.querySelector('#service' + suffix(num));
+        let address = document.querySelector('#address' + suffix(num));
         let service_type_id = Number(serviceType.value);
         let service_id = Number(service.value);
         let address_id = Number(address.value);
@@ -142,36 +147,38 @@ let CreateUserWindow = function () {
             service_id: service_id,
             address_id: address_id,
         };
-        setCookie('user_data-' + num, JSON.stringify(data));
+        setUserData(data, num)
     }
 
     this.saveAdminCurrentData = function (num) {
-        let address = document.querySelector('#admin-address-' + num);
+        let address = document.querySelector('#admin-address' + suffix(num));
         let address_id = Number(address.value);
         let data = {
             address_id: address_id
         };
-        setCookie('admin_data-' + num, JSON.stringify(data));
+        setCookie('admin_data' + suffix(num), JSON.stringify(data));
     }
 
-    this.setCurrentData = function (data) {
-        let num = data.service_id;
-        let serviceType = document.getElementById('service-type-' + num);
-        serviceType.value = data.service_type_id;
-        if (data.service_type_id) {
-            this.loadServices(num, data.service_type_id, data.service_id)
-        }
-        if (data.service_id) {
-            this.loadAddresses(num, data.service_id, data.address_id)
-        }
+    this.setCurrentData = function (num) {
+        let data = getUserData(num);
+        console.log(num, data);
+        if (Object.keys('data').length) {
+            if (data.service_type_id) {
+                this.loadServices(num, data.service_type_id, data.service_id)
 
-        isInit = false;
+            }
+            if (data.service_id) {
+                this.loadAddresses(num, data.service_id, data.address_id)
+            }
+
+            isInit = false;
+        }
     }
 
     this.satAdminCurrentData = function (data) {
         let num = data.service_id;
-        let address = document.querySelector('#admin-address-' + num);
-        if (data) {
+        let address = document.querySelector('#admin-address' + suffix(num));
+        if (address) {
             address.value = data.address_id;
         }
     }

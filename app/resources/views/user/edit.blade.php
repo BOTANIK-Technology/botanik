@@ -1,9 +1,10 @@
 @section('scripts')
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
+        let id = '{{$id}}';
         let saveData = "{{request()->get('savedata', 0)}}";
-        if (!saveData){
-       //     resetAll();
+        if (!saveData) {
+            //     resetAll();
         }
         let note = '{{auth()->user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';
@@ -11,18 +12,19 @@
         let services = @json($services);
         let addresses = @json($addresses);
         let timeTables = @json($timetables);
-        let user = @json($user);
-        setCookie('user', user );
+
+        @if($user)
+        setCookie('user', @json($user));
+        @endif
+
+        @if($userData)
+        setCookie('userData', @json($userData));
+        @endif
+
         for (let item in timeTables) {
-            setCookie(item,timeTables[item] );
+            setCookie(item, timeTables[item]);
         }
-        let userData = @json($userData);
-        console.log('user data', userData);
-        if(userData && Object.keys(userData).length){
-            for (let item in userData) {
-                setCookie(item, userData[item]);
-            }
-        }
+
 
     </script>
     <script src="{{asset('js/requests.js')}}"></script>
@@ -39,13 +41,14 @@
         <input type="hidden" id="token_id" name="_token" value="{{ csrf_token() }}">
 
         <div class="flex direction-column add-user">
-            <div><input type="text"  value="{{$user->name}}" placeholder="{{__(' ФИО')}}" id="fio"></div>
-            <div><input type="text"  value="{{$user->phone}}" placeholder="{{__('Телефон')}}" id="phone"></div>
+            <div><input type="text" value="{{$user->name}}" placeholder="{{__(' ФИО')}}" id="fio"></div>
+            <div><input type="text" value="{{$user->phone}}" placeholder="{{__('Телефон')}}" id="phone"></div>
             <div><input type="email" value="{{$user->email}}" placeholder="Email" id="email"></div>
-            <div><input type="text"  placeholder="Пароль" id="password"></div>
+            <div><input type="text" placeholder="Пароль" id="password"></div>
 
             <div class="checkboxes flex justify-content-between">
-                <input id="master" type="radio" name="role" value="master" {{$user->hasRole('master') ? 'checked' : ''}}>
+                <input id="master" type="radio" name="role"
+                       value="master" {{$user->hasRole('master') ? 'checked' : ''}}>
                 <label for="master">{{__('Специалист')}}</label>
                 <input id="admin" type="radio" name="role" value="admin" {{$user->hasRole('admin') ? 'checked' : ''}}>
                 <label for="admin">{{__('Администратор')}}</label>
@@ -53,14 +56,12 @@
 
             <div class="line full-width"></div>
 
-            @foreach($user->services as $service)
-                @php($i = $service->id)
-
-                <div class="flex direction-column">
+            @for($i = 0; $i <= $moreService; $i++)
+                <div class="flex direction-column master-only">
                     <label class="list-label" for="service-type-{{$i}}">Тип услуги</label>
                     @if ($types)
-                        <select id="service-type-{{$i}}" onchange="userWin.changeServiceType({{$i}})"
-                                name="service-type">
+                        <select class="master-service-type" id="service-type-{{$i}}"
+                                onchange="userWin.changeServiceType({{$i}})">
                             <option class="placeholder" value="0" selected>{{__('Выберите тип услуги')}}</option>
                             @foreach($types as $type)
                                 <option value="{{$type->id}}">{{$type->type}}</option>
@@ -75,14 +76,14 @@
                     @endif
                 </div>
 
-                <div id="service-container-{{$i}}" class="flex direction-column ">
+                <div id="service-container-{{$i}}" class="flex direction-column master-only">
                     <label class="list-label" for="service-{{$i}}">Услуга</label>
                     <select class="master-service hide" onchange="userWin.changeService({{$i}});" id="service-{{$i}}"
                             data-id="{{$i}}" name="service-{{$i}}[]">
                     </select>
                 </div>
 
-                <div id="addresses-container-{{$i}}" class="flex direction-column">
+                <div id="addresses-container-{{$i}}" class="flex direction-column master-only">
                     <label class="list-label" for="service-type-{{$i}}">Адрес</label>
                     <select class="master-address hide" onchange="userWin.changeAddress({{$i}});" id="address-{{$i}}"
                             name="address-{{$i}}[]">
@@ -90,7 +91,7 @@
                 </div>
 
 
-                <div id="admin-addresses-{{$i}}" class="flex direction-column">
+                <div id="admin-addresses-{{$i}}" class="flex direction-column admin-only">
                     @if ($addresses)
                         <select onchange="userWin.changeAdminAddress({{$i}});" id="admin-address-{{$i}}"
                                 class="admin-address" name="admin-address-{{$i}}[]">
@@ -109,27 +110,29 @@
                 <div class="flex justify-content-between align-items-center">
                     <span class="calendar">{{__('Расписание')}}</span>
                     <a id="calendar" class="background-none calendar-a"
-                       href="{{route('window.service', [
+                       href="{{route('window.user', [
                                 'business' => $slug,
+                                'id' => $user->id,
                                   'currentService' => $i,
                                    'modal' => 'timetable'
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>
                     <div class="filled-months">
-{{--                        @foreach($usedMonths[$i] as $month)--}}
-{{--                            <p>{{$month}}</p>--}}
-{{--                        @endforeach--}}
+                        {{--                        @foreach($usedMonths[$i] as $month)--}}
+                        {{--                            <p>{{$month}}</p>--}}
+                        {{--                        @endforeach--}}
                     </div>
 
                 </div>
-            @endforeach
+            @endfor
         </div>
         <div class="line"></div>
         @slot('buttons')
             <div id="type-block" class="row-1 col-3 flex align-items-center justify-content-center">
                 <div class="add-b-icon"></div>
-                <a id="add-type" class="color text-decoration-none" href="{{route('addService', ['business' => $slug, 'id' => $user->id, 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load, 'savedata' => 1])}}">{{__('Добавить услугу к специалисту')}}</a>
+                <a id="add-type" class="color text-decoration-none"
+                   href="{{route('addService', ['business' => $slug, 'id' => $user->id, 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load])}}">{{__('Добавить услугу к специалисту')}}</a>
             </div><br>
             <button type="button" id="edit-user" class="btn-primary">
                 {{ __('Сохранить') }}

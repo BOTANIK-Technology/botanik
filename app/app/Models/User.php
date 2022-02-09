@@ -289,6 +289,33 @@ class User extends Authenticatable
         return $array;
     }
 
+    public function updateSlots($services, $addresses, $timestables)
+    {
+        foreach ($services as $key => $service){
+            $slot = UsersSlots::updateOrCreate(
+                [
+                    'user_id' => $this->id,
+                    'service_id' => $service,
+                    'address_id' =>$addresses[$key]
+                ],
+                [
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]
+            );
+            UsersTimetables::where('users_slot_id', $slot->id)->delete();
+            foreach ($timestables[$key] as $year => $monthTable){
+                foreach ($monthTable as $month => $table){
+                    UsersTimetables::create([
+                       'users_slot_id' => $slot->id,
+                       'year' => $year,
+                       'month' => $month,
+                       'schedule' => json_encode($table)
+                    ]);
+                }
+            }
+        }
+    }
+
     public function attachCustom (string $relation, array $array, bool $rewrite = false)
     {
         $duplicates = collect($array)->toBase()->duplicates();

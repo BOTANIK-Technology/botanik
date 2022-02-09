@@ -1,19 +1,19 @@
 let editUserBtn = document.getElementById('edit-user');
 if (editUserBtn) {
     editUserBtn.addEventListener('click', function () {
+        let data = getData();
         let send = {
-            'name': fio.value,
-            'phone': phone.value,
-            'email': email.value,
-            'password': password.value,
-            'addresses': getValues(addressSelects),
-            'timetables': getTimetables(),
+            'name': data.fio,
+            'phone': data.phone,
+            'email': data.email,
+            'password': data.password,
+            'timetables': [getCookie('timetable' + suffix(id))],
         };
 
         if (master.checked) {
             send.role = master.value;
-            send.services = addressServices(serviceSelects);
-            send.addresses = getValues(addressSelects);
+            send.services = data.services;
+            send.addresses = data.addresses;
         } else {
             send.role = admin.value;
             send.addresses = getValues(adminAddressSelects);
@@ -22,7 +22,7 @@ if (editUserBtn) {
         let Request = postRequest(editRoute+'/edit-user', send);
         Request.onload = function() {
             if (Request.status >= 200 && Request.status < 400) {
-                closeModal();
+             //   closeModal();
             } else {
                 showErrors(Request.response);
             }
