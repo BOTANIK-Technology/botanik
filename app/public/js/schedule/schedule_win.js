@@ -104,19 +104,22 @@ let ScheduleWindow = function () {
                         // первая строка календаря
                         if (index == 0) {
                             if (i != 1) {
-                            // Кнопка "назад"
-                                cell.innerHTML = response[index][i].text;
-                                cell.classList.add('pointer');
+                                // Кнопки
+                                if (response[index][i].text == "⏪") {
+                                    cell.classList.add('month_prev');
+                                }
+                                if (response[index][i].text == "⏩") {
+                                    cell.classList.add('month_next');
+                                }
                                 cell.addEventListener('click', () => {
                                     _this.loadMonth(response[index][i]['callback_data']);
-                                } );
+                                });
 
-                            }
-                            else {
+                            } else {
                                 cell.innerHTML = response[index][i].text;
                             }
-                        }
-                        else {
+                        } else {
+                            cell.setAttribute('onclick', 'scheduleWin.loadDay("' + response[index][i].callback_data + '")');
                             cell.innerHTML = response[index][i].text;
                         }
                         row.appendChild(cell);
@@ -126,6 +129,38 @@ let ScheduleWindow = function () {
 
             }
         });
+    }
+
+    this.loadDay = function (day) {
+        let _this = this;
+        let service_id = this.service.value;
+        let master_id = this.master.value;
+        let address_id = this.address.value;
+
+        this.post({
+                url: '/api/times',
+                data: {
+                    day: day,
+                    service_id: service_id,
+                    master_id: master_id,
+                    address_id: address_id
+                },
+                success: function (response) {
+                    console.log(response);
+                    let table = document.getElementById('user_times');
+                    table.innerHTML = '';
+                    for (let time of response) {
+                        let baseUrl = '/' + SLUG + '/schedule/create';
+                        let cell = document.createElement('div');
+                        cell.classList.add('time_cell');
+                        cell.textContent = time;
+                        table.appendChild(cell);
+                    }
+                }
+
+
+            }
+        );
     }
 
     this.post = function (options) {

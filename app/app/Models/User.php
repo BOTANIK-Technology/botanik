@@ -104,14 +104,35 @@ class User extends Authenticatable
 
     public function timetables()
     {
-        return $this->hasManyThrough(UsersTimetables::class, UsersSlots::class, );
+        return $this->hasManyThrough(UsersTimetables::class, UsersSlots::class,);
+    }
+
+    public function getTimesForDate($address_id, $service_id, $dateString)
+    {
+
+        $year = Carbon::parse($dateString)->format('Y');
+        $month = strtolower(Carbon::parse($dateString)->format('F') );
+        $date = Carbon::parse($dateString)->format('Y-m-d');
+        $record = $this->slots()->getQuery()
+            ->where('users_slots.address_id', $address_id)
+            ->where('users_slots.service_id', $service_id)
+            ->leftJoin('users_timetables', 'users_timetables.users_slots_id', '=', 'users_slots.id')
+            ->where('year', $year)
+            ->where('month', $month)
+            ->first();
+
+        if ($record) {
+            $schedule = json_decode($record->schedule, true);
+            return $schedule[$date] ?? [];
+        }
+        return [];
     }
 
 
     /**
      * @return BelongsToMany
      */
-    public function addresses (): BelongsToMany
+    public function addresses(): BelongsToMany
     {
         return $this->belongsToMany(Address::class, 'users_addresses');
     }
@@ -120,12 +141,12 @@ class User extends Authenticatable
      */
     public function getServicesAttribute()
     {
-       $slots = $this->slots;
-       $res = [];
-       foreach ($slots as $slot){
-           $res[] = $slot->service()->without('users')->first();
-       }
-       return $res;
+        $slots = $this->slots;
+        $res = [];
+        foreach ($slots as $slot) {
+            $res[] = $slot->service()->without('users')->first();
+        }
+        return $res;
     }
 
     /**
@@ -183,14 +204,16 @@ class User extends Authenticatable
      */
     public function profit(): int
     {
-        if ( $this->records->isEmpty() )
+        if ($this->records->isEmpty()) {
             return 0;
+        }
         else {
             $now = \Carbon\Carbon::now();
             $profit = 0;
             foreach ($this->records as $record) {
-                if ($record->status && $now->greaterThan($record->date.' '.$record->time))
+                if ($record->status && $now->greaterThan($record->date . ' ' . $record->time)) {
                     $profit += $record->service->price;
+                }
             }
             return $profit;
         }
@@ -202,16 +225,18 @@ class User extends Authenticatable
      * @return int
      */
 
-    public function completedRecords (): int
+    public function completedRecords(): int
     {
-        if ( $this->records->isEmpty() )
+        if ($this->records->isEmpty()) {
             return 0;
+        }
         else {
             $now = \Carbon\Carbon::now();
             $count = 0;
             foreach ($this->records as $record)
-                if ($now->greaterThan($record->date.' '.$record->time))
+                if ($now->greaterThan($record->date . ' ' . $record->time)) {
                     $count++;
+                }
             return $count;
         }
     }
@@ -228,8 +253,9 @@ class User extends Authenticatable
             foreach ($timetable as $day => $time)
                 $table->$day = json_encode($time);
             $table->address_id = $addresses[$k];
-            if (!empty($services))
+            if (!empty($services)) {
                 $table->service_id = $services[$k];
+            }
             $this->timetables()->save($table);
         }
     }
@@ -239,19 +265,22 @@ class User extends Authenticatable
      * @param int $address_id
      * @return bool|string
      */
-    public function canRecord (int $service_id, int $address_id)
+    public function canRecord(int $service_id, int $address_id)
     {
         $address = $this->addresses->where('id', $address_id)->first();
-        if (empty($address))
-            return __('Специалист').' '.$this->name.' '.__('не привязан к выбранному адресу.');
+        if (empty($address)) {
+            return __('Специалист') . ' ' . $this->name . ' ' . __('не привязан к выбранному адресу.');
+        }
 
         $service = $this->services->where('id', $service_id)->first();
-        if (empty($service))
-            return __('Специалист').' '.$this->name.' '.__('не привязан к выбранной услуге.');
+        if (empty($service)) {
+            return __('Специалист') . ' ' . $this->name . ' ' . __('не привязан к выбранной услуге.');
+        }
 
         $address = $service->addresses->where('id', $address_id)->first();
-        if (empty($address))
-            return __('Услуга').' "'.$service->name.'" '.__('не привязана к выбранному адресу.');
+        if (empty($address)) {
+            return __('Услуга') . ' "' . $service->name . '" ' . __('не привязана к выбранному адресу.');
+        }
 
         return true;
     }
@@ -270,12 +299,14 @@ class User extends Authenticatable
                 $service = Service::find($service_id);
                 if ($service->addresses->contains('id', $addresses[$k])) {
                     $array[] = $service->id;
-                } else {
-                    $address = Address::find($addresses[$k]);
-                    return __('Адрес').' "'.$address->address.'"" '.__('не привязан к услуге').' "'.$service->name.'".';
                 }
-            } catch (Exception $e) {
-               return $e->getMessage().' '.$e->getLine();
+                else {
+                    $address = Address::find($addresses[$k]);
+                    return __('Адрес') . ' "' . $address->address . '"" ' . __('не привязан к услуге') . ' "' . $service->name . '".';
+                }
+            }
+            catch (Exception $e) {
+                return $e->getMessage() . ' ' . $e->getLine();
             }
         }
         return $array;
@@ -286,8 +317,9 @@ class User extends Authenticatable
      */
     public function getArrayOfAddresses()
     {
-        if ($this->addresses->isEmpty())
+        if ($this->addresses->isEmpty()) {
             return false;
+        }
         $array = [];
         foreach ($this->addresses as $addr)
             $array[$addr->id] = $addr->address;
@@ -297,29 +329,29 @@ class User extends Authenticatable
     public function updateSlots($services, $addresses, $timetables)
     {
         UsersSlots::where('user_id', $this->id)->delete();
-        foreach ($services as $key => $service){
+        foreach ($services as $key => $service) {
             $slot = UsersSlots::create(
                 [
-                    'user_id' => $this->id,
+                    'user_id'    => $this->id,
                     'service_id' => $service,
-                    'address_id' =>$addresses[$key]
+                    'address_id' => $addresses[$key]
                 ],
             );
             UsersTimetables::where('users_slots_id', $slot->id)->delete();
-            foreach ($timetables[$key] as $year => $monthTable){
-                foreach ($monthTable as $month => $table){
+            foreach ($timetables[$key] as $year => $monthTable) {
+                foreach ($monthTable as $month => $table) {
                     UsersTimetables::create([
-                       'users_slots_id' => $slot->id,
-                       'year' => $year,
-                       'month' => $month,
-                       'schedule' => json_encode($table)
+                        'users_slots_id' => $slot->id,
+                        'year'           => $year,
+                        'month'          => $month,
+                        'schedule'       => $table
                     ]);
                 }
             }
         }
     }
 
-    public function attachCustom (string $relation, array $array, bool $rewrite = false)
+    public function attachCustom(string $relation, array $array, bool $rewrite = false)
     {
         $duplicates = collect($array)->toBase()->duplicates();
         if ($duplicates->count()) {
@@ -328,8 +360,9 @@ class User extends Authenticatable
             }
         }
 
-        if ($rewrite)
+        if ($rewrite) {
             $this->$relation()->detach($this->getIds($relation));
+        }
         $this->$relation()->attach($array);
     }
 

@@ -4,9 +4,12 @@ namespace App\Models;
 
 
 
+use App\Traits\TimetableTrait;
 use Illuminate\Database\Eloquent\Builder;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Log;
 
@@ -20,9 +23,9 @@ use Illuminate\Support\Facades\Log;
  * @method static Builder|UserTimetable query()
  * @property-read Service $service
  */
-class UserTimetable extends Timetables
+class UserTimetable extends Model
 {
-
+    use HasFactory, TimetableTrait;
 
     protected $fillable = [
         'monday',
@@ -111,7 +114,7 @@ class UserTimetable extends Timetables
 
             if ($tab->address_id == $address_id && $tab->service_id == $service_id) {
                 foreach ($tab->timetables as $table){
-                    if (in_array($date, array_keys(json_decode($table->schedule, true) ) ) ){
+                    if (in_array($date, array_keys($table->schedule, true)  ) ){
                         return true;
                     }
                 }
@@ -129,9 +132,12 @@ class UserTimetable extends Timetables
      */
     public static function getTimes(User $user, int $address_id, int $service_id, string $date)
     {
-        $date = mb_strtolower(Carbon::parse($date)->format('l'));
+        $date = mb_strtolower(Carbon::parse($date)->format('Y-m-d'));
 
-        $table = $user->timetables->where('address_id', $address_id)->where('service_id', $service_id)->first();
+        $table = $user->getTimesForDate($date);
+        if(!$table){
+            return [];
+        }
 
         Log::info('getTimes: ', $table->toArray());
         $times = false;

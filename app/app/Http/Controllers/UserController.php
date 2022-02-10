@@ -179,7 +179,7 @@ class UserController extends Controller
         foreach ($user->slots as $key => $slot) {
             $timetable = [];
             foreach($slot->timetables as $item) {
-                $timetable[$item->year][$item->month] = json_decode($item->schedule);
+                $timetable[$item->year][$item->month] = $item->schedule;
                 $months[$key][] = $item->year . '-' . Timetables::getMonthList()[$item->month];
             }
             $this->params['timetables'][$key] = $timetable;

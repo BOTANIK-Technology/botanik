@@ -36,10 +36,6 @@ function send () {
     };
 }
 
-// inputActive([date, time]);
-// selectActive([client, service, address, master]);
-
-
 
 document.addEventListener('DOMContentLoaded', function(){
 

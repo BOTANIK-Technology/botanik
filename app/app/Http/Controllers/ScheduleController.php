@@ -54,12 +54,11 @@ class ScheduleController extends Controller
         $this->params['slug'] = $request->route()->parameter('business');
         $this->params['months'] = UserTimetable::getMonths();
 
-        $this->params['next_month'] = mb_strtolower( Carbon::parse($this->params['current_month'])->addMonth()->format('F') );
-        $this->params['prev_month'] = mb_strtolower( Carbon::parse($this->params['current_month'])->subMonth()->format('F') );
+        $this->params['next_month'] = mb_strtolower(Carbon::parse($this->params['current_month'])->addMonth()->format('F'));
+        $this->params['prev_month'] = mb_strtolower(Carbon::parse($this->params['current_month'])->subMonth()->format('F'));
         $this->params['current_day'] = $request->has('current_day') ? $request->input('current_day') : Carbon::now()->format('d');
         $this->params['days'] = UserTimetable::getDaysOfMonth($this->params['current_month']);
         $this->params['date'] = $request->has('date') ? $request->input('date') : Carbon::now()->format('Y-m-d');
-
 
 
         if (isset($request->modal)) {
@@ -68,7 +67,7 @@ class ScheduleController extends Controller
 
         if ($user->hasRole('admin', 'owner')) {
             $records = Record::whereDate('date', Carbon::parse($this->params['date']))
-                ->whereHas('service', function($q) use ($request){
+                ->whereHas('service', function ($q) use ($request) {
                     return $q->where('type_service_id', $request->current_type);
                 })
                 ->get();
@@ -77,9 +76,10 @@ class ScheduleController extends Controller
             $this->params['types'] = TypeService::all();
             $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
 
-            $this->params['services'] = !is_null($this->params['current_type']) ? $this->params['current_type']->services: [];
+            $this->params['services'] = !is_null($this->params['current_type']) ? $this->params['current_type']->services : [];
             $this->params['current_type'] = !is_null($this->params['current_type']) ? $this->params['current_type']->id : 0;
-        } else {
+        }
+        else {
 
             $s = [];
             $services = DB::table('users_services')->where('user_id', auth()->user()->id)->pluck('service_id')->toArray();
@@ -89,7 +89,7 @@ class ScheduleController extends Controller
 
             $types = Service::where('id', $s)->pluck('type_service_id')->toArray();
             $schedule = UserTimetable::userSchedule($user, Carbon::parse($this->params['date']));
-            $records = Record::where('user_id', $user->id)->whereDate( 'date', Carbon::parse($this->params['date']) )->get();
+            $records = Record::where('user_id', $user->id)->whereDate('date', Carbon::parse($this->params['date']))->get();
             $this->params['types'] = $types;
             $this->params['current_type'] = $request->has('current_type') ? $request->input('current_type') : $types[0];
             $this->params['schedule'] = $schedule['times'] ?? false;
@@ -129,7 +129,7 @@ class ScheduleController extends Controller
      * @return Factory|View
      * @throws Exception
      */
-    public function window (Request $request)
+    public function window(Request $request)
     {
 
         switch ($request->modal) {
@@ -157,7 +157,7 @@ class ScheduleController extends Controller
      * @param Request $request
      * @return JsonResponse|false
      */
-    public function createRecord (Request $request)
+    public function createRecord(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'client_id'  => 'required|integer',
@@ -175,24 +175,26 @@ class ScheduleController extends Controller
         if ($request->has('user_id')) {
             $user = User::findOrFail($request->user_id);
             $res = $user->canRecord($request->service_id, $request->address_id);
-        } else {
+        }
+        else {
             $service = Service::findOrFail($request->service_id);
             $res = $service->canRecord($request->address_id);
         }
 
-        if ($res !== true)
+        if ($res !== true) {
             return response()->json(['errors' => ['text' => $res]], 405);
+        }
 
 
         try {
 
             $record = Record::create([
                 'telegram_user_id' => $request->client_id,
-                'service_id' => $request->service_id,
-                'address_id' => $request->address_id,
-                'user_id' => $request->has('user_id') ? $request->user_id: null,
-                'time' => explode(':',$request->time)[0] . ":00",
-                'date' => Carbon::parse($request->date)->format('Y-m-d')
+                'service_id'       => $request->service_id,
+                'address_id'       => $request->address_id,
+                'user_id'          => $request->has('user_id') ? $request->user_id : null,
+                'time'             => explode(':', $request->time)[0] . ":00",
+                'date'             => Carbon::parse($request->date)->format('Y-m-d')
             ]);
 
             $service = Service::find($request->service_id);
@@ -204,91 +206,92 @@ class ScheduleController extends Controller
             $pay->money = $service->price;
             $record->payment()->save($pay);
 
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
 
         $client = TelegramUser::find($request->client_id);
 
         return TelegramAPI::createRecordNotice($service->name, $record, $client, $request);
-/*
-        if (!ConnectService::prepareJob())
-            return false;
+        /*
+                if (!ConnectService::prepareJob())
+                    return false;
 
-        try {
+                try {
 
-            $notice_mess = __('Новая запись на услугу').' <b>'.$service->name.'</b> от '.$client->getFio().' на '.$request->date. ' в '.$request->time;
-            SendNotice::dispatch(
-                $request->business_db,
-                [
-                    [
-                        'address_id' => $request->address_id,
-                        'message' => $notice_mess
-                    ],
-                    [
-                        'user_id' => $request->user_id,
-                        'message' => $notice_mess
-                    ]
-                ]
-            )->delay(now()->addMinutes(2));
+                    $notice_mess = __('Новая запись на услугу').' <b>'.$service->name.'</b> от '.$client->getFio().' на '.$request->date. ' в '.$request->time;
+                    SendNotice::dispatch(
+                        $request->business_db,
+                        [
+                            [
+                                'address_id' => $request->address_id,
+                                'message' => $notice_mess
+                            ],
+                            [
+                                'user_id' => $request->user_id,
+                                'message' => $notice_mess
+                            ]
+                        ]
+                    )->delay(now()->addMinutes(2));
 
-            $time = Carbon::parse($request->getDate() . " " . $request->getTime());
+                    $time = Carbon::parse($request->getDate() . " " . $request->getTime());
 
-            $remind1Time = $time->subHours(config('memoBefore'));
-            $remind2Time = $time->subDay();
+                    $remind1Time = $time->subHours(config('memoBefore'));
+                    $remind2Time = $time->subDay();
 
-            // Проверка на ночное время. Если уведомление выпадает на ночь - переносим на утро.
-            if ($remind2Time->hour >= config('params.nightBeginHour') ){
-                $remind2Time->setHour(config('params.nightBeginHour'))->setMinutes(0);
-            }
-            else if ($remind2Time->hour < config('params.nightEndHour')){
-                $remind2Time->subDay()->setHours(config('params.nightBeginHour'));
-            }
-            if ($remind2Time > Carbon::now()){
-                TelegramNotice::dispatch(
-                    $request->business_db,
-                    $client->chat_id,
-                    $record->id,
-                    __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
-                    $request->date,
-                    $request->time,
-                    $request->token
-                )->delay($time->subDay());
-            }
+                    // Проверка на ночное время. Если уведомление выпадает на ночь - переносим на утро.
+                    if ($remind2Time->hour >= config('params.nightBeginHour') ){
+                        $remind2Time->setHour(config('params.nightBeginHour'))->setMinutes(0);
+                    }
+                    else if ($remind2Time->hour < config('params.nightEndHour')){
+                        $remind2Time->subDay()->setHours(config('params.nightBeginHour'));
+                    }
+                    if ($remind2Time > Carbon::now()){
+                        TelegramNotice::dispatch(
+                            $request->business_db,
+                            $client->chat_id,
+                            $record->id,
+                            __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
+                            $request->date,
+                            $request->time,
+                            $request->token
+                        )->delay($time->subDay());
+                    }
 
-            TelegramNotice::dispatch(
-                $request->business_db,
-                $client->chat_id,
-                $record->id,
-                __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
-                $request->date,
-                $request->time,
-                $request->token
-            )->delay($time->subDay());
+                    TelegramNotice::dispatch(
+                        $request->business_db,
+                        $client->chat_id,
+                        $record->id,
+                        __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
+                        $request->date,
+                        $request->time,
+                        $request->token
+                    )->delay($time->subDay());
 
 
 
-            TelegramFeedBack::dispatch(
-                $request->business_db,
-                $client->chat_id,
-                $record->id,
-                $request->token
-            )->delay($time->addDay());
+                    TelegramFeedBack::dispatch(
+                        $request->business_db,
+                        $client->chat_id,
+                        $record->id,
+                        $request->token
+                    )->delay($time->addDay());
 
-            return response()->json(['ok' => 'Запись создана']);
+                    return response()->json(['ok' => 'Запись создана']);
 
-        }
-        catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]], 500);
-        }
-*/
+                }
+                catch (Exception $e) {
+                    return response()->json(['errors' => ['server' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]], 500);
+                }
+        */
     }
 
     /**
      * @param Request $request
      * @return JsonResponse
      */
-    public function deleteSchedule (Request $request): JsonResponse
+    public function deleteSchedule(Request $request): JsonResponse
     {
         try {
             Record::find($request->id)->delete();
@@ -303,7 +306,7 @@ class ScheduleController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function editSchedule (Request $request): JsonResponse
+    public function editSchedule(Request $request): JsonResponse
     {
         try {
             $record = Record::find($request->id);
@@ -319,34 +322,35 @@ class ScheduleController extends Controller
         $client = TelegramUser::find($record->telegram_user_id);
         $service_name = TypeService::find($record->service->name);
 
-        if (!ConnectService::prepareJob())
+        if (!ConnectService::prepareJob()) {
             return response()->json(['errors' => ['server' => __('Запись изменена. Уведомления не будут отправлены.')]], 500);
+        }
 
         try {
             TelegramNotice::dispatch(
                 $request->business_db,
                 $client->chat_id,
                 $record->id,
-                __('Внимание! Запись на услугу').' "'.$service_name.'" перенесена на '.$request->date.' в '.$request->time,
+                __('Внимание! Запись на услугу') . ' "' . $service_name . '" перенесена на ' . $request->date . ' в ' . $request->time,
                 $request->date,
                 $request->time,
                 $request->token
             )->delay(now()->addMinutes(2));
 
-            $notice_mess = __('Перенесена запись на услугу ').' <b>'.$service_name.'</b> от '.$client->getFio().' на '.$request->date. ' в '.$request->time;
+            $notice_mess = __('Перенесена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $request->date . ' в ' . $request->time;
             SendNotice::dispatch(
                 $request->business_db,
                 [
                     [
                         'address_id' => $record->address_id,
-                        'message' => $notice_mess
+                        'message'    => $notice_mess
                     ],
                     [
                         'user_id' => $record->user_id,
                         'message' => $notice_mess
                     ]
                 ],
-                )->delay(now()->addMinutes(2));
+            )->delay(now()->addMinutes(2));
 
             return response()->json(['ok' => 'Запись изменена']);
         }
@@ -363,7 +367,7 @@ class ScheduleController extends Controller
     {
         $addresses = [];
         $service_id = $request->service_id;
-        if($service_id) {
+        if ($service_id) {
             $ids = Service::query()
                 ->where('id', $service_id)
                 ->join('services_addresses', 'services.id', '=', 'services_addresses.service_id')
@@ -378,7 +382,7 @@ class ScheduleController extends Controller
         }
         else {
             $services = Service::all();
-            foreach ($services as $service){
+            foreach ($services as $service) {
                 $ids = Service::query()
                     ->where('id', $service->id)
                     ->join('services_addresses', 'services.id', '=', 'services_addresses.service_id')
@@ -403,7 +407,7 @@ class ScheduleController extends Controller
     {
         $service_type_id = $request->service_type_id;
         $services = [];
-        if($service_type_id) {
+        if ($service_type_id) {
             $services = Service::query()
                 ->where('type_service_id', $service_type_id)
                 ->select('id', 'name')
@@ -432,7 +436,7 @@ class ScheduleController extends Controller
     {
         $masters = [];
         $service_id = $request->service_id;
-        if($service_id > 0) {
+        if ($service_id > 0) {
             $ids = Service::query()
                 ->where('services.id', $service_id)
                 ->join('users_slots', 'services.id', '=', 'users_slots.service_id')
@@ -451,16 +455,26 @@ class ScheduleController extends Controller
     public function getCalendar(Request $request)
     {
         $month = explode('_', $request->month);
-        if ($month){
+        if ($month) {
             $month = $month[0];
         }
         $master_id = $request->master_id;
         $service_id = $request->service_id;
         $address_id = $request->address_id;
 
-        $dates = DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
-//        $this->params['masterDates'] = $dates;
-        return $dates;
+        return DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
+    }
+
+    public function getTimes(Request $request)
+    {
+        $date = substr($request->day, 5);
+        $service_id = $request->service_id;
+        $master_id = $request->master_id;
+        $address_id = $request->address_id;
+
+        $user = User::find($master_id);
+
+        return DatesHelper::getFreeMasterTimes($user,  $address_id,  $service_id,  $date);
     }
 
 }

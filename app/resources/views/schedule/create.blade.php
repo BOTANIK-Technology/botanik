@@ -60,6 +60,11 @@
     @include('schedule.user_calendar')
 
 </div>
+<div class="flex justify-content-around create">
+
+    @include('schedule.user_times')
+
+</div>
 
 @slot('buttons')
     <button type="button" id="create" data-href="{{route('schedule.create', ['business' => $slug])}}" class="btn-primary">

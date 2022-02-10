@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use App\Models\User;
+use App\Models\UsersSlots;
+use App\Models\UsersTimetables;
 use App\Models\UserTimetable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
@@ -77,8 +79,121 @@ class DatesHelper
         return $date;
     }
 
+    public static function masterTimes($master_id, $service_id, $address_id, $date)
+    {
+        /** @var User $master */
+        $master = User::find($master_id);
+        $times = $master->getTimesForDate($date);
+
+
+    }
+
     public static function getNameOfMonth (Carbon $date): array
     {
         return ['text' => Date::parse($date->toFormattedDateString())->format('F'), 'callback_data' => '-'];
+    }
+
+    /**
+     * @param User $user
+     * @param int $address_id
+     * @param int $service_id
+     * @param string $date
+     * @param null $ignore_time
+     * @return array
+     */
+    public static function getFreeMasterTimes(User $user, int $address_id, int $service_id, string $date, $ignore_time = null)
+    {
+        $check_hours = \Carbon\Carbon::parse($date)->isToday();
+        $now = Carbon::now();
+
+
+        // Расписание мастера
+        $times = $user->getTimesForDate($address_id, $service_id, $date);
+        if (!$times) {
+            return [];
+        }
+
+
+        // параметры услуги
+        $slot = $user->slots()->where('address_id', $address_id)
+            ->where('service_id', $service_id)
+            ->first();
+
+        // Список уже забронированных услуг с длительностью
+        $booked_array = UserTimetable::getBookedTimes($user, $date);
+
+        if (!$booked_array) {
+            $booked_array = [];
+        }
+
+        // массив-карта слотов мастера
+        $timeMap = [];
+        $masterEndSlot = count($times) - 1;
+
+        //сначала заполним единицами (доступно все)
+        for ($i = 0; $i <= $masterEndSlot; $i++) {
+            // если запись на сегодня - отбросим уже прошедшие слоты
+            if ($check_hours && !Carbon::parse($times[$i])->greaterThanOrEqualTo($now)) {
+                $timeMap[$i] = 0;
+            } else {
+                $timeMap[$i] = 1;
+            }
+        }
+
+        // Длительность проверяемой услуги
+        $duration = $slot->service->interval->minutes + $slot->service->range;
+
+        // Число слотов по 30мин в проверяемой услуге
+        $serviceSlotsCount = intdiv($duration, 30);
+        if ($duration % 30) {
+            $serviceSlotsCount++;
+        }
+
+        // Перебираем все созданные услуги и отмечаем недоступные из-них слоты
+        foreach ($booked_array as $book => $bookDuration) {
+
+            //Если прилетел слот для игнорирования (при правке даты уже созданной записи) - то мы его игнорируем
+            if($book == $ignore_time) {
+                continue;
+            }
+            // получим число слотов в текущей услуге
+            $bookSlotsCount = intdiv($bookDuration, 30);
+            if ($bookDuration % 30) {
+                $bookSlotsCount++;
+            }
+
+            // Слот, соответствующий началу текущей услуги
+            $timeBegin = array_search($book, $times);
+
+            //уберем недоступные в процессе выполнения текущей услуги слоты
+            for ($i = 0; $i < $bookSlotsCount; $i++) {
+                $timeMap[$timeBegin + $i] = 0;
+            }
+
+
+            for ($i = 0; $i < $serviceSlotsCount; $i++) {
+                // уберем слоты перед текущей услугой - в которые мы не сможем втиснуться по времени
+                if ($i <= $timeBegin) {
+                    $timeMap[$timeBegin - $i] = 0;
+                }
+            }
+        }
+
+        for ($i = 0; $i < $serviceSlotsCount; $i++) {
+            // Уберем слоты с конца рабочего дня
+            if ($i < $masterEndSlot) {
+                $timeMap[$masterEndSlot - $i] = 0;
+            }
+        }
+
+        // Перенесем карту слотов в формат времени
+        $free = [];
+        foreach ($timeMap as $key => $value) {
+            if ($value) {
+                $free[] = $times[$key];
+            }
+        }
+        Log::info('timeMap', $timeMap);
+        return $free;
     }
 }
