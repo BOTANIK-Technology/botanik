@@ -1,6 +1,6 @@
 @section('scripts')
     <script>
-        let id = '{{$id}}';
+        let id = {{$id}};
         let currentService = {{$currentService}}
     </script>
     <script src="{{asset('js/user/page.js')}}"></script>
@@ -33,11 +33,11 @@
             <button type="button" id="time-confirm" data-id="{{$currentService}}" class="btn-primary">
                 {{ __('Подтвердить') }}
             </button>
-            @if (isset($id))
+            @if ($id)
                 <a href="{{route('addService', ['business' => $slug, 'modal' => 'edit', 'id' => $id, 'moreService' => $moreService])}}"
                    id="refresh-modal"></a>
             @else
-                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 'new','moreService' => $moreService])}}"
+                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 0,'moreService' => $moreService])}}"
                    id="refresh-modal"></a>
             @endif
         @endslot

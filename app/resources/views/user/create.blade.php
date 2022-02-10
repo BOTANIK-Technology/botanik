@@ -2,9 +2,15 @@
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let note = '{{Auth::user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
-        let countService = '{{$moreService}}';
+        let countService = 1;
         let createRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'create'])}}";
         let timetableDB = @json([]);
+
+        let id = 0;
+
+        let services = @json([]);
+        let addresses = @json([]);
+
     </script>
     <script src="{{asset('js/user/page.js')}}"></script>
     <script src="{{asset('js/requests.js')}}"></script>
@@ -92,11 +98,14 @@
                 </div>
                 <div class="flex justify-content-between align-items-center">
                     <span class="calendar">{{__('Расписание')}}</span>
-                    <button
-                        id="calendar-{{$i}}"
-                        class="background-none calendar-a"
-                        data-href="{{route('window.user', ['business' => $slug, 'modal' => 'timetable', 'sort' => $sort, 'currentService' => $i, 'moreService' => $moreService])}}"
-                    >
+                    <a id="calendar" class="background-none calendar-a"
+                       href="{{route('window.user', [
+                            'business' => $slug,
+                            'id' => 0,
+                            'currentService' => $i,
+							 'moreService' => $moreService,
+                            'modal' => 'timetable'
+                    ])}}">
                         <div class="calendar-icon"></div>
                     </button>
                 </div>
@@ -111,7 +120,9 @@
                 <a id="add-type" class="color text-decoration-none"
                    data-href="{{route('addService', ['business' => $slug, 'id' => $id ?? 'new', 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load])}}">{{__('Добавить услугу к специалисту')}}</a>
             </div><br>
-            <button type="button" id="add-user" class="btn-primary">
+            <button type="button" id="edit-user"
+                    data-ref="{{route('editUser', ['business' => $slug, 'id' => 0])}}"
+                    class="btn-primary">
                 {{ __('Создать') }}
             </button>
             <a href="{{route('user', ['business' => $slug, 'sort' => $sort])}}" id="refresh-modal"></a>

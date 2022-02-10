@@ -22,11 +22,12 @@ let CreateUserWindow = function () {
 
     this.initAllServices = function () {
         let uData = getCookie('userData');
-        for (let i in uData) {
-            console.log(i);
-            this.setCurrentData(i);
-            this.satAdminCurrentData(i);
-
+        console.log('initAllServices', uData);
+        if(uData) {
+            for (let i in uData) {
+                this.setCurrentData(i);
+                this.satAdminCurrentData(i);
+            }
         }
     }
 
@@ -43,7 +44,6 @@ let CreateUserWindow = function () {
             this.loadServices(num, service_type_id);
             if (!isInit) {
                 this.saveCurrentData(num);
-                setUserData(num);
             }
         }
     }
@@ -63,19 +63,16 @@ let CreateUserWindow = function () {
             this.loadAddresses(num, service_id);
             if (!isInit) {
                 this.saveCurrentData(num);
-                setUserData(num);
             }
         }
     }
 
     this.changeAddress = function (num) {
         this.saveCurrentData(num);
-        setUserData(num);
     }
 
     this.changeAdminAddress = function (num) {
         this.saveAdminCurrentData(num);
-        setUserData(num);
     }
 
     this.loadAllServices = function () {
@@ -161,7 +158,7 @@ let CreateUserWindow = function () {
         setCookie('admin_data', data);
     }
 
-    this.setCurrentData = function (num) {
+    this.setCurrentData = function (num = 0) {
         let data = getUserData(num);
         console.log('setCurrentData', num, data);
         if (Object.keys('data').length) {
@@ -190,7 +187,7 @@ let CreateUserWindow = function () {
         let xhr = new XMLHttpRequest();
         let json = JSON.stringify(options.data);
 
-        xhr.open("POST", url, true)
+        xhr.open("POST", url, true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         xhr.setRequestHeader('X-CSRF-TOKEN', this.token.value);
         xhr.onreadystatechange = function (e) {

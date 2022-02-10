@@ -227,13 +227,15 @@ Route::group(
                      */
                     Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('user');
 
-                    Route::get('/users/modal-edit/{id}', [App\Http\Controllers\UserController::class, 'modalEditUser'])->name('modalEdit.user');
-
                     Route::get('/users/window/{modal}/{id?}', [App\Http\Controllers\UserController::class, 'window'])->name('window.user');
                     Route::get('/users/window/{modal}/{id?}/{moreService?}', [App\Http\Controllers\UserController::class, 'addService'])->name('addService');
 
-                    Route::post('/users/window/create/add-user', [App\Http\Controllers\UserController::class, 'addUser']);
                     Route::post('/users/window/delete/{id}/confirm', [App\Http\Controllers\UserController::class, 'deleteUser']);
+
+//                    Route::post('/users/window/create/{id}/edit-user', [App\Http\Controllers\UserController::class, 'editUser']);
+                    Route::post('/users/window/edit/{id}/edit-user', [App\Http\Controllers\UserController::class, 'editUser'])->name('editUser');
+                    Route::get('/users/manage/confirm', [App\Http\Controllers\UserController::class, 'manageConfirm'])->name('manage.confirm');
+                    Route::get('/users/manage/reject', [App\Http\Controllers\UserController::class, 'manageReject'])->name('manage.reject');
 
                     /**
                      * Clients routes
@@ -308,14 +310,6 @@ Route::group(
                     Route::get('/partner-api', [App\Http\Controllers\PartnerApiController::class, 'index'])->name('api');
                     Route::put('/partner-api/{slug}/update', [App\Http\Controllers\PartnerApiController::class, 'update'])->name('api.update');
                     Route::get('/partner-api/{slug}/synchronize', [App\Http\Controllers\PartnerApiController::class, 'synchronize'])->name('api.synchronize');
-
-                    /**
-                     * Users routes
-                     */
-                    Route::post('/users/window/edit/{id}/edit-user', [App\Http\Controllers\UserController::class, 'editUser']);
-                    Route::get('/users/manage/confirm', [App\Http\Controllers\UserController::class, 'manageConfirm'])->name('manage.confirm');
-                    Route::get('/users/manage/reject', [App\Http\Controllers\UserController::class, 'manageReject'])->name('manage.reject');
-
                 });
             }
 

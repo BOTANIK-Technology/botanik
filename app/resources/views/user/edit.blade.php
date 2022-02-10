@@ -1,7 +1,7 @@
 @section('scripts')
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
-        let id = '{{$id}}';
+        let id = {{$id}};
         let saveData = "{{request()->get('savedata', 0)}}";
         if (!saveData) {
             //     resetAll();

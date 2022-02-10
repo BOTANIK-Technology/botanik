@@ -123,19 +123,6 @@ function setValues(objects, values) {
     });
 }
 
-// function issetTimetable(id) {
-//     let timetable = getCookie('timetable-' + id);
-//     console.log(id, timetable);
-//     return !!(timetable && timetable !== 'undefined' && timetable.length);
-// }
-
-// function getTimetable(id) {
-//     let timetable = getCookie('timetable-' + id);
-//     return timetable;
-// }
-
-
-
 function setChecked(objects, value) {
     Object.keys(objects).forEach((el) => {
         if (objects[el].value == value) objects[el].checked = 'checked';

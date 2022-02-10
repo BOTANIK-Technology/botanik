@@ -1,16 +1,8 @@
-// function getTimetables() {
-//     let array = [];
-//     for (let i = 0; i < countService; i++) {
-//         array.push(getCookie('timetable'));
-//     }
-//     return array;
-// }
-
 function unsetCookies() {
-        deleteCookie('input');
-        deleteCookie('timetable');
-        deleteCookie('user');
-        deleteCookie('userData');
+    deleteCookie('user');
+    deleteCookie('timetable');
+    deleteCookie('user');
+    deleteCookie('userData');
 }
 
 function addressServices(array) {
@@ -39,15 +31,15 @@ function toggleServices() {
 
 function hideAll(className) {
     let elems = document.getElementsByClassName(className);
-    for (let i = 0; i < elems.length; i++) {
-        elems[i].classList.add('hide');
+    for (let i of elems) {
+        i.classList.add('hide');
     }
 }
 
 function showAll(className) {
     let elems = document.getElementsByClassName(className);
-    for (let i = 0; i < elems.length; i++) {
-        elems[i].classList.remove('hide');
+    for (let i of elems) {
+        i.classList.remove('hide');
     }
 }
 
@@ -61,8 +53,6 @@ let email = document.getElementById('email');
 let calendar = document.getElementsByClassName('calendar-a');
 let addedServices = getCookie('service-type');
 
-// inputActive([fio, password, phone, email]);
-// selectActive();
 
 if (Object.keys(addedServices).length) {
     console.log(addedServices);
@@ -87,7 +77,7 @@ function getData() {
     addressSelects.push(document.getElementsByClassName('master-address'));
 
     let data = {
-        'fio': fio.value,
+        'name': fio.value,
         'phone': phone.value,
         'email': email.value,
         'password': password.value,
@@ -108,13 +98,12 @@ function getData() {
 if (calendar.length) {
     Object.keys(calendar).forEach((k) => {
         calendar[k].addEventListener('click', function () {
-            setCookie('input', getData());
-            setUserData(k);
-            //   window.location.href = this.dataset.href;
+            setCookie('user', getData());
+            userWin.saveCurrentData(k);
         });
     });
 } else {
-    unsetCookies(countService);
+    unsetCookies();
 }
 
 function setUserData(data, num) {
@@ -136,9 +125,9 @@ function getUserData(num) {
 let input = getCookie('user');
 
 if (input) {
-    fio.value = input.name;
-    phone.value = input.phone;
-    email.value = input.email;
+    fio.value = input.name || '';
+    phone.value = input.phone || '';
+    email.value = input.email || '';
     password.value = input.password || '';
     master.checked = !input.admin;
     admin.checked = input.admin;
@@ -147,16 +136,16 @@ if (input) {
 toggleServices();
 
 admin.addEventListener('change', function () {
-    setCookie('input', getData());
+    setCookie('user', getData());
     toggleServices()
 });
 master.addEventListener('change', function () {
-    setCookie('input', getData());
+    setCookie('user', getData());
     toggleServices()
 });
 
 document.getElementById('add-type').addEventListener('click', function () {
-    setCookie('input', getData());
+    setCookie('user', getData());
     window.location.href = this.dataset.href;
 });
 
@@ -178,6 +167,35 @@ if (close.length > 0) {
 }
 
 
+document.getElementById('edit-user').addEventListener('click', function () {
+    let href = this.dataset.ref;
+    let data = getData();
+    let send = {
+        'name': data.name,
+        'phone': data.phone,
+        'email': data.email,
+        'password': data.password,
+        'timetables': getCookie('timetable')
+    };
 
+    if (master.checked) {
+        send.role = master.value;
+        send.services = data.services;
+        send.addresses = data.addresses;
+    } else {
+        send.role = admin.value;
+        send.addresses = getValues(adminAddressSelects);
+    }
+console
+
+    let Request = postRequest(href, send);
+    Request.onload = function () {
+        if (Request.status >= 200 && Request.status < 400) {
+            closeModal();
+        } else {
+            showErrors(Request.response);
+        }
+    };
+});
 
 

@@ -105,7 +105,7 @@ class UserController extends Controller
                 break;
 
             case 'edit':
-                $this->params['id'] = $request->id ?? null;
+                $this->params['id'] = $request->id ?? 0;
                 /** @var User $user */
                 $user = User::find($this->params['id']);
 
@@ -120,22 +120,21 @@ class UserController extends Controller
                 break;
 
             case 'timetable':
-                $this->params['id'] = $request->id ?? null;
+                $this->params['id'] = $request->id ?? 0;
                 /** @var User $user */
                 $user = User::find($this->params['id']);
                 $time = new UserTimetable();
                 $this->params['times'] = $time->getHours();
                 $this->params['days'] = $time->getDays();
 
-
-                if (!is_null($this->params['id'])) {
+                if($user) {
                     $this->setTimetableCookies($user);
+                    $this->setUserCookies($user);
                 }
+
                 $this->params['user'] = $user;
                 $this->params['moreService'] = $request->moreService ?? count($user->services);
                 $this->params['currentService'] = intval($request->currentService);
-                $this->params['user'] = User::find($this->params['id']);
-                $this->setUserCookies($user);
                 break;
             case 'note':
                 break;
@@ -320,8 +319,10 @@ class UserController extends Controller
             }
 
             /** @var User $user */
-            $user = User::find($request->id);
-            $user->update($array);
+            $user = User::updateOrCreate(
+                ['id' => $request->id],
+                $array
+            );
 
             $user->roles()->detach($user->getIds('roles'));
             $user->roles()->attach($role);
@@ -343,19 +344,19 @@ class UserController extends Controller
         }
     }
 
-    public function modalEditUser(Request $request)
-    {
-        $this->params['id'] = $request->id;
-        $this->params['user'] = User::find($this->params['id']);
-        $this->setTimetableCookies($this->params['user']);
-        $this->params['services'] = Service::withoutTimetable();
-        $this->params['addresses'] = Address::all();
-        $this->params['moreService'] = $request->moreService ?? count($this->params['user']->slots);
-
-        $this->setParams($request);
-        $html = view($this->view, $this->params)->render();
-        return response()->json(['html' => $html]);
-    }
+//    public function modalEditUser(Request $request)
+//    {
+//        $this->params['id'] = $request->id;
+//        $this->params['user'] = User::find($this->params['id']);
+//        $this->setTimetableCookies($this->params['user']);
+//        $this->params['services'] = Service::withoutTimetable();
+//        $this->params['addresses'] = Address::all();
+//        $this->params['moreService'] = $request->moreService ?? count($this->params['user']->slots);
+//
+//        $this->setParams($request);
+//        $html = view($this->view, $this->params)->render();
+//        return response()->json(['html' => $html]);
+//    }
 
     /**
      * @param Request $request
