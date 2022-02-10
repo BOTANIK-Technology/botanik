@@ -294,21 +294,19 @@ class User extends Authenticatable
         return $array;
     }
 
-    public function updateSlots($services, $addresses, $timestables)
+    public function updateSlots($services, $addresses, $timetables)
     {
+        UsersSlots::where('user_id', $this->id)->delete();
         foreach ($services as $key => $service){
-            $slot = UsersSlots::updateOrCreate(
+            $slot = UsersSlots::create(
                 [
                     'user_id' => $this->id,
                     'service_id' => $service,
                     'address_id' =>$addresses[$key]
                 ],
-                [
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]
             );
             UsersTimetables::where('users_slots_id', $slot->id)->delete();
-            foreach ($timestables[$key] as $year => $monthTable){
+            foreach ($timetables[$key] as $year => $monthTable){
                 foreach ($monthTable as $month => $table){
                     UsersTimetables::create([
                        'users_slots_id' => $slot->id,

@@ -295,15 +295,6 @@ class UserController extends Controller
             return response()->json(['errors' => ['admin' => __('Выбранная роль не доступна.')]], 405);
         }
 
-//        $services = $request->services;
-//        if ($role->slug == 'master') {
-//            $services = User::relationServicesAddresses($request->services, $request->addresses);
-//            if (!is_array($services)) {
-//                return response()->json(['errors' => ['admin' => $services]], 405);
-//            }
-//        }
-
-
         try {
 
             $root = \Auth::user();
