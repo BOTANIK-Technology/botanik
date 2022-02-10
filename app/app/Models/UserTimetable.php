@@ -117,8 +117,6 @@ class UserTimetable extends Timetables
                 }
             }
         }
-        die;
-
         return false;
     }
 
