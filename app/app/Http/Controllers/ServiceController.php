@@ -236,8 +236,8 @@ class ServiceController extends Controller
             $type->services()->save($service);
             $service->attachAddresses($request->input('addresses'));
 
-            if ($request->has('timetable')) {
-                $service->attachTimetable($request->input('timetable'));
+            if ($request->has('timetables')) {
+                $service->attachTimetable($request->input('timetables'));
             }
 
             if ($request->prepay) {
@@ -307,8 +307,8 @@ class ServiceController extends Controller
 
             $service->rewriteAddresses($request->input('addresses'));
 
-            if ($request->has('timetable')) {
-                $service->updateTimetable($request->input('timetable'));
+            if ($request->has('timetables')) {
+                $service->updateTimetable($request->input('timetables'));
             }
 
             if ($request->prepay) {
@@ -370,7 +370,7 @@ class ServiceController extends Controller
             'range'     => 'integer|min:0',
             'message'   => 'nullable|required_with:quantity|string',
             'quantity'  => 'nullable|required_with:message|integer|min:2',
-            'timetable' => 'nullable|array',
+            'timetables' => 'nullable|array',
             'prepay'    => 'required|boolean',
             'cashpay'   => 'required|boolean',
             'onlinepay' => 'required|boolean',

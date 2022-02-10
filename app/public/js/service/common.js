@@ -64,7 +64,7 @@ function send(idVal = null) {
         'intervalHours': checkedByNameVal('intervalHours'),
         'intervalMinutes': checkedByNameVal('intervalMinutes'),
 
-        'timetable': getCookie('timetables'),
+        'timetables': getCookie('timetables'),
 
         'price': document.getElementById('price' + suffix(idVal)).value,
         'bonus': document.getElementById('bonus' + suffix(idVal)).value,

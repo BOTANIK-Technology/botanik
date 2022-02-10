@@ -23,7 +23,8 @@ if (year) {
 
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
     let timetables = getCookie('timetables');
-    if(timetables.length) {
+
+    if(timetables.length || Object.keys(timetables)) {
         let timetable = timetables[currentService];
         if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
             let checkedArray = timetable[yearVal][monthVal];
@@ -113,6 +114,7 @@ clr.addEventListener('click', function () {
 
 const saveMonthAction = (id) => {
     let allCookies = getCookie('timetables');
+    currentService = parseInt(currentService);
     serviceTimetable = allCookies[currentService];
     let cookies = {};
 

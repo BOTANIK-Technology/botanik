@@ -171,7 +171,7 @@ document.getElementById('edit-user').addEventListener('click', function () {
         'phone': data.phone,
         'email': data.email,
         'password': data.password,
-        'timetable': getCookie('timetables')
+        'timetables': getCookie('timetables')
     };
 
     if (master.checked) {
