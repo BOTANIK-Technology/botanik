@@ -12,7 +12,6 @@ class DatesHelper
 {
     public static function masterDates($master_id, $service_id, $address_id, $monthButton)
     {
-
         switch ($monthButton) {
             case 'DateNext':
                 $first_day = new Carbon('first day of next month');

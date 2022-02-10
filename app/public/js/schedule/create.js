@@ -37,7 +37,7 @@ function send () {
 }
 
 // inputActive([date, time]);
-selectActive([client, service, address, master]);
+// selectActive([client, service, address, master]);
 
 
 

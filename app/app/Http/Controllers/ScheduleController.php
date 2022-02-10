@@ -434,7 +434,7 @@ class ScheduleController extends Controller
         $service_id = $request->service_id;
         if($service_id > 0) {
             $ids = Service::query()
-                ->where('id', $service_id)
+                ->where('services.id', $service_id)
                 ->join('users_slots', 'services.id', '=', 'users_slots.service_id')
                 ->get('users_slots.user_id')
                 ->toArray();

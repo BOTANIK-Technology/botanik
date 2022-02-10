@@ -106,13 +106,18 @@ class UserTimetable extends Timetables
         {
             return false;
         }
+        $date = $date->format('Y-m-d');
+        foreach ($user->slots as $tab) {
 
-        $date = mb_strtolower($date->format('l'));
-        foreach ($user->timetables as $tab) {
             if ($tab->address_id == $address_id && $tab->service_id == $service_id) {
-                return isset($tab->$date);
+                foreach ($tab->timetables as $table){
+                    if (in_array($date, array_keys(json_decode($table->schedule, true) ) ) ){
+                        return true;
+                    }
+                }
             }
         }
+        die;
 
         return false;
     }
