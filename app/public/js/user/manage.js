@@ -147,7 +147,7 @@ document.getElementById('add-type').addEventListener('click', function () {
 
 
 const clearCloseModal = () => {
-    unsetCookies(id);
+    resetAll();
     closeModal();
 }
 
@@ -186,6 +186,7 @@ document.getElementById('edit-user').addEventListener('click', function () {
     let Request = postRequest(href, send);
     Request.onload = function () {
         if (Request.status >= 200 && Request.status < 400) {
+            resetAll();
             closeModal();
         } else {
             showErrors(Request.response);
