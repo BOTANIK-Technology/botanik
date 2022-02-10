@@ -5,6 +5,7 @@ namespace App\Services\Telegram\Callback;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Models\ServiceTimetable;
+use Illuminate\Support\Facades\Log;
 use Jenssegers\Date\Date;
 use Illuminate\Support\Carbon;
 
@@ -69,9 +70,10 @@ class DatesService extends CallbackQuery
 
         $i = 1;
         $days = [];
+        Log::info('Month:', $month);
         foreach ($month as $k => $day) {
 
-            if ($service->timetable->isWorkDay(Carbon::parse($k), $first_day)) {
+            if ($service->isWorkDay(Carbon::parse($k), $first_day)) {
                 $days[] = ['text' => $day, 'callback_data' => 'Time_'.$k];
             } else {
                 $days[] = ['text' => ' ', 'callback_data' => '-'];

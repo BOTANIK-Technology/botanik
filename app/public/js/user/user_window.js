@@ -5,6 +5,7 @@ let CreateUserWindow = function () {
 
     let allServiceList = {};
     let allAddressList = {};
+    let timetable;
 
     this.slug = null;
 
@@ -15,6 +16,12 @@ let CreateUserWindow = function () {
     this.init = function () {
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
+        timetable = getCookie('timetable');
+
+        if (!(Object.keys(timetable).length)) {
+            timetable = timetableDB;
+            setCookie('timetable', timetable);
+        }
         this.loadAllServices();
         // this.initAllServices();
         // document.querySelector('input[name="role"]);

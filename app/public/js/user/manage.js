@@ -186,7 +186,6 @@ document.getElementById('edit-user').addEventListener('click', function () {
         send.role = admin.value;
         send.addresses = getValues(adminAddressSelects);
     }
-console
 
     let Request = postRequest(href, send);
     Request.onload = function () {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\RelationHelper;
+use Carbon\Carbon;
 use Eloquent;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,7 +54,7 @@ class Service extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['intervalFields', 'rangeFields'];
+    protected $appends = ['intervalFields', 'rangeFields', 'fullTimetable'];
 
     public function getIntervalFieldsAttribute()
     {
@@ -117,13 +118,36 @@ class Service extends Model
         return $this->hasOne(Prepayment::class);
     }
 
-//    /**
-//     * @return HasMany
-//     */
-//    public function timetable (): HasMany
-//    {
-//        return $this->hasMany(ServiceTimetable::class);
-//    }
+    /**
+     * @return
+     */
+    public function getFullTimetableAttribute ()
+    {
+       $res = [];
+       foreach ($this->timetables as $timetable){
+           $res[$timetable->year][$timetable->month] = $timetable->schedule;
+       }
+        return $res;
+    }
+
+    public function isWorkDay (Carbon $date, Carbon $comparison = null) : bool
+    {
+        if (!is_null($comparison) && $comparison->greaterThan($date))
+        {
+            return false;
+        }
+
+        $date = $date->format('Y-m-d');
+        $res = false;
+        foreach ($this->timetables as $timetable){
+            if(in_array($date, $timetable->schedule)){
+                $res = true;
+                continue;
+            }
+        }
+
+        return $res;
+    }
 
     /**
      * @return HasMany

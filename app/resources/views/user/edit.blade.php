@@ -19,6 +19,13 @@
         if(! getCookie('userData').length) {
             setCookie('userData', @json($userData));
         }
+        let timetableDB;
+        if(id) {
+            timetableDB = @json($timetables);
+        }
+        else {
+            timetableDB = @json([]);
+        }
 
 
     </script>
@@ -133,7 +140,9 @@
                 <a id="add-type" class="color text-decoration-none"
                    href="{{route('addService', ['business' => $slug, 'id' => $user->id, 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load])}}">{{__('Добавить услугу к специалисту')}}</a>
             </div><br>
-            <button type="button" id="edit-user" class="btn-primary">
+            <button type="button" id="edit-user"
+                    data-ref="{{route('editUser', ['business' => $slug, 'id' => $id])}}"
+                    class="btn-primary">
                 {{ __('Сохранить') }}
             </button>
             <a href="{{route('user', ['business' => $slug, 'sort' => $sort, 'load' => $load])}}" id="refresh-modal"></a>

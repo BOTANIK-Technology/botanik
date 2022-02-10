@@ -22,12 +22,7 @@ if (year) {
 }
 
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
-    let timetable = getCookie('timetable');
 
-    if (!(Object.keys(timetable).length)) {
-        timetable = timetableDB;
-        setCookie('timetable', timetable);
-    }
     timetable = timetable[currentService];
     if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
         let checkedArray = timetable[yearVal][monthVal];
