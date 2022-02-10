@@ -6,8 +6,8 @@
         let note = '{{auth()->user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';
         let editRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $id])}}";
-        let services = @json($services);
-        let addresses = @json($addresses);
+        let services = @json($services || []);
+        let addresses = @json($addresses || []);
        if(! Object.keys(getCookie('user') ).length) {
            setCookie('user', @json($user));
        }

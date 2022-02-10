@@ -155,7 +155,8 @@ class UserController extends Controller
                 $cookie = [
                     'service_type_id' => $slot->service->type_service_id,
                     'service_id'      => $slot->service_id,
-                    'address_id'      => $slot->address_id
+                    'address_id'      => $slot->address_id,
+                    'slot_id'      => $slot->id
                 ];
                 $this->params['userData'][] = $cookie;
             }

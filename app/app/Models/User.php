@@ -123,7 +123,7 @@ class User extends Authenticatable
        $slots = $this->slots;
        $res = [];
        foreach ($slots as $slot){
-           $res[] = $slot->service;
+           $res[] = $slot->service()->without('users')->first();
        }
        return $res;
     }

@@ -56,6 +56,16 @@ class Service extends Model
 
     protected $appends = ['intervalFields', 'rangeFields', 'fullTimetable'];
 
+    public function getUserList()
+    {
+        $res = [];
+        $slots = UsersSlots::where('service_id', $this->id)->without('services')->get();
+        foreach ($slots as $slot){
+            $res[] = $slot->user()->without('service')->first();
+        }
+        return $res;
+    }
+
     public function getIntervalFieldsAttribute()
     {
         return [

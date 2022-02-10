@@ -27,11 +27,12 @@ class Master extends CallbackQuery
      */
     private function getMaster($service_id, $address_id) {
         $masters = [];
+        /** @var \App\Models\Service $service */
         $service = \App\Models\Service::find($service_id);
         /** @var User $user */
-        foreach ($service->users as $user) {
-            foreach ($user->addresses as $user_address) {
-                if ($user_address->id == $address_id) {
+        foreach ($service->getUserList() as $user) {
+            foreach ($user->slots as $slot) {
+                if ($slot->address_id == $address_id) {
                     $session_id = $this->user->telegramSession->id;
                     $query = TelegramSession::query()->where("id", $session_id);
                     $query->update([

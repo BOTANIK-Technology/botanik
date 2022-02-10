@@ -99,6 +99,7 @@ Object.keys(checkboxes).forEach((el) => {
 
 let all = document.querySelector('#select-all');
 all.addEventListener('click', function () {
+    changeSavedButton(false);
     Object.keys(checkboxes).forEach((el) => {
         checkboxes[el].classList.add('checked')
     });
@@ -106,6 +107,7 @@ all.addEventListener('click', function () {
 
 let clr = document.querySelector('#clear-all');
 clr.addEventListener('click', function () {
+    changeSavedButton(false);
     Object.keys(checkboxes).forEach((el) => {
         checkboxes[el].classList.remove('checked')
     });
