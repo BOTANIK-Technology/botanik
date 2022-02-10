@@ -1,14 +1,13 @@
 function getCookie(name) {
     let storData;
-    if(!localStorage.data ){
-        storData = {};
-        localStorage.data = JSON.stringify(storData);
+    if(!localStorage.getItem('data') ){
+        localStorage.setItem('data', JSON.stringify({}) );
     }
-    storData = JSON.parse(localStorage.data);
+    storData = JSON.parse(localStorage.getItem('data'));
 
     if (!(name in storData)) {
         storData[name] = {};
-        localStorage.data = JSON.stringify(storData);
+        localStorage.setItem('data',  JSON.stringify(storData) );
     }
 
     return storData[name];
@@ -16,23 +15,23 @@ function getCookie(name) {
 }
 
 function setCookie(name, value, options = {}) {
-    if(! localStorage.data){
-        localStorage.data = JSON.stringify({});
+    if(! localStorage.getItem('data')){
+        localStorage.setItem('data', JSON.stringify({}) );
     }
-    let data = JSON.parse(localStorage.data);
-
+    let data = JSON.parse(localStorage.getItem('data'));
     data[name] = value;
-    localStorage.data = JSON.stringify(data);
+    localStorage.setItem('data', JSON.stringify(data) );
     return data;
 
 
 }
 
 function deleteCookie(name, path = '/') {
-    if(localStorage.data) {
-        let data = JSON.parse(localStorage.data);
+    let data = localStorage.getItem('data');
+    if(data ) {
+        data = JSON.parse(data);
         delete data[name];
-        localStorage.data = JSON.stringify(data);
+        localStorage.setItem('data', JSON.stringify(data) );
     }
 }
 

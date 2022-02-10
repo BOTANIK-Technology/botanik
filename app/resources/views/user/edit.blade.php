@@ -1,17 +1,13 @@
 @section('scripts')
+    <script src="{{asset('js/user/page.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let id = {{$id}};
-        let saveData = "{{request()->get('savedata', 0)}}";
-        if (!saveData) {
-            //     resetAll();
-        }
         let note = '{{auth()->user()->hasRole('admin') ? route('window.user', ['business' => $slug, 'sort' => $sort, 'modal' => 'note', 'load' => $load]) : ''}}';
         let countService = '{{$moreService}}';
         let editRoute = "{{route('window.user', ['business' => $slug, 'modal' => 'edit', 'id' => $id])}}";
         let services = @json($services);
         let addresses = @json($addresses);
-
        if(! Object.keys(getCookie('user') ).length) {
            setCookie('user', @json($user));
        }
@@ -19,20 +15,13 @@
         if(! getCookie('userData').length) {
             setCookie('userData', @json($userData));
         }
-        let timetableDB;
-        if(id) {
-            timetableDB = @json($timetables);
+        if (!getCookie('timetables').length) {
+            setCookie('timetables', @json($timetables));
         }
-        else {
-            timetableDB = @json([]);
-        }
-
 
     </script>
     <script src="{{asset('js/requests.js')}}"></script>
-    <script src="{{asset('js/user/page.js')}}"></script>
     <script src="{{asset('js/user/manage.js')}}"></script>
-    <script src="{{asset('js/user/edit.js')}}"></script>
     <script src="{{asset('js/user/user_window.js')}}"></script>
 @endsection
 

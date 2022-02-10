@@ -34,7 +34,6 @@ const suffix = (idVal = null) => {
 function getValues(array) {
     let returned = [];
     array.forEach((select) => {
-        console.log(select);
 
         Object.keys(select).forEach((value) => {
             returned.push(select[value].value)

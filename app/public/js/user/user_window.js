@@ -5,7 +5,6 @@ let CreateUserWindow = function () {
 
     let allServiceList = {};
     let allAddressList = {};
-    let timetable;
 
     this.slug = null;
 
@@ -16,12 +15,7 @@ let CreateUserWindow = function () {
     this.init = function () {
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
-        timetable = getCookie('timetable');
 
-        if (!(Object.keys(timetable).length)) {
-            timetable = timetableDB;
-            setCookie('timetable', timetable);
-        }
         this.loadAllServices();
         // this.initAllServices();
         // document.querySelector('input[name="role"]);
@@ -29,7 +23,6 @@ let CreateUserWindow = function () {
 
     this.initAllServices = function () {
         let uData = getCookie('userData');
-        console.log('initAllServices', uData);
         if(uData) {
             for (let i in uData) {
                 this.setCurrentData(i);
@@ -113,7 +106,6 @@ let CreateUserWindow = function () {
             cnt += "<option value='" + servL[serv].id + "'>" + servL[serv].name + "</option>";
         }
         let services = document.querySelector('#service' + suffix(num));
-        console.log('#service' + suffix(num), services);
         if (services) {
             services.innerHTML = cnt;
             document.querySelector('#service' + suffix(num)).classList.remove('hide');
@@ -142,6 +134,7 @@ let CreateUserWindow = function () {
     }
 
     this.saveCurrentData = function (num) {
+        setCookie('user', getData());
         let serviceType = document.querySelector('#service-type' + suffix(num));
         let service = document.querySelector('#service' + suffix(num));
         let address = document.querySelector('#address' + suffix(num));
@@ -167,7 +160,6 @@ let CreateUserWindow = function () {
 
     this.setCurrentData = function (num = 0) {
         let data = getUserData(num);
-        console.log('setCurrentData', num, data);
         if (Object.keys('data').length) {
             if (data.service_type_id) {
                 let type = document.getElementById('service-type' + suffix(num));
@@ -177,7 +169,6 @@ let CreateUserWindow = function () {
             if (data.service_id) {
                 this.loadAddresses(num, data.service_id, data.address_id)
             }
-            isInit = false;
         }
     }
 

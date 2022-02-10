@@ -16,7 +16,6 @@
     <script src="{{asset('js/requests.js')}}"></script>
 
     <script src="{{asset('js/user/manage.js')}}"></script>
-    <script src="{{asset('js/user/create.js')}}"></script>
     <script src="{{asset('js/user/user_window.js')}}"></script>
 @endsection
 

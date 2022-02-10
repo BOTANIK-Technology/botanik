@@ -1,6 +1,6 @@
 function unsetCookies() {
     deleteCookie('user');
-    deleteCookie('timetable');
+    deleteCookie('timetables');
     deleteCookie('user');
     deleteCookie('userData');
 }
@@ -55,7 +55,6 @@ let addedServices = getCookie('service-type');
 
 
 if (Object.keys(addedServices).length) {
-    console.log(addedServices);
     addedServices.forEach((id) => {
         document.getElementById('service-' + id).insertAdjacentHTML(
             'beforeEnd',
@@ -98,12 +97,9 @@ function getData() {
 if (calendar.length) {
     Object.keys(calendar).forEach((k) => {
         calendar[k].addEventListener('click', function () {
-            setCookie('user', getData());
             userWin.saveCurrentData(k);
         });
     });
-} else {
-    unsetCookies();
 }
 
 function setUserData(data, num) {
@@ -175,7 +171,7 @@ document.getElementById('edit-user').addEventListener('click', function () {
         'phone': data.phone,
         'email': data.email,
         'password': data.password,
-        'timetables': getCookie('timetable')
+        'timetable': getCookie('timetables')
     };
 
     if (master.checked) {

@@ -1,18 +1,11 @@
 @section('scripts')
+    <script src="{{asset('js/user/page.js')}}"></script>
+    <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let id = {{$id}};
         let currentService = {{$currentService}}
-    </script>
-    <script src="{{asset('js/user/page.js')}}"></script>
-
-    <script src="{{asset('js/cookie.js')}}"></script>
-    <script>
-        let timetableDB;
-        if(id) {
-            timetableDB = @json($timetables);
-        }
-        else {
-            timetableDB = @json([]);
+        if (!getCookie('timetables').length) {
+            setCookie('timetables', @json($timetables));
         }
 
     </script>

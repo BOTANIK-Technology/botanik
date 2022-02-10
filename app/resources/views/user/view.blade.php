@@ -12,21 +12,16 @@
             <div class="line"></div>
             @if ($user->timetables && !$user->timetables->isEmpty())
 
-                @foreach($user->timetables as $timetable)
+                @foreach($user->slots as $slot)
                     @if($user->hasRole('master'))
                         <span>{{__('Услуга')}}</span>
-                        <div>{{$timetable->service->name}}</div>
+                        <div>{{$slot->service->name}}</div>
                     @endif
                     <span>{{__('Адрес')}}</span>
-                    <div>{{$timetable->address->address}}</div>
+                    <div>{{$slot->address->address}}</div>
                     <span>{{__('Расписание')}}</span>
                     <div>
-                        @foreach($timetable->getDays() as $day => $ru)
-                            @if (!empty($timetable->$day))
-                                @php $val = json_decode($timetable->$day) @endphp
-                                <b>{{$ru.'. '.$val[0].' - '.$val[count($val)-1]}}</b><br>
-                            @endif
-                        @endforeach
+
                     </div>
                     <div class="line"></div>
                 @endforeach
