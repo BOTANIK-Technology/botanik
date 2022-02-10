@@ -114,7 +114,7 @@ class UserTimetable extends Model
 
             if ($tab->address_id == $address_id && $tab->service_id == $service_id) {
                 foreach ($tab->timetables as $table){
-                    if (in_array($date, array_keys($table->schedule, true)  ) ){
+                    if (in_array($date, array_keys($table->schedule)  ) ){
                         return true;
                     }
                 }

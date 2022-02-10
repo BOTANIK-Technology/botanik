@@ -2,6 +2,7 @@
 
 namespace App\Services\Telegram\Callback;
 
+use App\Helpers\DatesHelper;
 use App\Models\User;
 use App\Models\UserTimetable;
 use Illuminate\Http\Request;
@@ -43,7 +44,8 @@ class Time extends CallbackQuery
             "address_id" => $address_id,
             "date"      => $date
         ]);
-        $times = UserTimetable::getFreeTimes($master, $address_id, $service_id, $date);
+//        $times = UserTimetable::getFreeTimes($master, $address_id, $service_id, $date);
+        $times = DatesHelper::getFreeMasterTimes($master,  $address_id,  $service_id,  $date);
         return $this->getButtons($times);
     }
 
