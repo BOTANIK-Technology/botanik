@@ -122,6 +122,8 @@ class DatesHelper
         // Список уже забронированных услуг с длительностью
         $booked_array = UserTimetable::getBookedTimes($user, $date);
 
+
+
         if (!$booked_array) {
             $booked_array = [];
         }

@@ -21,9 +21,14 @@ let ScheduleWindow = function () {
         this.address = document.querySelector('#address');
         this.master = document.querySelector('#master');
 
-        this.service.addEventListener('change', function () {
-            _this.loadAddresses();
-            _this.loadMasters();
+        if(this.service.value) {
+            this.loadAddresses();
+            this.loadMasters();
+        }
+
+        this.service.addEventListener('click', function () {
+                _this.loadAddresses();
+                _this.loadMasters();
         });
         this.master.addEventListener('change', function () {
             _this.loadMonth(currentMonth);
@@ -64,13 +69,15 @@ let ScheduleWindow = function () {
             },
             success: function (response) {
                 if (response.result === "OK") {
-                    let cnt = "<option value=''>Специалист</option>";
-                    for (let mas in response.masters) {
-                        cnt += "<option value='" + response.masters[mas][0].id + "'>" + response.masters[mas][0].name + "</option>";
+                    if (response.masters.length) {
+                        let cnt = "<option value=''>Специалист</option>";
+                        for (let mas in response.masters) {
+                            cnt += "<option value='" + response.masters[mas][0].id + "'>" + response.masters[mas][0].name + "</option>";
+                        }
+                        _this.master.innerHTML = cnt;
+                        let lblEl = document.querySelector('#master_label');
+                        lblEl.style.display = 'block';
                     }
-                    _this.master.innerHTML = cnt;
-                    let lblEl = document.querySelector('#master_label');
-                    lblEl.style.display = 'block';
                 }
             }
         });

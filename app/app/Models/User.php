@@ -134,7 +134,7 @@ class User extends Authenticatable
      */
     public function addresses(): BelongsToMany
     {
-        return $this->belongsToMany(Address::class, 'users_addresses');
+        return $this->belongsToMany(Address::class, 'users_slots');
     }
 
     /**
@@ -144,7 +144,8 @@ class User extends Authenticatable
         $slots = $this->slots;
         $res = [];
         foreach ($slots as $slot) {
-            $res[] = $slot->service()->without('users')->first();
+            $serv =  $slot->service()->without('users')->first();
+            $res[$serv->id] = $serv;
         }
         return $res;
     }
@@ -272,8 +273,8 @@ class User extends Authenticatable
             return __('Специалист') . ' ' . $this->name . ' ' . __('не привязан к выбранному адресу.');
         }
 
-        $service = $this->services->where('id', $service_id)->first();
-        if (empty($service)) {
+        $service = $this->services[$service_id] ?? null;
+        if (! $service) {
             return __('Специалист') . ' ' . $this->name . ' ' . __('не привязан к выбранной услуге.');
         }
 

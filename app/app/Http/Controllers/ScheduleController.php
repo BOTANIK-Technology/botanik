@@ -174,16 +174,16 @@ class ScheduleController extends Controller
 
         if ($request->has('user_id')) {
             $user = User::findOrFail($request->user_id);
-      //      $res = $user->canRecord($request->service_id, $request->address_id);
+            $res = $user->canRecord($request->service_id, $request->address_id);
         }
         else {
             $service = Service::findOrFail($request->service_id);
-     //       $res = $service->canRecord($request->address_id);
+            $res = $service->canRecord($request->address_id);
         }
 
-//        if ($res !== true) {
-//            return response()->json(['errors' => ['text' => $res]], 405);
-//        }
+        if ($res !== true) {
+            return response()->json(['errors' => ['text' => $res]], 405);
+        }
 
 
         try {
