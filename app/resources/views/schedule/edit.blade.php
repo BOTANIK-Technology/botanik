@@ -51,4 +51,4 @@
     @endforeach
 </div>
 
-<a href="{{route('schedule', ['business' => $slug, 'date' => $date])}}" id="refresh-modal"></a>
+<a href="{{route('schedule', ['business' => $slug, 'current_type' => $current_type, 'date' => $date, 'current_month' => $current_month])}}" id="refresh-modal"></a>
