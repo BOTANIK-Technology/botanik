@@ -142,7 +142,7 @@
         justify-content: flex-start;
         -ms-flex-wrap: wrap;
         flex-wrap: wrap;
-        border-color: #CEB5CE;
+        border: none;
         max-width: 242px;
     }
 
@@ -161,30 +161,79 @@
         font-size: 12px;
         border-bottom: 1px solid #CEB5CE;
         border-right: 1px solid #CEB5CE;
-        padding: 0 20px;
+        padding: 0;
     }
 
-    .user_times .time_cell:nth-last-child(1),
-    .user_times .time_cell:nth-last-child(2),
-    .user_times .time_cell:nth-last-child(3),
-    .user_times .time_cell:nth-last-child(4) {
-        border-bottom: none;
+    .user_times .time_cell:nth-child(1),
+    .user_times .time_cell:nth-child(2),
+    .user_times .time_cell:nth-child(3),
+    .user_times .time_cell:nth-child(4) {
+        border-top: 1px solid #CEB5CE;
     }
 
-    .user_times .time_cell:nth-child(4n) {
-        border-right: none;
+    .user_times .time_cell:nth-child(1),
+    .user_times .time_cell:nth-child(4n + 1) {
+        border-left: 1px solid #CEB5CE;
     }
 
-    .user_times .time_cell:nth-child(4n):nth-last-child(4) {
-        border-bottom: 1px solid #CEB5CE;
-    }
+    .calendar_cell,
+    .time_cell,
     .pay-block {
+        position: relative;
+    }
+
+    .calendar_cell input,
+    .time_cell input,
+    .pay-block input {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: pointer;
+        opacity: 0;
+    }
+
+    .calendar_cell input:checked+label,
+    .time_cell input:checked+label,
+    .pay-block input:checked+label {
+        color: #fff;
+        background: #084887;
+    }
+
+    .calendar_cell input+label,
+    .time_cell input+label,
+    .pay-block input+label {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        width: 100%;
+        font-weight: 500;
+        font-size: 11px;
+        line-height: 1;
+        letter-spacing: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .pay-block input:checked+label {
+        border-color: #084887;
+    }
+
+    .pay-block input+label {
         border: 1px solid #CEB5CE;
-        margin: 2px;
+        padding: 0 15px;
     }
-    label > input[type=radio]:checked{
-        background-color: #1d68a7;
-    }
-
 </style>
-
