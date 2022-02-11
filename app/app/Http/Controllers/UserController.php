@@ -130,10 +130,14 @@ class UserController extends Controller
                 if($user) {
                     $this->setTimetableCookies($user);
                     $this->setUserCookies($user);
+                $this->params['moreService'] = $request->moreService ?? count($user->services);
+                }
+                else {
+
+                $this->params['moreService'] = $request->moreService ??  0;
                 }
 
                 $this->params['user'] = $user;
-                $this->params['moreService'] = $request->moreService ?? count($user->services);
                 $this->params['currentService'] = intval($request->currentService);
                 break;
             case 'note':

@@ -138,17 +138,19 @@ class ScheduleController extends Controller
                 $this->params['create_services'] = Service::all();
                 $this->params['create_users'] = User::all();
                 $this->params['create_addresses'] = Address::all();
-                $this->params['months'] = Address::all();
                 break;
             case 'edit':
             case 'view':
             case 'delete':
-                $this->params['window_records'] =
+
+                $this->params['record'] =
                     Record::whereDate('date', Carbon::parse($request->input('date')))
                         ->where('service_id', $request->id)
                         ->where('time', $request->time)
-                        ->get();
+                        ->first();
+            $this->params['month'] = strtolower(Carbon::parse($this->params['record']->date)->format('F') );
                 break;
+
         }
         return $this->getView($request);
     }
@@ -214,77 +216,7 @@ class ScheduleController extends Controller
         $client = TelegramUser::find($request->client_id);
 
         return TelegramAPI::createRecordNotice($service->name, $record, $client, $request);
-        /*
-                if (!ConnectService::prepareJob())
-                    return false;
 
-                try {
-
-                    $notice_mess = __('Новая запись на услугу').' <b>'.$service->name.'</b> от '.$client->getFio().' на '.$request->date. ' в '.$request->time;
-                    SendNotice::dispatch(
-                        $request->business_db,
-                        [
-                            [
-                                'address_id' => $request->address_id,
-                                'message' => $notice_mess
-                            ],
-                            [
-                                'user_id' => $request->user_id,
-                                'message' => $notice_mess
-                            ]
-                        ]
-                    )->delay(now()->addMinutes(2));
-
-                    $time = Carbon::parse($request->getDate() . " " . $request->getTime());
-
-                    $remind1Time = $time->subHours(config('memoBefore'));
-                    $remind2Time = $time->subDay();
-
-                    // Проверка на ночное время. Если уведомление выпадает на ночь - переносим на утро.
-                    if ($remind2Time->hour >= config('params.nightBeginHour') ){
-                        $remind2Time->setHour(config('params.nightBeginHour'))->setMinutes(0);
-                    }
-                    else if ($remind2Time->hour < config('params.nightEndHour')){
-                        $remind2Time->subDay()->setHours(config('params.nightBeginHour'));
-                    }
-                    if ($remind2Time > Carbon::now()){
-                        TelegramNotice::dispatch(
-                            $request->business_db,
-                            $client->chat_id,
-                            $record->id,
-                            __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
-                            $request->date,
-                            $request->time,
-                            $request->token
-                        )->delay($time->subDay());
-                    }
-
-                    TelegramNotice::dispatch(
-                        $request->business_db,
-                        $client->chat_id,
-                        $record->id,
-                        __('Напоминание. Вы записаны на услугу').' "'.$service->name.'". Начало '. Carbon::parse($request->date)->format('d.m.Y') . ' в ' . $request->time,
-                        $request->date,
-                        $request->time,
-                        $request->token
-                    )->delay($time->subDay());
-
-
-
-                    TelegramFeedBack::dispatch(
-                        $request->business_db,
-                        $client->chat_id,
-                        $record->id,
-                        $request->token
-                    )->delay($time->addDay());
-
-                    return response()->json(['ok' => 'Запись создана']);
-
-                }
-                catch (Exception $e) {
-                    return response()->json(['errors' => ['server' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]], 500);
-                }
-        */
     }
 
     /**
@@ -469,7 +401,7 @@ class ScheduleController extends Controller
 
     public function getTimes(Request $request)
     {
-        $date = substr($request->day, 5);
+        $date = $request->day;
         $service_id = $request->service_id;
         $master_id = $request->master_id;
         $address_id = $request->address_id;

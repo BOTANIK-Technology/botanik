@@ -1,37 +1,39 @@
 let ScheduleWindow = function () {
+    this.mode = 'create';
+
     this.recordTime = {date: "", time: ""};
     this.paymentTypes = {cash_pay: false, bonus_pay: false, online_pay: false};
 
     this.token = null;
-
     this.slug = null;
 
+    this.client = null;
     this.service = null;
-
     this.address = null;
-
     this.master = null;
 
     this.init = function () {
+        this.mode = 'create';
         let _this = this;
 
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
-        this.service = document.querySelector('#service');
-        this.address = document.querySelector('#address');
-        this.master = document.querySelector('#master');
+        this.client = document.querySelector('#client');
+        this.service = this.service || document.querySelector('#service');
+        this.address = this.address || document.querySelector('#address');
+        this.master = this.master || document.querySelector('#master');
 
-        if(this.service.value) {
+        if (this.service.value) {
             this.loadAddresses();
             this.loadMasters();
         }
 
         this.service.addEventListener('click', function () {
-                _this.loadAddresses();
-                _this.loadMasters();
+            _this.loadAddresses();
+            _this.loadMasters();
         });
         this.master.addEventListener('change', function () {
-            _this.loadMonth(currentMonth);
+            _this.loadMonthCreate(currentMonth);
         });
     }
 
@@ -83,11 +85,21 @@ let ScheduleWindow = function () {
         });
     }
 
-    this.loadMonth = function (month) {
+    this.loadMonthCreate = function (month) {
+        console.log(this.mode, this.mode == 'create');
+        if (this.mode == 'create') {
+            let service_id = this.service.value;
+            let master_id = this.master.value;
+            let address_id = this.address.value;
+            this.loadMonth(month, service_id, master_id, address_id)
+        } else {
+            this.loadMonth(month, service_id, master_id, address_id)
+        }
+    }
+
+    this.loadMonth = function (month, service_id, master_id, address_id) {
         let _this = this;
-        let service_id = this.service.value;
-        let master_id = this.master.value;
-        let address_id = this.address.value;
+
 
         this.post({
             url: '/api/calendar',
@@ -104,7 +116,6 @@ let ScheduleWindow = function () {
                 for (let index in response.monthData) {
                     let row = document.createElement('tr');
                     row.classList.add('calendar_row');
-                    let baseUrl = '/' + SLUG + '/schedule/create';
 
                     for (let i in response.monthData[index]) {
                         let cellData = response.monthData[index][i];
@@ -121,7 +132,7 @@ let ScheduleWindow = function () {
                                     cell.classList.add('month_next');
                                 }
                                 cell.addEventListener('click', () => {
-                                    _this.loadMonth(cellData.callback_data);
+                                    _this.loadMonthCreate(cellData.callback_data);
                                 });
 
                             } else {
@@ -131,7 +142,7 @@ let ScheduleWindow = function () {
 
                             let num = parseInt(cellData.text);
                             if (!isNaN(num) && num > 0) {
-                                cell.setAttribute('onclick', 'scheduleWin.loadDay("' + cellData.callback_data + '")');
+                                cell.setAttribute('onclick', 'scheduleWin.loadDayCreate("' + cellData.callback_data + '")');
                                 let radioInput = document.createElement('input');
                                 radioInput.setAttribute('type', 'radio');
                                 radioInput.setAttribute('name', 'calendar_day');
@@ -139,8 +150,8 @@ let ScheduleWindow = function () {
                                 let radioLabel = document.createElement('label');
                                 radioLabel.innerHTML = cellData.text;
 
-                                cell.appendChild(radioLabel);
                                 cell.appendChild(radioInput);
+                                cell.appendChild(radioLabel);
                             } else {
                                 cell.innerHTML = cellData.text;
                             }
@@ -154,29 +165,33 @@ let ScheduleWindow = function () {
         });
     }
 
-    this.loadDay = function (day) {
-        this.recordTime.date = day;
+    this.loadDayCreate = function (date) {
+        if (this.mode === 'create') {
+            let service_id = this.service.value;
+            let master_id = this.master.value;
+            let address_id = this.address.value;
+            this.loadDay(date.substr(5), service_id, master_id, address_id)
+        }
+        else {
+            this.loadDay(date.substr(5), service_id, master_id, address_id)
+        }
+    }
 
-        let _this = this;
-        let service_id = this.service.value;
-        let master_id = this.master.value;
-        let address_id = this.address.value;
-
+    this.loadDay = function (date, service_id, master_id, address_id) {
+        this.recordTime.date = date;
 
         this.post({
                 url: '/api/times',
                 data: {
-                    day: day,
+                    day: date,
                     service_id: service_id,
                     master_id: master_id,
                     address_id: address_id
                 },
                 success: function (response) {
-                    console.log(response);
                     let table = document.getElementById('user_times');
                     table.innerHTML = '';
                     for (let time of response) {
-                        let baseUrl = '/' + SLUG + '/schedule/create';
                         let cell = document.createElement('div');
                         cell.setAttribute('onclick', 'scheduleWin.loadPayment("' + time + '")');
                         let radioInput = document.createElement('input');
@@ -186,8 +201,8 @@ let ScheduleWindow = function () {
                         let radioLabel = document.createElement('label');
                         radioLabel.innerHTML = time;
 
-                        cell.appendChild(radioLabel);
                         cell.appendChild(radioInput);
+                        cell.appendChild(radioLabel);
                         cell.classList.add('time_cell');
 
                         table.appendChild(cell);
@@ -201,26 +216,25 @@ let ScheduleWindow = function () {
 
     this.loadPayment = function (time) {
         this.recordTime.time = time;
-        console.log(this.recordTime, this.paymentTypes);
+
         let html = '<label for="cash_pay"></label>' +
             '<input class="pay-input" type="radio" name="cash_pay">';
         let container = document.getElementById('payments-block');
-        console.log('paymentType', this.paymentTypes, this.paymentTypes.cash_pay)
-        if(this.paymentTypes.cash_pay) {
+
+        if (this.paymentTypes.cash_pay) {
             document.getElementById('block-cash_pay').classList.remove('hide');
         }
-        if(this.paymentTypes.bonus_pay) {
+        if (this.paymentTypes.bonus_pay) {
             document.getElementById('block-bonus_pay').classList.remove('hide');
         }
-        if(this.paymentTypes.online_pay) {
+        if (this.paymentTypes.online_pay) {
             document.getElementById('block-online_pay').classList.remove('hide');
         }
-        let createBtn = document.getElementById('create');
+        let createBtn = document.getElementById('action');
         createBtn.addEventListener('click', send);
         document.getElementById('payments-block').addEventListener('click', () => {
             createBtn.classList.remove('hide');
         });
-
 
 
     }
@@ -247,5 +261,7 @@ let ScheduleWindow = function () {
 let scheduleWin = new ScheduleWindow();
 
 document.addEventListener('DOMContentLoaded', function () {
-    scheduleWin.init();
+    if (scheduleWin.mode == 'create') {
+        scheduleWin.init();
+    }
 });

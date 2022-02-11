@@ -66,21 +66,21 @@
 
 <div class="flex justify-content-around create" id="payments-block">
     <div class="pay-block hide" id="block-cash_pay">
-        <label for="cash_pay">{{__('Наличными')}}</label>
         <input class="pay-input" type="radio" name="pay_type">
+        <label for="cash_pay">{{__('Наличными')}}</label>
     </div>
     <div class="pay-block hide" id="block-bonus_pay">
-        <label for="bonus_pay">{{__('Бонусами')}}</label>
         <input class="pay-input" type="radio" name="pay_type">
+        <label for="bonus_pay">{{__('Бонусами')}}</label>
     </div>
     <div class="pay-block hide" id="block-online_pay">
-        <label for="online_pay">{{__('Бонусами')}}</label>
         <input class="pay-input" type="radio" name="pay_type">
+        <label for="online_pay">{{__('Бонусами')}}</label>
     </div>
 </div>
 
 @slot('buttons')
-    <button type="button" id="create" data-href="{{route('schedule.create', ['business' => $slug])}}"
+    <button type="button" id="action" data-href="{{route('schedule.create', ['business' => $slug])}}"
             class="btn-primary hide">
         {{ __('Создать') }}
     </button>
