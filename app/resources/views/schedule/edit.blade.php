@@ -23,13 +23,16 @@
 
             <div class="flex justify-content-around create">
 
-                <label for="time">
-                    <input id="time-{{$record->id}}" type="text" class="inp active" value="{{$record->time}}" placeholder="00:00">
-                </label>
+                <div class="flex justify-content-around create">
 
-                <label for="date">
-                    <input id="date-{{$record->id}}" type="text" class="inp active" value="{{$record->date}}" placeholder="{{__('01.01.2020')}}">
-                </label>
+                    @include('schedule.user_calendar')
+
+                </div>
+                <div class="flex justify-content-around create">
+
+                    @include('schedule.user_times')
+
+                </div>
 
             </div>
 

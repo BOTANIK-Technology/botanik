@@ -77,7 +77,7 @@ class ScheduleController extends Controller
             $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
 
             $this->params['services'] = !is_null($this->params['current_type']) ? $this->params['current_type']->services : [];
-            $this->params['current_type'] = !is_null($this->params['current_type']) ? $this->params['current_type']->id : 0;
+            $this->params['current_type'] = $this->params['current_type']->id ?? 0;
         }
         else {
 
@@ -91,7 +91,7 @@ class ScheduleController extends Controller
             $schedule = UserTimetable::userSchedule($user, Carbon::parse($this->params['date']));
             $records = Record::where('user_id', $user->id)->whereDate('date', Carbon::parse($this->params['date']))->get();
             $this->params['types'] = $types;
-            $this->params['current_type'] = $request->has('current_type') ? $request->input('current_type') : $types[0];
+            $this->params['current_type'] = $request->input('current_type') ?? $types[0];
             $this->params['schedule'] = $schedule['times'] ?? false;
             $this->params['address'] = $schedule['address'] ?? false;
         }
