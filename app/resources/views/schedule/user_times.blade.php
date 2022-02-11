@@ -5,11 +5,5 @@
     <div id="user_times" class="user_times border">
     </div>
 </div>
-@section('modal-styles')
-    <style>
-        .pointer {
-            cursor: pointer
-        }
-    </style>
-@endsection
+
 

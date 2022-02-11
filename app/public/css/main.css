@@ -629,3 +629,8 @@ div.add-service {
     background-image: url('/images/notification_icon.png') !important;
     background-size: 10%;
 }
+
+
+.pointer {
+    cursor: pointer
+}

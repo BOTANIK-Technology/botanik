@@ -1,4 +1,6 @@
 let ScheduleWindow = function () {
+    this.recordTime = {date: "", time: ""};
+    this.paymentTypes = {cash_pay: false, bonus_pay: false, online_pay: false};
 
     this.token = null;
 
@@ -89,38 +91,52 @@ let ScheduleWindow = function () {
                 address_id: address_id
             },
             success: function (response) {
-                console.log(response);
+                _this.paymentTypes = response.paymentTypes;
                 let table = document.getElementById('user_calendar');
                 table.innerHTML = '';
-                for (let index in response) {
+                for (let index in response.monthData) {
                     let row = document.createElement('tr');
                     row.classList.add('calendar_row');
                     let baseUrl = '/' + SLUG + '/schedule/create';
 
-                    for (let i in response[index]) {
+                    for (let i in response.monthData[index]) {
+                        let cellData = response.monthData[index][i];
                         let cell = document.createElement('td');
                         cell.classList.add('calendar_cell');
-
                         // первая строка календаря
                         if (index == 0) {
                             if (i != 1) {
                                 // Кнопки
-                                if (response[index][i].text == "⏪") {
+                                if (cellData.text == "⏪") {
                                     cell.classList.add('month_prev');
                                 }
-                                if (response[index][i].text == "⏩") {
+                                if (cellData.text == "⏩") {
                                     cell.classList.add('month_next');
                                 }
                                 cell.addEventListener('click', () => {
-                                    _this.loadMonth(response[index][i]['callback_data']);
+                                    _this.loadMonth(cellData.callback_data);
                                 });
 
                             } else {
-                                cell.innerHTML = response[index][i].text;
+                                cell.innerHTML = cellData.text;
                             }
                         } else {
-                            cell.setAttribute('onclick', 'scheduleWin.loadDay("' + response[index][i].callback_data + '")');
-                            cell.innerHTML = response[index][i].text;
+
+                            let num = parseInt(cellData.text);
+                            if (!isNaN(num) && num > 0) {
+                                cell.setAttribute('onclick', 'scheduleWin.loadDay("' + cellData.callback_data + '")');
+                                let radioInput = document.createElement('input');
+                                radioInput.setAttribute('type', 'radio');
+                                radioInput.setAttribute('name', 'calendar_day');
+                                radioInput.setAttribute('value', cellData.callback_data);
+                                let radioLabel = document.createElement('label');
+                                radioLabel.innerHTML = cellData.text;
+
+                                cell.appendChild(radioLabel);
+                                cell.appendChild(radioInput);
+                            } else {
+                                cell.innerHTML = cellData.text;
+                            }
                         }
                         row.appendChild(cell);
                     }
@@ -132,10 +148,13 @@ let ScheduleWindow = function () {
     }
 
     this.loadDay = function (day) {
+        this.recordTime.date = day;
+
         let _this = this;
         let service_id = this.service.value;
         let master_id = this.master.value;
         let address_id = this.address.value;
+
 
         this.post({
                 url: '/api/times',
@@ -152,8 +171,18 @@ let ScheduleWindow = function () {
                     for (let time of response) {
                         let baseUrl = '/' + SLUG + '/schedule/create';
                         let cell = document.createElement('div');
+                        cell.setAttribute('onclick', 'scheduleWin.loadPayment("' + time + '")');
+                        let radioInput = document.createElement('input');
+                        radioInput.setAttribute('type', 'radio');
+                        radioInput.setAttribute('name', 'calendar_time');
+                        radioInput.setAttribute('value', time);
+                        let radioLabel = document.createElement('label');
+                        radioLabel.innerHTML = time;
+
+                        cell.appendChild(radioLabel);
+                        cell.appendChild(radioInput);
                         cell.classList.add('time_cell');
-                        cell.textContent = time;
+
                         table.appendChild(cell);
                     }
                 }
@@ -162,6 +191,33 @@ let ScheduleWindow = function () {
             }
         );
     }
+
+    this.loadPayment = function (time) {
+        this.recordTime.time = time;
+        console.log(this.recordTime, this.paymentTypes);
+        let html = '<label for="cash_pay"></label>' +
+            '<input class="pay-input" type="radio" name="cash_pay">';
+        let container = document.getElementById('payments-block');
+        console.log('paymentType', this.paymentTypes, this.paymentTypes.cash_pay)
+        if(this.paymentTypes.cash_pay) {
+            document.getElementById('block-cash_pay').classList.remove('hide');
+        }
+        if(this.paymentTypes.bonus_pay) {
+            document.getElementById('block-bonus_pay').classList.remove('hide');
+        }
+        if(this.paymentTypes.online_pay) {
+            document.getElementById('block-online_pay').classList.remove('hide');
+        }
+        let createBtn = document.getElementById('create');
+        createBtn.addEventListener('click', send);
+        document.getElementById('payments-block').addEventListener('click', () => {
+            createBtn.classList.remove('hide');
+        });
+
+
+
+    }
+
 
     this.post = function (options) {
         let url = '/' + this.slug.value + options.url;

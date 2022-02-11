@@ -174,16 +174,16 @@ class ScheduleController extends Controller
 
         if ($request->has('user_id')) {
             $user = User::findOrFail($request->user_id);
-            $res = $user->canRecord($request->service_id, $request->address_id);
+      //      $res = $user->canRecord($request->service_id, $request->address_id);
         }
         else {
             $service = Service::findOrFail($request->service_id);
-            $res = $service->canRecord($request->address_id);
+     //       $res = $service->canRecord($request->address_id);
         }
 
-        if ($res !== true) {
-            return response()->json(['errors' => ['text' => $res]], 405);
-        }
+//        if ($res !== true) {
+//            return response()->json(['errors' => ['text' => $res]], 405);
+//        }
 
 
         try {
@@ -462,7 +462,9 @@ class ScheduleController extends Controller
         $service_id = $request->service_id;
         $address_id = $request->address_id;
 
-        return DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
+        $service = Service::findOrFail($service_id);
+        $monthData = DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
+        return ['monthData' => $monthData, 'paymentTypes' => $service->paymentList];
     }
 
     public function getTimes(Request $request)
@@ -472,9 +474,11 @@ class ScheduleController extends Controller
         $master_id = $request->master_id;
         $address_id = $request->address_id;
 
-        $user = User::find($master_id);
+
+        $user = User::findOrFail($master_id);
 
         return DatesHelper::getFreeMasterTimes($user,  $address_id,  $service_id,  $date);
+
     }
 
 }

@@ -22,8 +22,8 @@ function send () {
         'client_id': client.value,
         'service_id': service.value,
         'address_id': address.value,
-        'date': date.value,
-        'time': time.value
+        'date': scheduleWin.recordTime.date.substr(5),
+        'time': scheduleWin.recordTime.time
     };
     if (master.value) data.user_id = master.value;
     let Request = postRequest(create.dataset.href, data);

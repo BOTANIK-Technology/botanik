@@ -54,7 +54,7 @@ class Service extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['intervalFields', 'rangeFields', 'fullTimetable'];
+    protected $appends = ['intervalFields', 'rangeFields', 'fullTimetable', 'paymentList'];
 
     public function getUserList()
     {
@@ -64,6 +64,15 @@ class Service extends Model
             $res[] = $slot->user()->without('service')->first();
         }
         return $res;
+    }
+
+    public function getPaymentListAttribute()
+    {
+        return [
+            'cash_pay' => $this->cash_pay,
+            'bonus_pay' => $this->bonus_pay,
+            'online_pay' => $this->online_pay,
+        ];
     }
 
     public function getIntervalFieldsAttribute()

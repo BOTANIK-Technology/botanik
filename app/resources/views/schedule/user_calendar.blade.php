@@ -7,13 +7,6 @@
     <table id="user_calendar" class="user_calendar new_style">
     </table>
 </div>
-@section('modal-styles')
-    <style>
-        .pointer {
-            cursor: pointer
-        }
-    </style>
-@endsection
 
 <style>
     .create {
@@ -185,4 +178,13 @@
     .user_times .time_cell:nth-child(4n):nth-last-child(4) {
         border-bottom: 1px solid #CEB5CE;
     }
+    .pay-block {
+        border: 1px solid #CEB5CE;
+        margin: 2px;
+    }
+    label > input[type=radio]:checked{
+        background-color: #1d68a7;
+    }
+
 </style>
+
