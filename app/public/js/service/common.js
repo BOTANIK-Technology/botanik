@@ -5,7 +5,7 @@ function addressSelectors(idVal = null) {
 function addAddressSelector(idVal = null) {
     let options = document.getElementById('address').innerHTML;
 
-    let addressesBlock = document.getElementById('addresses' + suffix(idVal));
+    let addressesBlock = document.getElementById('addresses');
     addressesBlock.insertAdjacentHTML('beforeEnd', '<select class="address" name="addresses[]">' + options + '</select>')
 
 }
@@ -55,8 +55,8 @@ if (saveBtn) {
 
 function send(idVal = null) {
     return {
-        'name': document.getElementById('service-name' + suffix(idVal)).value,
-        'type': document.getElementById('service-type' + suffix(idVal)).value,
+        'name': document.getElementById('service-name').value,
+        'type': document.getElementById('service-type').value,
         'addresses': addressesVal(idVal),
 
         'durationHours': checkedByNameVal('durationHours'),
@@ -66,17 +66,17 @@ function send(idVal = null) {
 
         'timetables': getCookie('timetables'),
 
-        'price': document.getElementById('price' + suffix(idVal)).value,
-        'bonus': document.getElementById('bonus' + suffix(idVal)).value,
+        'price': document.getElementById('price').value,
+        'bonus': document.getElementById('bonus').value,
         'grouped': groupVal(idVal),
-        'quantity': document.getElementById('quantity' + suffix(idVal)).value,
-        'message': document.getElementById('message' + suffix(idVal)).value,
-        'prepay': document.getElementById('prepay' + suffix(idVal)).checked,
-        'cashpay': document.getElementById('cashpay' + suffix(idVal)).checked,
-        'onlinepay': document.getElementById('onlinepay' + suffix(idVal)).checked,
-        'bonuspay': document.getElementById('bonuspay' + suffix(idVal)).checked,
-        'prepay_message': document.getElementById('prepay-message' + suffix(idVal)).value,
-        'prepay_card': document.getElementById('card' + suffix(idVal)).value,
+        'quantity': document.getElementById('quantity').value,
+        'message': document.getElementById('message').value,
+        'prepay': document.getElementById('prepay').checked,
+        'cashpay': document.getElementById('cashpay').checked,
+        'onlinepay': document.getElementById('onlinepay').checked,
+        'bonuspay': document.getElementById('bonuspay').checked,
+        'prepay_message': document.getElementById('prepay-message').value,
+        'prepay_card': document.getElementById('card').value,
     }
 }
 
@@ -111,7 +111,7 @@ function getCheckedVal(objects) {
 }
 
 function groupVal(idVal = null) {
-    return getCheckedVal(document.getElementsByName('group' + suffix(idVal)))
+    return getCheckedVal(document.getElementsByName('group'))
 }
 
 
@@ -132,19 +132,19 @@ function setChecked(objects, value) {
 const setInitialData = (idVal) => {
     let inputs = getCookie('inputs');
     if (inputs && Object.keys(inputs).length) {
-        document.getElementById('service-name' + suffix(idVal)).value = inputs.name;
-        document.getElementById('service-type' + suffix(idVal)).value = inputs.type;
+        document.getElementById('service-name').value = inputs.name;
+        document.getElementById('service-type').value = inputs.type;
 
-        document.getElementById('price' + suffix(idVal)).value = inputs.price;
-        document.getElementById('bonus' + suffix(idVal)).value = inputs.bonus;
-        document.getElementById('quantity' + suffix(idVal)).value = inputs.quantity;
-        document.getElementById('message' + suffix(idVal)).value = inputs.message;
-        document.getElementById('prepay' + suffix(idVal)).checked = inputs.prepay;
-        document.getElementById('cashpay' + suffix(idVal)).checked = inputs.cashpay;
-        document.getElementById('onlinepay' + suffix(idVal)).checked = inputs.onlinepay;
-        document.getElementById('bonuspay' + suffix(idVal)).checked = inputs.bonuspay;
-        document.getElementById('prepay-message' + suffix(idVal)).value = inputs.prepay_message;
-        document.getElementById('card' + suffix(idVal)).value = inputs.prepay_card;
+        document.getElementById('price').value = inputs.price;
+        document.getElementById('bonus').value = inputs.bonus;
+        document.getElementById('quantity').value = inputs.quantity;
+        document.getElementById('message').value = inputs.message;
+        document.getElementById('prepay').checked = inputs.prepay;
+        document.getElementById('cashpay').checked = inputs.cashpay;
+        document.getElementById('onlinepay').checked = inputs.onlinepay;
+        document.getElementById('bonuspay').checked = inputs.bonuspay;
+        document.getElementById('prepay-message').value = inputs.prepay_message;
+        document.getElementById('card').value = inputs.prepay_card;
 
         let selectors = addressSelectors(idVal);
         if (selectors.length < inputs.addresses.length) {
@@ -155,7 +155,7 @@ const setInitialData = (idVal) => {
         selectors = addressSelectors(idVal);
         setValues(selectors, inputs.addresses);
 
-        setChecked(document.getElementsByName('group' + suffix(idVal)), inputs.grouped);
+        setChecked(document.getElementsByName('group'), inputs.grouped);
 
         setChecked(document.getElementsByName('durationHours'), inputs.durationHours);
         setChecked(document.getElementsByName('durationMinutes'), inputs.durationMinutes);
@@ -166,8 +166,8 @@ const setInitialData = (idVal) => {
     /**
      * Group
      */
-    let groupBlock = document.getElementById('group-service' + suffix(idVal));
-    let groupBtns = document.getElementsByName('group' + suffix(idVal));
+    let groupBlock = document.getElementById('group-service');
+    let groupBtns = document.getElementsByName('group');
     if (groupVal(idVal) ) {
         groupOff(groupBlock, idVal);
     }
@@ -185,8 +185,8 @@ const setInitialData = (idVal) => {
         })
     });
 
-    let prepayBlock = document.getElementById('prepay-service' + suffix(idVal));
-    let prepayBtn = document.querySelector('#prepay' + suffix(idVal));
+    let prepayBlock = document.getElementById('prepay-service');
+    let prepayBtn = document.querySelector('#prepay');
     if (!prepayBtn.checked) {
         prepayOff(prepayBlock, idVal);
     }
