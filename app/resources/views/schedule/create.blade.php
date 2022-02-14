@@ -1,7 +1,11 @@
 @section('modal-scripts')
     <script src="{{asset('js/requests.js')}}"></script>
-    <script src="{{asset('js/schedule/create.js')}}"></script>
+    <script>
+        let date = null;
+        let time = null;
+    </script>
     <script src="{{asset('js/schedule/schedule_win.js')}}"></script>
+    <script src="{{asset('js/schedule/create.js')}}"></script>
 @endsection
 
 <div class="grid create">

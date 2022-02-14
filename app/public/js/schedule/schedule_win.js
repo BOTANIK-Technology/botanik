@@ -1,7 +1,5 @@
 let ScheduleWindow = function () {
-    this.mode = 'create';
-
-    this.recordTime = {date: "", time: ""};
+    this.recordTime = {date: date, time: time};
     this.paymentTypes = {cash_pay: false, bonus_pay: false, online_pay: false};
 
     this.token = null;
@@ -14,8 +12,8 @@ let ScheduleWindow = function () {
     this.calendar = null;
 
     this.init = function () {
-        this.mode = 'create';
         let _this = this;
+
 
         this.token = document.getElementById('token_id');
         this.slug = document.getElementById('url_slug');
@@ -23,7 +21,7 @@ let ScheduleWindow = function () {
         this.service = this.service || document.getElementById('service');
         this.address = this.address || document.getElementById('address');
         this.master = this.master || document.getElementById('master');
-        this.calendar = this.calendar || document.getElementById('user_calendar');
+
 
         if (this.service.value) {
             _this.loadAddresses();
@@ -155,14 +153,18 @@ let ScheduleWindow = function () {
 
                             let num = parseInt(cellData.text);
                             if (!isNaN(num) && num > 0) {
-                                cell.setAttribute('onclick', 'scheduleWin.loadDayCreate("' + cellData.callback_data + '")');
+                                cell.setAttribute('onclick', 'scheduleWin.loadDayCreate("' + cellData.callback_data.substr(5) + '")');
                                 let radioInput = document.createElement('input');
                                 radioInput.setAttribute('type', 'radio');
+                                radioInput.setAttribute('id', cellData.callback_data.substr(5));
                                 radioInput.setAttribute('name', 'calendar_day');
-                                radioInput.setAttribute('value', cellData.callback_data);
+                                radioInput.setAttribute('value', cellData.callback_data.substr(5));
                                 let radioLabel = document.createElement('label');
                                 radioLabel.innerHTML = cellData.text;
 
+                                if (date && date == cellData.callback_data.substr(5)) {
+                                    radioInput.checked = true
+                                }
                                 cell.appendChild(radioInput);
                                 cell.appendChild(radioLabel);
                             } else {
@@ -183,19 +185,23 @@ let ScheduleWindow = function () {
             let service_id = this.service.value;
             let master_id = this.master.value;
             let address_id = this.address.value;
-            this.loadDay(date.substr(5), service_id, master_id, address_id)
+            this.loadDay(date, service_id, master_id, address_id)
         } else {
-            this.loadDay(date.substr(5), service_id, master_id, address_id)
+            this.loadDay(date, service_id, master_id, address_id)
         }
     }
 
     this.loadDay = function (date, service_id, master_id, address_id) {
         this.recordTime.date = date;
+        let _this = this;
+        console.log(_this.recordTime.time, _this.mode);
 
         this.post({
                 url: '/api/times',
                 data: {
                     day: date,
+                    mode: _this.mode,
+                    ignored_time: _this.recordTime.time,
                     service_id: service_id,
                     master_id: master_id,
                     address_id: address_id
@@ -203,21 +209,25 @@ let ScheduleWindow = function () {
                 success: function (response) {
                     let table = document.getElementById('user_times');
                     table.innerHTML = '';
-                    for (let time of response) {
+                    for (let cellTime of response) {
                         let cell = document.createElement('div');
-                        cell.setAttribute('onclick', 'scheduleWin.loadPayment("' + time + '")');
+                        cell.setAttribute('onclick', 'scheduleWin.loadPayment("' + cellTime + '")');
                         let radioInput = document.createElement('input');
                         radioInput.setAttribute('type', 'radio');
-                        radioInput.setAttribute('name', 'calendar_time');
-                        radioInput.setAttribute('value', time);
+                        radioInput.setAttribute('id', cellTime);
+                        radioInput.setAttribute('name', 'calendar_cellTime');
+                        radioInput.setAttribute('value', cellTime);
                         let radioLabel = document.createElement('label');
-                        radioLabel.innerHTML = time;
+                        radioLabel.innerHTML = cellTime;
 
                         cell.appendChild(radioInput);
                         cell.appendChild(radioLabel);
                         cell.classList.add('time_cell');
 
                         table.appendChild(cell);
+                        if (time && time == cellTime) {
+                            radioInput.checked = true
+                        }
                     }
                 }
 
@@ -249,7 +259,7 @@ let ScheduleWindow = function () {
         }
         let createBtn = document.getElementById('action');
         createBtn.addEventListener('click', send);
-        if(!hasPayment){
+        if (!hasPayment) {
             createBtn.classList.remove('hide');
         }
         document.getElementById('payments-block').addEventListener('click', () => {

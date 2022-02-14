@@ -4,7 +4,6 @@ scheduleWin.token = document.querySelector('#token_id');
 scheduleWin.loadMonth (month, service_id, master_id, address_id);
 scheduleWin.loadDay (date, service_id, master_id, address_id);
 
-
 function send (id) {
     let send = {
         'date': scheduleWin.recordTime.date,

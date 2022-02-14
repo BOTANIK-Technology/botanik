@@ -417,15 +417,16 @@ class ScheduleController extends Controller
         $service_id = $request->service_id;
         $master_id = $request->master_id;
         $address_id = $request->address_id;
+        $ignoredTime = $request->mode == 'edit' ? $request->ignored_time : null;
 
         if ($master_id) {
             $user = User::findOrFail($master_id);
-            return DatesHelper::getFreeMasterTimes($user, $address_id, $service_id, $date);
+            return DatesHelper::getFreeMasterTimes($user, $address_id, $service_id, $date, $ignoredTime);
         }
         /** @var Service $service */
         $service = Service::findOrFail($service_id);
 
-        return $service->getFreeTimes($date);
+        return $service->getFreeTimes($date, $ignoredTime);
     }
 
 

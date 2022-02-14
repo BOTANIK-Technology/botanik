@@ -1,6 +1,5 @@
 @section('modal-scripts')
     <script src="{{asset('js/requests.js')}}"></script>
-    <script src="{{asset('js/schedule/schedule_win.js')}}"></script>
     <script>
         let service_id = {{$record->service_id}};
         let address_id = {{$record->address_id}};
@@ -9,6 +8,7 @@
         let date = '{{$record->date}}';
         let time = '{{$record->time}}';
     </script>
+    <script src="{{asset('js/schedule/schedule_win.js')}}"></script>
     <script src="{{asset('js/schedule/edit.js')}}"></script>
 @endsection
 
