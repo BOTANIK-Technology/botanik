@@ -31,8 +31,8 @@
         </select>
     </label>
 
-    <label id="address_label" for="address" style="display: none;">
-        <select id="address">
+    <label id="address_label" for="address" >
+        <select id="address" class="dropdown dropdown-address hide">
             <option value="">{{__('Адрес *')}}</option>
             @foreach($create_addresses as $address)
                 <option value="{{$address->id}}">{{$address->address}}</option>
@@ -40,8 +40,8 @@
         </select>
     </label>
 
-    <label id="master_label" for="master" style="display: none;">
-        <select id="master">
+    <label id="master_label" for="master" >
+        <select id="master" class="dropdown dropdown-address hide">
             <option value="">{{__('Специалист')}}</option>
             @foreach($create_users as $user)
                 <option value="{{$user->id}}">{{$user->name}}</option>

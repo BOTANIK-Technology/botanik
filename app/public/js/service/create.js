@@ -9,29 +9,6 @@ if (document.querySelector('.modal-create') ) {
     let addressSelectorSelect = document.getElementById('more-addresses-select');
 
 
-    // function issetTimetable() {
-    //     let timetable = getCookie('timetable');
-    //     return !!(timetable && timetable !== 'undefined' && timetable.length);
-    // }
-    //
-    // function getTimetable() {
-    //     let timetable = getCookie('timetable');
-    //     return JSON.parse(timetable);
-    // }
-    //
-    // function setValues (objects, values) {
-    //     Object.keys(objects).forEach((k) => {
-    //         if (values[k])
-    //             objects[k].value = values[k];
-    //     });
-    // }
-    //
-    // function setChecked (objects, value) {
-    //     Object.keys(objects).forEach((el) => {
-    //         if (objects[el].value === value) objects[el].checked = 'checked';
-    //     });
-    // }
-
     let groupBlock = document.getElementById('group-service');
     function groupOff () {
         groupBlock.classList.add('hide');

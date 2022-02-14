@@ -10,7 +10,9 @@ use App\Models\Address;
 use App\Models\Payment;
 use App\Models\Record;
 use App\Models\Service;
+use App\Models\ServiceTimetable;
 use App\Models\TelegramUser;
+use App\Models\Timetables;
 use App\Models\User;
 use App\Services\Telegram\TelegramAPI;
 use Carbon\Carbon;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
+use function PHPUnit\Framework\isNan;
 
 class ScheduleController extends Controller
 {
@@ -299,6 +302,7 @@ class ScheduleController extends Controller
     {
         $addresses = [];
         $service_id = $request->service_id;
+        $isEmpty = false;
         if ($service_id) {
             $ids = Service::query()
                 ->where('id', $service_id)
@@ -311,6 +315,7 @@ class ScheduleController extends Controller
                     ->get(['id', 'address'])
                     ->toArray();
             }
+            $isEmpty = ServiceTimetable::where('service_id', $service_id)->count() == 0;
         }
         else {
             $services = Service::all();
@@ -328,7 +333,8 @@ class ScheduleController extends Controller
                 }
             }
         }
-        return response()->json(["result" => "OK", "addresses" => $addresses]);
+
+        return response()->json(["result" => "OK", "addresses" => $addresses, 'is_empty' => $isEmpty]);
     }
 
     /**
@@ -395,7 +401,14 @@ class ScheduleController extends Controller
         $address_id = $request->address_id;
 
         $service = Service::findOrFail($service_id);
-        $monthData = DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
+        if ($master_id) {
+            $monthData = DatesHelper::masterDates($master_id, $service_id, $address_id, $month);
+        }
+        else {
+            $monthData = DatesHelper::serviceDates($service_id, $address_id, $month);
+
+
+        }
         return ['monthData' => $monthData, 'paymentTypes' => $service->paymentList];
     }
 
@@ -413,8 +426,45 @@ class ScheduleController extends Controller
 
     }
 
+    public function checkRecords(Request $request)
+    {
+        $year = $request->year;
+        $month = $request->month;
+        $timeTable = $request->timetable;
+        $service_id = $request->service_id;
+        $master_id = $request->master_id;
+
+        $dates = new Carbon();
+        $dates->setYear($year);
+        $dates->setMonth($month);
+
+        $firstDate = $dates->firstOfMonth();
+        if($firstDate->lessThan(Carbon::now())){
+            $firstDate = Carbon::now();
+        }
+        $lastDate = $dates->lastOfMonth();
+
+
+        $records = Record::where('service_id', $service_id)
+            ->where('user_id', $master_id)
+            ->whereDate('date', '>=', $firstDate)
+            ->whereDate('date', '<=', $lastDate)
+            ->get();
+        $times = $timeTable[$year][$month];
+        $errors = [];
+        foreach ($records as $record){
+            if(! in_array($record->time, $times[$record->date])) {
+                $errors[] = $record->time . ' ' . $record->time . ' - ' . $record->telegramUser->getFio();
+            }
+        }
+
+        if ($errors) {
+            return response()->json(["result" => "Error", "errors" => $errors]);
+        }
+        return response()->json(["result" => "OK"]);
+    }
+
 }
 
 
-//        return dd(Date::now()->format('l j F Y H:i:s'));
-//        return dd(Date::now()->format('F'));
+

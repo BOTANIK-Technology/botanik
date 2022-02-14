@@ -45,7 +45,7 @@ if (saveBtn) {
         Request.onload = function () {
             if (Request.status >= 200 && Request.status < 400) {
                 unsetCookies(id);
-                closeModal();
+               closeModal();
             } else {
                 showErrors(Request.response)
             }
@@ -168,52 +168,53 @@ const setInitialData = (idVal) => {
      */
     let groupBlock = document.getElementById('group-service');
     let groupBtns = document.getElementsByName('group');
-    if (groupVal(idVal) ) {
-        groupOff(groupBlock, idVal);
+    if (groupBlock) {
+        if (groupVal(idVal)) {
+            groupOff(groupBlock, idVal);
+        } else {
+            groupBlock.classList.remove('hide');
+        }
+        Object.keys(groupBtns).forEach((el) => {
+            groupBtns[el].addEventListener('change', function () {
+                if (!this.value) {
+                    groupOff(groupBlock, idVal);
+                } else {
+                    groupBlock.classList.remove('hide');
+                }
+            })
+        });
     }
-    else {
-        groupBlock.classList.remove('hidVale');
-    }
-    Object.keys(groupBtns).forEach((el) => {
-        groupBtns[el].addEventListener('change', function () {
-            if (!this.value) {
-                groupOff(groupBlock, idVal);
-            }
-            else {
-                groupBlock.classList.remove('hidVale');
-            }
-        })
-    });
 
     let prepayBlock = document.getElementById('prepay-service');
     let prepayBtn = document.querySelector('#prepay');
-    if (!prepayBtn.checked) {
-        prepayOff(prepayBlock, idVal);
-    }
-    else {
-        prepayBlock.classList.remove('hidVale');
-    }
-    prepayBtn.addEventListener('change', function () {
-        if (this.checked)
+    if (prepayBtn) {
+        if (!prepayBtn.checked) {
+            prepayOff(prepayBlock, idVal);
+        } else {
             prepayBlock.classList.remove('hidVale');
-        else
-            prepayOff(prepayBlock, idVal)
-    });
+        }
+        prepayBtn.addEventListener('change', function () {
+            if (this.checked)
+                prepayBlock.classList.remove('hidVale');
+            else
+                prepayOff(prepayBlock, idVal)
+        });
+    }
 }
 function groupOff(groupBlock, id) {
     groupBlock.classList.add('hide');
-    document.getElementById('quantity' + suffix(id)).value = '';
-    document.getElementById('message' + suffix(id)).value = '';
+    document.getElementById('quantity').value = '';
+    document.getElementById('message').value = '';
 }
 
 function prepayOff(prepayBlock, id) {
     prepayBlock.classList.add('hide');
-    document.getElementById('card' + suffix(id)).value = '';
-    document.getElementById('prepay-message' + suffix(id)).value = '';
+    document.getElementById('card').value = '';
+    document.getElementById('prepay-message').value = '';
 }
 
 function intervalVal(id) {
-    return getCheckedVal(document.getElementsByName('interval' + suffix(id)))
+    return getCheckedVal(document.getElementsByName('interval'))
 }
 function checkedByNameVal (name) {
     return getCheckedVal(document.getElementsByName(name));

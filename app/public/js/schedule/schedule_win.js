@@ -11,29 +11,30 @@ let ScheduleWindow = function () {
     this.service = null;
     this.address = null;
     this.master = null;
+    this.calendar = null;
 
     this.init = function () {
         this.mode = 'create';
         let _this = this;
 
-        this.token = document.querySelector('#token_id');
-        this.slug = document.querySelector('#url_slug');
-        this.client = document.querySelector('#client');
-        this.service = this.service || document.querySelector('#service');
-        this.address = this.address || document.querySelector('#address');
-        this.master = this.master || document.querySelector('#master');
+        this.token = document.getElementById('token_id');
+        this.slug = document.getElementById('url_slug');
+        this.client = document.getElementById('client');
+        this.service = this.service || document.getElementById('service');
+        this.address = this.address || document.getElementById('address');
+        this.master = this.master || document.getElementById('master');
+        this.calendar = this.calendar || document.getElementById('user_calendar');
 
         if (this.service.value) {
-            this.loadAddresses();
-            this.loadMasters();
-        }
-
-        this.service.addEventListener('click', function () {
             _this.loadAddresses();
             _this.loadMasters();
-        });
-        this.master.addEventListener('change', function () {
-            _this.loadMonthCreate(currentMonth);
+        }
+
+        this.service.addEventListener('change', function () {
+            _this.address.classList.add('hide');
+            _this.master.classList.add('hide');
+            _this.calendar.innerHTML = '';
+            _this.loadAddresses();
         });
     }
 
@@ -53,18 +54,30 @@ let ScheduleWindow = function () {
                         cnt += "<option value='" + response.addresses[addr][0].id + "'>" + response.addresses[addr][0].address + "</option>";
                     }
                     _this.address.innerHTML = cnt;
-                    let lblEl = document.querySelector('#address_label');
-                    lblEl.style.display = 'block';
+                    let lblEl = document.getElementById('address_label');
+                    lblEl.classList.remove('hide');
+                    if (response.is_empty) {
+                        _this.address.removeEventListener('change', _this.monthCreateListener);
+                        _this.address.addEventListener('change', _this.loadMasters);
+                    } else {
+                        _this.master.classList.add('hide');
+                        _this.address.addEventListener('change', _this.monthCreateListener);
+                        _this.master.removeEventListener('change', _this.loadMasters);
+                    }
+                    _this.address.classList.remove('hide');
                 }
             }
         });
     }
 
-    this.loadMasters = function () {
-        let _this = this;
-        let service_id = this.service.value;
+    this.monthCreateListener = function (event) {
+        scheduleWin.loadMonthCreate(currentMonth);
+    }
 
-        this.post({
+    this.loadMasters = function () {
+        let service_id = scheduleWin.service.value;
+
+        scheduleWin.post({
             url: '/api/services_masters',
             data: {
                 service_id: service_id
@@ -76,10 +89,10 @@ let ScheduleWindow = function () {
                         for (let mas in response.masters) {
                             cnt += "<option value='" + response.masters[mas][0].id + "'>" + response.masters[mas][0].name + "</option>";
                         }
-                        _this.master.innerHTML = cnt;
-                        let lblEl = document.querySelector('#master_label');
-                        lblEl.style.display = 'block';
+                        scheduleWin.master.innerHTML = cnt;
                     }
+                    scheduleWin.master.classList.remove('hide');
+                    scheduleWin.master.addEventListener('change', scheduleWin.monthCreateListener);
                 }
             }
         });
@@ -171,8 +184,7 @@ let ScheduleWindow = function () {
             let master_id = this.master.value;
             let address_id = this.address.value;
             this.loadDay(date.substr(5), service_id, master_id, address_id)
-        }
-        else {
+        } else {
             this.loadDay(date.substr(5), service_id, master_id, address_id)
         }
     }

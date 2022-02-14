@@ -389,4 +389,37 @@ class User extends Authenticatable
             ->first();
     }
 
+    /**
+     * @param User $user
+     * @param int $address_id
+     * @param int $service_id
+     * @param \Carbon\Carbon $date
+     * @param Carbon|null $comparison
+     * @return bool
+     */
+    public function isWorkDay(int $address_id, int $service_id, Carbon $date, Carbon $comparison = null): bool
+    {
+        if (!is_null($comparison) && $comparison->greaterThan($date))
+        {
+            return false;
+        }
+
+        if (empty($this->timetables))
+        {
+            return false;
+        }
+        $date = $date->format('Y-m-d');
+        foreach ($this->slots as $tab) {
+
+            if ($tab->address_id == $address_id && $tab->service_id == $service_id) {
+                foreach ($tab->timetables as $table){
+                    if (in_array($date, array_keys($table->schedule)  ) ){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 }

@@ -3,6 +3,8 @@
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
         let id = {{$service_id ?? 0}};
+        let service_id = id;
+        let master_id = null;
         let currentService = 0;
         let timetableDB;
         if(id) {
@@ -11,9 +13,10 @@
         else {
             timetableDB = @json([]);
         }
+        console.log(timetableDB);
     </script>
+    <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/service/common.js')}}"></script>
-    <script src="{{asset('js/service/timetable.js')}}"></script>
     <script src="{{asset('js/timetable.js')}}"></script>
 @endsection
 @section('modal')

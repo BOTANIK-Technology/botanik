@@ -24,18 +24,21 @@ if (year) {
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
     let timetables = getCookie('timetables');
 
-    if(timetables.length || Object.keys(timetables)) {
-        let timetable = timetables[currentService];
-        if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
-            let checkedArray = timetable[yearVal][monthVal];
-            for (let dateEl in checkedArray) {
-                for (let timeEl of checkedArray[dateEl]) {
-                    let cell = document.getElementById(dateEl + '-' + timeEl);
-                    if (cell) cell.classList.add('checked')
-                }
+    if (timetables.length || Object.keys(timetables)) {
+        timetables = timetableDB;
+        setCookie('timetables', timetables);
+    }
+    let timetable = timetables[currentService];
+    if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
+        let checkedArray = timetable[yearVal][monthVal];
+        for (let dateEl in checkedArray) {
+            for (let timeEl of checkedArray[dateEl]) {
+                let cell = document.getElementById(dateEl + '-' + timeEl);
+                if (cell) cell.classList.add('checked')
             }
         }
     }
+
 }
 if (month && year) {
     showFromStorage(year.value, month.value, id);
@@ -117,7 +120,7 @@ clr.addEventListener('click', function () {
 const saveMonthAction = (id) => {
     let allCookies = getCookie('timetables');
     currentService = parseInt(currentService);
-    serviceTimetable = allCookies[currentService];
+    let serviceTimetable = allCookies[currentService];
     let cookies = {};
 
     let times = document.getElementsByClassName('checked');
@@ -141,6 +144,22 @@ const saveMonthAction = (id) => {
     }
 
     serviceTimetable[indexYear][indexMonth] = cookies;
+
+    let Request = postRequest(CURRENT_URL + '/check-records', {
+        'service_id': service_id,
+        'master_id': master_id,
+        'year': indexYear,
+        'month': indexMonth,
+        'timetable': serviceTimetable
+    });
+
+    Request.onload = function () {
+        if (Request.status >= 200 && Request.status < 400) {
+            console.log(Request.response)
+        } else {
+            showErrors(Request.response);
+        }
+    };
 
     if (Object.keys(serviceTimetable).length) {
 

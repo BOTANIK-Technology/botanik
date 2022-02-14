@@ -196,6 +196,8 @@ Route::group(
                      * Services routes
                      */
                     Route::get('/services', [App\Http\Controllers\ServiceController::class, 'index'])->name('service');
+                    Route::post('/services/window/timetable/check-records', [App\Http\Controllers\ScheduleController::class, 'checkRecords']);
+
                     Route::get('/services/window/{modal}/{id?}', [App\Http\Controllers\ServiceController::class, 'window'])->name('window.service');
                     Route::post('/services/window/create/add-type', [App\Http\Controllers\ServiceController::class, 'addType']);
                     Route::post('/services/window/create/add-address', [App\Http\Controllers\ServiceController::class, 'addAddress']);
@@ -207,6 +209,7 @@ Route::group(
 
                     Route::post('/services/window/edit/{id}/remove-service', [App\Http\Controllers\ServiceController::class, 'removeService']);
                     Route::post('/services/window/edit/{id}/remove-address', [App\Http\Controllers\ServiceController::class, 'removeAddress']);
+
 
                     /**
                      * Types routes

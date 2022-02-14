@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Models\Service;
+use App\Models\ServiceTimetable;
 use App\Models\User;
 use App\Models\UsersSlots;
 use App\Models\UsersTimetables;
@@ -12,6 +14,11 @@ use Illuminate\Support\Facades\Log;
 
 class DatesHelper
 {
+    public static function getNameOfMonth (Carbon $date): array
+    {
+        return ['text' => Date::parse($date->toFormattedDateString())->format('F'), 'callback_data' => '-'];
+    }
+
     public static function masterDates($master_id, $service_id, $address_id, $monthButton)
     {
         switch ($monthButton) {
@@ -56,7 +63,7 @@ class DatesHelper
         $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00'));
 
         foreach ($month as $k => $day) {
-            $isWork = UserTimetable::isWorkDay($master, $address_id, $service_id, Carbon::parse($k), $first_day);
+            $isWork = $master->isWorkDay($address_id, $service_id, Carbon::parse($k), $first_day);
             if ($isWork) {
                 $master_days[] = ['text' => $day, 'callback_data' => 'Time_'.$k];
             } else {
@@ -79,18 +86,13 @@ class DatesHelper
         return $date;
     }
 
-    public static function masterTimes($master_id, $service_id, $address_id, $date)
+
+
+        public static function masterTimes($master_id, $service_id, $address_id, $date)
     {
         /** @var User $master */
         $master = User::find($master_id);
         $times = $master->getTimesForDate($date);
-
-
-    }
-
-    public static function getNameOfMonth (Carbon $date): array
-    {
-        return ['text' => Date::parse($date->toFormattedDateString())->format('F'), 'callback_data' => '-'];
     }
 
     /**
@@ -198,4 +200,74 @@ class DatesHelper
         Log::info('timeMap', $timeMap);
         return $free;
     }
+
+    public static function serviceDates($service_id, $address_id, $monthButton)
+    {
+
+        switch ($monthButton) {
+            case 'DateNext':
+                $first_day = new Carbon('first day of next month');
+                $dates[] = [
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DatesService_'.$address_id],
+                    self::getNameOfMonth($first_day),
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateLater_'.$address_id]
+                ];
+                $month = ServiceTimetable::getNextMonthBot();
+                break;
+            case 'DateLater':
+                $first_day = new Carbon('first day of 2 months');
+                $dates[] = [
+                    ['text' => hex2bin('e28faa'), 'callback_data' => 'DateNext_'.$address_id],
+                    self::getNameOfMonth($first_day),
+                    ['text' => ' ', 'callback_data' => '-']
+                ];
+                $month = ServiceTimetable::getMonthLaterBot();
+                break;
+            default:
+                $first_day = Carbon::now();
+                $dates[] = [
+                    ['text' => ' ', 'callback_data' => '-'],
+                    self::getNameOfMonth($first_day),
+                    ['text' => hex2bin('e28fa9'), 'callback_data' => 'DateNext_'.$address_id]
+                ];
+                $month = ServiceTimetable::getCurrentMonthBot();
+        }
+
+        $days = [];
+        $first_day = Carbon::parse($first_day->format('Y-m-d 00:00:00'));
+        foreach (ServiceTimetable::getDays() as $day) //name of the days of the week
+        {
+            $days[] = ['text' => $day, 'callback_data' => '-'];
+        }
+        $dates[] = $days;
+
+        /** @var Service $service */
+        $service = Service::find($service_id);
+
+        $i = 1;
+        $days = [];
+        foreach ($month as $k => $day) {
+
+            if ($service->isWorkDay(Carbon::parse($k), $first_day)) {
+                $days[] = ['text' => $day, 'callback_data' => 'Time_'.$k];
+            } else {
+                $days[] = ['text' => ' ', 'callback_data' => '-'];
+            }
+
+            if ($i % 7 == 0) {
+                $dates[] = $days;
+                $days = [];
+            }
+
+            $i++;
+        }
+        $i--;
+        while ($i % 7 != 0) {
+            $days[] = ['text' => ' ', 'callback_data' => '-'];
+            $i++;
+        }
+        $dates[] = $days;
+        return $dates;
+    }
+
 }

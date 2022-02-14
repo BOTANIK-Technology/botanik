@@ -53,7 +53,7 @@
                 <label class="row-12 col-1 align-self-start" for="prepay-1">{{__('Оплата *')}}</label>
 
                 <div class="row-1 col-2">
-                    <select id="service-type-{{$view_service->id}}">
+                    <select id="service-type">
                         @foreach($types_select as $type)
                             <option
                                 value="{{$type->id}}" {{$view_service->typeServices->id == $type->id ? 'selected' : ''}}>{{$type->type}}</option>
@@ -62,15 +62,15 @@
                 </div>
 
                 <div class="row-2 col-2">
-                    <input id="service-name-{{$view_service->id}}" class="inp" type="text"
+                    <input id="service-name" class="inp" type="text"
                            value="{{$view_service->name}}" placeholder="{{__('Введите название')}}">
                 </div>
 
 
                 <div class="row-3 col-2 align-self-start">
-                    <div id="addresses-{{$view_service->id}}" class="addresses">
+                    <div id="addresses" class="addresses">
                         @foreach($view_service->addresses as $address)
-                            <select id="address-{{$view_service->id}}" class="address"
+                            <select id="address" class="address"
                                     name="addresses[]">
                                 @foreach($addresses as $add)
                                     <option value="{{$add->id}}"
@@ -79,7 +79,7 @@
                             </select>
                         @endforeach
                     </div>
-                    <div id="more-address-{{$view_service->id}}" class="row-2 col-3 flex more-address">
+                    <div id="more-address" class="row-2 col-3 flex more-address">
                         <button id="include-address" data-id="{{$view_service->id}}"
                                 class="include-address color">
                             <div class="add-b-icon"></div>&nbsp;&nbsp;{{__('Добавить адрес к услуге')}}</button>
@@ -129,12 +129,12 @@
                 {{-- /Интервал --}}
 
                 <div class="row-8 col-2">
-                    <input id="price-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->price}}"
+                    <input id="price" class="inp" type="text" value="{{$view_service->price}}"
                            placeholder="{{__('Введите сумму')}}">
                 </div>
 
                 <div class="row-9 col-2">
-                    <input id="bonus-{{$view_service->id}}" class="inp" type="text" value="{{$view_service->bonus}}"
+                    <input id="bonus" class="inp" type="text" value="{{$view_service->bonus}}"
                            placeholder="{{__('Введите количество')}}">
                 </div>
 
@@ -156,27 +156,27 @@
 
 
                 <div class="row-11 col-2 grid intervals">
-                    <input id="group-1-{{$view_service->id}}" type="radio" name="group-{{$view_service->id}}"
+                    <input id="group-1" type="radio" name="group"
                            value="1" {{isset($view_service->group) ? 'checked' : ''}}>
-                    <label for="group-1-{{$view_service->id}}" class="user-select-none">{{__('Да')}}</label>
-                    <input id="group-0-{{$view_service->id}}" type="radio" name="group-{{$view_service->id}}"
+                    <label for="group-1" class="user-select-none">{{__('Да')}}</label>
+                    <input id="group-0" type="radio" name="group"
                            value="0" {{!isset($view_service->group) ? 'checked' : ''}}>
-                    <label for="group-0-{{$view_service->id}}" class="user-select-none">{{__('Нет')}}</label>
+                    <label for="group-0" class="user-select-none">{{__('Нет')}}</label>
                 </div>
 
                 <div class="row-12 col-2 grid intervals">
-                    <input id="prepay-{{$view_service->id}}" type="checkbox" name="pre-{{$view_service->id}}"
+                    <input id="prepay" type="checkbox" name="pre"
                            value="1" {{isset($view_service->prepayment) ? 'checked' : ''}}>
-                    <label for="prepay-{{$view_service->id}}" class="user-select-none">{{__('Предоплата')}}</label>
-                    <input id="cashpay-{{$view_service->id}}" type="checkbox" name="cash-{{$view_service->id}}"
+                    <label for="prepay" class="user-select-none">{{__('Предоплата')}}</label>
+                    <input id="cashpay" type="checkbox" name="cash"
                            value="1" {{$view_service->cash_pay ? 'checked' : ''}}>
-                    <label for="cashpay-{{$view_service->id}}" class="user-select-none">{{__('На месте')}}</label>
-                    <input id="onlinepay-{{$view_service->id}}" type="checkbox" name="online-{{$view_service->id}}"
+                    <label for="cashpay" class="user-select-none">{{__('На месте')}}</label>
+                    <input id="onlinepay" type="checkbox" name="online"
                            value="1" {{$view_service->online_pay ? 'checked' : ''}}>
-                    <label for="onlinepay-{{$view_service->id}}" class="user-select-none">{{__('Онлайн')}}</label>
-                    <input id="bonuspay-{{$view_service->id}}" type="checkbox" name="bonuspay-{{$view_service->id}}"
+                    <label for="onlinepay" class="user-select-none">{{__('Онлайн')}}</label>
+                    <input id="bonuspay" type="checkbox" name="bonuspay"
                            value="1" {{$view_service->bonus_pay ? 'checked' : ''}}>
-                    <label for="bonuspay-{{$view_service->id}}" class="user-select-none">{{__('Бонусами')}}</label>
+                    <label for="bonuspay" class="user-select-none">{{__('Бонусами')}}</label>
                 </div>
 
                 <div class="row-1 col-3 align-self-start text-align-center">
@@ -187,7 +187,7 @@
                 </div>
 
                 <div class="row-2 col-3 align-self-start text-align-center">
-                    <button type="button" id="delete-{{$view_service->id}}" data-service="{{$view_service->id}}"
+                    <button type="button" id="delete" data-service="{{$view_service->id}}"
                             class="btn-primary" name="delete-service">
                         {{ __('Удалить') }}
                     </button>
@@ -195,35 +195,35 @@
 
             </div>
 
-            <div id="group-service-{{$view_service->id}}" class="grid group add-service hide">
+            <div id="group-service" class="grid group add-service hide">
                 <label class="row-1 col-1 align-self-center"
-                       for="quantity-{{$view_service->id}}">{{__('Количество участников *')}}</label>
+                       for="quantity">{{__('Количество участников *')}}</label>
                 <label class="row-2 col-1 align-self-center"
-                       for="message-{{$view_service->id}}">{{__('Сообщение')}}</label>
+                       for="message">{{__('Сообщение')}}</label>
 
                 <div class="row-1 col-2">
-                    <input id="quantity-{{$view_service->id}}" class="inp align-self-center" type="text"
+                    <input id="quantity" class="inp align-self-center" type="text"
                            value="{{$view_service->group->quantity ?? ''}}" placeholder="{{__('Введите количество')}}">
                 </div>
                 <div class="row-2 col-2 align-self-center">
-                    <textarea id="message-{{$view_service->id}}" class="inp" type="text"
+                    <textarea id="message" class="inp" type="text"
                               placeholder="{{__('Введите сообщение')}}">{{$view_service->group->message ?? ''}}</textarea>
                 </div>
             </div>
 
-            <div id="prepay-service-{{$view_service->id}}" class="grid group add-service hide">
+            <div id="prepay-service" class="grid group add-service hide">
                 <label class="row-1 col-1 align-self-center"
-                       for="card-{{$view_service->id}}">{{__('Номер банковской карты *')}}</label>
+                       for="card">{{__('Номер банковской карты *')}}</label>
                 <label class="row-2 col-1 align-self-center"
-                       for="prepay-message-{{$view_service->id}}">{{__('Сообщение *')}}</label>
+                       for="prepay-message">{{__('Сообщение *')}}</label>
 
                 <div class="row-1 col-2">
-                    <input id="card-{{$view_service->id}}" class="inp align-self-center" type="text"
+                    <input id="card" class="inp align-self-center" type="text"
                            value="{{$view_service->prepayment->card_number ?? ''}}"
                            placeholder="{{__('Введите номер карты')}}">
                 </div>
                 <div class="row-2 col-2 align-self-center">
-                    <textarea id="prepay-message-{{$view_service->id}}" class="inp" type="text"
+                    <textarea id="prepay-message" class="inp" type="text"
                               placeholder="{{__('Введите сообщение')}}">{{$view_service->prepayment->message ?? ''}}</textarea>
                 </div>
             </div>

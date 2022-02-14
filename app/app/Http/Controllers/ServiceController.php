@@ -85,16 +85,10 @@ class ServiceController extends Controller
         $modal = $request->modal;
 
         $this->params['modal'] = $modal;
-        switch ($modal) {
-            case 'delete':
-            case 'view':
-            case 'edit':
-            case 'create':
-            case 'timetable':
-                break;
-            default:
+        if (! in_array($modal, ['delete', 'view', 'edit', 'create', 'timetable'])) {
                 abort(404);
         }
+
         $serviceView = Service::find($id);
         $serviceRequest = Service::find($request->service_id);
 
@@ -210,54 +204,54 @@ class ServiceController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function create(Request $request): JsonResponse
-    {
-        $validator = $this->validateService($request);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 405);
-        }
-
-        try {
-            $service = new Service();
-            $type = TypeService::find($request->input('type'));
-            $service->name = $request->input('name');
-
-
-            $service->price = $request->input('price');
-            $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
-            $service->cash_pay = $request->input('cashpay');
-            $service->online_pay = $request->input('onlinepay');
-            $service->bonus_pay = $request->input('bonuspay');
-
-            $service->interval_id = $this->getIntervalId($request, 'duration');
-            $service->range = $this->getIntervalRange($request, 'interval');
-
-            $type->services()->save($service);
-            $service->attachAddresses($request->input('addresses'));
-
-            if ($request->has('timetables')) {
-                $service->attachTimetable($request->input('timetables'));
-            }
-
-            if ($request->prepay) {
-                $service->updatePrepayment([
-                    'card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')
-                ]);
-            }
-
-            if (!empty($request->input('quantity')) && !empty($request->input('message'))) {
-                $service->group()->create([
-                    'quantity' => $request->input('quantity'), 'message' => $request->input('message')
-                ]);
-            }
-
-            return response()->json(['ok' => true]);
-        }
-        catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
-        }
-    }
+//    public function create(Request $request): JsonResponse
+//    {
+//        $validator = $this->validateService($request);
+//
+//        if ($validator->fails()) {
+//            return response()->json(['errors' => $validator->errors()], 405);
+//        }
+//
+//        try {
+//            $service = new Service();
+//            $type = TypeService::find($request->input('type'));
+//            $service->name = $request->input('name');
+//
+//
+//            $service->price = $request->input('price');
+//            $service->bonus = $request->has('bonus') ? $request->input('bonus') : 0;
+//            $service->cash_pay = $request->input('cashpay');
+//            $service->online_pay = $request->input('onlinepay');
+//            $service->bonus_pay = $request->input('bonuspay');
+//
+//            $service->interval_id = $this->getIntervalId($request, 'duration');
+//            $service->range = $this->getIntervalRange($request, 'interval');
+//
+//            $type->services()->save($service);
+//            $service->attachAddresses($request->input('addresses'));
+//
+//            if ($request->has('timetables')) {
+//                $service->attachTimetable($request->input('timetables'));
+//            }
+//
+//            if ($request->prepay) {
+//                $service->updatePrepayment([
+//                    'card_number' => $request->input('prepay_card'), 'message' => $request->input('prepay_message')
+//                ]);
+//            }
+//
+//            if (!empty($request->input('quantity')) && !empty($request->input('message'))) {
+//                $service->group()->create([
+//                    'quantity' => $request->input('quantity'), 'message' => $request->input('message')
+//                ]);
+//            }
+//
+//            return response()->json(['ok' => true]);
+//        }
+//        catch (Exception $e) {
+//            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+//        }
+//    }
 
     public function getIntervalId($request, $type)
     {

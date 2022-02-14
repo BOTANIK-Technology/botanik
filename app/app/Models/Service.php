@@ -159,7 +159,7 @@ class Service extends Model
         $date = $date->format('Y-m-d');
         $res = false;
         foreach ($this->timetables as $timetable){
-            if(in_array($date, $timetable->schedule)){
+            if(in_array($date, array_keys($timetable->schedule) ) ){
                 $res = true;
                 continue;
             }
@@ -211,25 +211,24 @@ class Service extends Model
         $this->attachAddresses($addresses);
     }
 
-    /**
-     * @param array $timeTable
-     */
+
     public function attachTimetable(array $timeTables = []) : void
     {
         foreach ($timeTables as $year => $monthTable){
-            foreach ($monthTable as $month => $schedule){
-                ServicesTimetables::create([
-                   'service_id' => $this->id,
-                   'year' => $year,
-                   'month' => $month,
-                   'schedule' => $schedule
-                ]);
+            foreach ($monthTable as $month => $schedule) {
+                if (!empty($schedule)) {
+                    ServicesTimetables::create([
+                        'service_id' => $this->id,
+                        'year'       => $year,
+                        'month'      => $month,
+                        'schedule'   => $schedule
+                    ]);
+                }
             }
         }
     }
 
     /**
-     * @param array $timetable
      * @throws Exception
      */
     public function updateTimetable(array $timetables = []) : void
@@ -284,7 +283,7 @@ class Service extends Model
             return false;
         $collection = collect();
         foreach ($services as $service) {
-            if(is_null($service->timetable)) {
+            if(empty($service->timetable)) {
                 $collection->add($service);
             }
         }
