@@ -74,7 +74,6 @@ class ScheduleController extends Controller
                     return $q->where('type_service_id', $request->current_type);
                 })
                 ->get();
-
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
             $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
@@ -151,7 +150,7 @@ class ScheduleController extends Controller
                         ->where('service_id', $request->id)
                         ->where('time', $request->time)
                         ->first();
-            $this->params['month'] = strtolower(Carbon::parse($this->params['record']->date)->format('F') );
+                $this->params['month'] = strtolower(Carbon::parse($this->params['record']->date)->format('F'));
                 break;
 
         }
@@ -419,12 +418,16 @@ class ScheduleController extends Controller
         $master_id = $request->master_id;
         $address_id = $request->address_id;
 
+        if ($master_id) {
+            $user = User::findOrFail($master_id);
+            return DatesHelper::getFreeMasterTimes($user, $address_id, $service_id, $date);
+        }
+        /** @var Service $service */
+        $service = Service::findOrFail($service_id);
 
-        $user = User::findOrFail($master_id);
-
-        return DatesHelper::getFreeMasterTimes($user,  $address_id,  $service_id,  $date);
-
+        return $service->getFreeTimes($date);
     }
+
 
     public function checkRecords(Request $request)
     {
@@ -439,7 +442,7 @@ class ScheduleController extends Controller
         $dates->setMonth($month);
 
         $firstDate = $dates->firstOfMonth();
-        if($firstDate->lessThan(Carbon::now())){
+        if ($firstDate->lessThan(Carbon::now())) {
             $firstDate = Carbon::now();
         }
         $lastDate = $dates->lastOfMonth();
@@ -452,8 +455,8 @@ class ScheduleController extends Controller
             ->get();
         $times = $timeTable[$year][$month];
         $errors = [];
-        foreach ($records as $record){
-            if(! in_array($record->time, $times[$record->date])) {
+        foreach ($records as $record) {
+            if (!in_array($record->time, $times[$record->date])) {
                 $errors[] = $record->time . ' ' . $record->time . ' - ' . $record->telegramUser->getFio();
             }
         }

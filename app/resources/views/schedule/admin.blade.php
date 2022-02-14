@@ -32,7 +32,7 @@
             @foreach($records as $item)
                 <tr>
                     <td class="schedule_table-time">{{$item->time}}</td>
-                    <td>{{$item->user->name}}</td>
+                    <td>{{$item->user ? $item->user->name : ''}}</td>
                     <td>{{$item->service->name}}</td>
                     <td>{{$item->service->group ? $item->service->group->quantity : ''}}</td>
                     <td>{{$item->telegramUser->getFio()}}</td>

@@ -1,9 +1,10 @@
 
-let create  = document.querySelector('#create');
+
 
 // client.addEventListener('change', checkClient);
 
 function send () {
+    let create  = document.getElementById('action');
     let data = {
         'client_id': client.value,
         'service_id': scheduleWin.service.value,

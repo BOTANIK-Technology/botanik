@@ -4,7 +4,7 @@
     <script>
         let service_id = {{$record->service_id}};
         let address_id = {{$record->address_id}};
-        let master_id = {{$record->user_id}};
+        let master_id = {{$record->user_id ?? 0}};
         let month = '{{$month}}';
         let date = '{{$record->date}}';
         let time = '{{$record->time}}';

@@ -88,13 +88,6 @@ class DatesHelper
 
 
 
-        public static function masterTimes($master_id, $service_id, $address_id, $date)
-    {
-        /** @var User $master */
-        $master = User::find($master_id);
-        $times = $master->getTimesForDate($date);
-    }
-
     /**
      * @param User $user
      * @param int $address_id
