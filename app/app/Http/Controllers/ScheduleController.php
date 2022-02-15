@@ -440,7 +440,7 @@ class ScheduleController extends Controller
 
         $dates = new Carbon();
         $dates->setYear($year);
-        $dates->setMonth($month);
+        $dates->setMonth(Carbon::createFromFormat('F', strtoupper($month) )->month );
 
         $firstDate = $dates->firstOfMonth();
         if ($firstDate->lessThan(Carbon::now())) {
@@ -454,10 +454,11 @@ class ScheduleController extends Controller
             ->whereDate('date', '>=', $firstDate)
             ->whereDate('date', '<=', $lastDate)
             ->get();
+
         $times = $timeTable[$year][$month];
         $errors = [];
         foreach ($records as $record) {
-            if (!in_array($record->time, $times[$record->date])) {
+            if (!$times || !$times[$record->date] || !in_array($record->time, $times[$record->date])) {
                 $errors[] = $record->time . ' ' . $record->time . ' - ' . $record->telegramUser->getFio();
             }
         }

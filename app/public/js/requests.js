@@ -42,7 +42,7 @@ function redirect(url) {
     document.location.href = url;
 }
 
-function showErrors(response) {
+function showErrors(response, message = '') {
     try {
         response = JSON.parse(response);
     } catch (e) {
@@ -70,6 +70,7 @@ function showErrors(response) {
             '<button type="button" class="close" onclick="closeError()">×</button>' +
             '</div>' +
             '<div class="modal-body">' +
+            '<p class="modal-message">' + message + '</p>' +
             '<ul class="error-list">' +
             errors +
             '</ul>' +

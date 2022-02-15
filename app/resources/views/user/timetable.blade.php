@@ -2,13 +2,13 @@
     <script src="{{asset('js/user/page.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
-        let id = {{$id}};
-        let currentService = {{$currentService}}
-        if (!getCookie('timetables').length) {
-            setCookie('timetables', @json($timetables));
-        }
-
+        let id = {{$id ?? 0}};
+        let currentService = {{$currentService}};
+        let service_id = 0;
+        let master_id = id;
+        let timetableDB = @json($timetables ?? []);
     </script>
+    <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/timetable.js')}}"></script>
     <script src="{{asset('js/user/timetable.js')}}"></script>
 @endsection

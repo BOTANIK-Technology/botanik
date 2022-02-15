@@ -198,6 +198,7 @@ Route::group(
                     Route::get('/services', [App\Http\Controllers\ServiceController::class, 'index'])->name('service');
                     Route::post('/services/window/timetable/check-records', [App\Http\Controllers\ScheduleController::class, 'checkRecords']);
 
+
                     Route::get('/services/window/{modal}/{id?}', [App\Http\Controllers\ServiceController::class, 'window'])->name('window.service');
                     Route::post('/services/window/create/add-type', [App\Http\Controllers\ServiceController::class, 'addType']);
                     Route::post('/services/window/create/add-address', [App\Http\Controllers\ServiceController::class, 'addAddress']);
@@ -230,6 +231,7 @@ Route::group(
                      * Users routes
                      */
                     Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('user');
+                    Route::post('/users/window/timetable/{id}/check-records', [App\Http\Controllers\ScheduleController::class, 'checkRecords']);
 
                     Route::get('/users/window/{modal}/{id?}', [App\Http\Controllers\UserController::class, 'window'])->name('window.user');
                     Route::get('/users/window/{modal}/{id?}/{moreService?}', [App\Http\Controllers\UserController::class, 'addService'])->name('addService');

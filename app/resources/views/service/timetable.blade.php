@@ -6,14 +6,7 @@
         let service_id = id;
         let master_id = null;
         let currentService = 0;
-        let timetableDB;
-        if(id) {
-            timetableDB = @json($timetables ? $timetables : []);
-        }
-        else {
-            timetableDB = @json([]);
-        }
-        console.log(timetableDB);
+        let timetableDB = @json($timetables ?? []);
     </script>
     <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/service/common.js')}}"></script>

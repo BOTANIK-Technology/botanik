@@ -515,7 +515,7 @@ class TelegramAPI
                 ],
             )->delay(now()->addMinutes(0));
 
-            $time = Carbon::createFromFormat('Y-m-d H:i:s', $record->date . " " . $record->time . ':00', 'Europe/Kiev');
+            $time = Carbon::createFromFormat('Y-m-d H:i', $record->date . " " . $record->time , 'Europe/Kiev');
 
             $remind1Time = new Carbon($time);
             $remind2Time = new Carbon($time);
@@ -525,11 +525,12 @@ class TelegramAPI
             $remind2Time = self::checkNight($remind2Time->subDay() );
             $feedbackTime = self::checkNight($feedbackTime->addDay() );
 
-Log::info('Константы', [config('params.memoBefore'), config('params.nightBeginHour'), config('params.nightEndHour') ]);
-Log::info('Уведомления',['Запись' => $time,
-                         '1-e уведомление' => $remind1Time,
-                         '2-e уведомление' => $remind2Time,
-                         'фидбек' => $feedbackTime]);
+
+//Log::info('Константы', [config('params.memoBefore'), config('params.nightBeginHour'), config('params.nightEndHour') ]);
+//Log::info('Уведомления',['Запись' => $time,
+//                         '1-e уведомление' => $remind1Time,
+//                         '2-e уведомление' => $remind2Time,
+//                         'фидбек' => $feedbackTime]);
 
             /*
              * Client notice

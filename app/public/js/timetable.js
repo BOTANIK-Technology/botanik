@@ -144,6 +144,10 @@ const saveMonthAction = (id) => {
     }
 
     serviceTimetable[indexYear][indexMonth] = cookies;
+    let userData = getCookie('userData');
+    if (userData && userData[currentService]) {
+        service_id = userData[currentService].service_id;
+    }
 
     let Request = postRequest(CURRENT_URL + '/check-records', {
         'service_id': service_id,
@@ -154,17 +158,15 @@ const saveMonthAction = (id) => {
     });
 
     Request.onload = function () {
-        if (Request.status >= 200 && Request.status < 400) {
-            console.log(Request.response)
+            let res = JSON.parse(Request.response);
+        if (res && res.result === 'OK') {
+            allCookies[currentService] = serviceTimetable;
+            setCookie('timetables', allCookies);
+            changeSavedButton(true);
         } else {
-            showErrors(Request.response);
+            showErrors(Request.response, 'Невозможно сохранить расписание. <br>Имеются записи клиентов на следующие даты:');
         }
-    };
-
-    if (Object.keys(serviceTimetable).length) {
-
-        allCookies[currentService] = serviceTimetable;
-        setCookie('timetables', allCookies);
     }
-    changeSavedButton(true);
+
+
 }

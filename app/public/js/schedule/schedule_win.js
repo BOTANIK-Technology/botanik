@@ -31,7 +31,9 @@ let ScheduleWindow = function () {
         this.service.addEventListener('change', function () {
             _this.address.classList.add('hide');
             _this.master.classList.add('hide');
-            _this.calendar.innerHTML = '';
+           if(_this.calendar) {
+               _this.calendar.innerHTML = '';
+           }
             _this.loadAddresses();
         });
     }
