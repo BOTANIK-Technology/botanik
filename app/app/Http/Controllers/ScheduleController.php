@@ -69,17 +69,21 @@ class ScheduleController extends Controller
         }
 
         if ($user->hasRole('admin', 'owner')) {
-            $records = Record::whereDate('date', Carbon::parse($this->params['date']))
-                ->whereHas('service', function ($q) use ($request) {
-                    return $q->where('type_service_id', $request->current_type);
-                })
-                ->get();
+            $recordsQueue = Record::whereDate('date', Carbon::parse($this->params['date']));
+            if($request->current_type) {
+                $recordsQueue->whereHas('service', function ($q) use ($request) {
+                        return $q->where('type_service_id', $request->current_type);
+                    });
+            }
+            $records = $recordsQueue->get();
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
-            $this->params['current_type'] = $request->has('current_type') ? TypeService::findOrFail($request->current_type) : $this->params['types']->first();
 
-            $this->params['services'] = !is_null($this->params['current_type']) ? $this->params['current_type']->services : [];
-            $this->params['current_type'] = $this->params['current_type']->id ?? 0;
+            $type = TypeService::find($request->current_type);
+
+            $this->params['current_type'] = $request->input('current_type', 0);
+
+            $this->params['services'] = $type->services ?? [];
         }
         else {
 

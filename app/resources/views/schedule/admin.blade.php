@@ -12,8 +12,10 @@
 
     <div class="schedule_table-box">
         <div class="schedule_table-nav types flex justify-content-around align-self-center">
+            <a class="hashtag text-decoration-none {{$current_type == 0 ? 'active' : ''}}"
+               href="{{route('schedule', ['business' => $slug, 'current_type' => 0, 'date' => $date, 'current_month' => $current_month])}}">{{__('Все')}}</a>
             @foreach($types as $type_link)
-                <a class="hashtag text-decoration-none{{$current_type === $type_link->id ? ' active' : ''}}"
+                <a class="hashtag text-decoration-none {{$current_type == $type_link->id ? 'active' : ''}}"
                    href="{{route('schedule', ['business' => $slug, 'current_type' => $type_link->id, 'date' => $date, 'current_month' => $current_month])}}">{{$type_link->type}}</a>
             @endforeach
         </div>
