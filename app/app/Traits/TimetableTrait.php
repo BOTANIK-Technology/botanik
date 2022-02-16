@@ -412,8 +412,14 @@ trait TimetableTrait
         $date->setYear($year ?? strtolower(date('Y') ));
         $date->setMonth(Carbon::createFromFormat('F', $month ?? date('F'))->month );
 
+        $now = Carbon::now();
 
-        $start = Carbon::parse($date)->firstOfMonth();
+        if ($date->month == $now->month){
+            $start = Carbon::parse($now);
+        }
+        else {
+            $start = Carbon::parse($date)->firstOfMonth();
+        }
         $end = Carbon::parse($date)->endOfMonth();
 
         return self::generateFullDateRange($start, $end);
