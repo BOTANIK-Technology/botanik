@@ -1,1 +1,0 @@
-inputActive(document.getElementsByClassName('inp'));
