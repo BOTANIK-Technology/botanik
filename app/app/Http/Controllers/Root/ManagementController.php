@@ -35,7 +35,7 @@ class ManagementController extends Controller
      *
      * @param Request $request
      */
-    private function setParams(Request $request)
+    public function setParams(Request $request)
     {
         $this->params['countItems'] = Business::count();
         $this->params['load'] = $request->load ?? 5;
