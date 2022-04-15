@@ -232,8 +232,48 @@ class ScheduleController extends Controller
     public function deleteSchedule(Request $request): JsonResponse
     {
         try {
+            $record = Record::find($request->id);
             Record::find($request->id)->delete();
-            return response()->json(['ok' => true]);
+        }
+        catch (Exception $e) {
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+        }
+
+        $client = TelegramUser::find($record->telegram_user_id);
+        $service_name = TypeService::find($record->service->name);
+
+        if (!ConnectService::prepareJob()) {
+            return response()->json(['errors' => ['server' => __('Запись изменена. Уведомления не будут отправлены.')]], 500);
+        }
+        try {
+
+                TelegramNotice::dispatch(
+                    $request->business_db,
+                    $client->chat_id,
+                    $record->id,
+                    __('Внимание! Запись на услугу') . ' "' . $service_name . ' ' . $request->date . ' в ' . $request->time . 'удалена',
+                    $request->date,
+                    $request->time,
+                    $request->token
+                )->delay(now() );
+
+                $notice_mess = __('Удалена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $request->date . ' в ' . $request->time;
+                SendNotice::dispatch(
+                    $request->business_db,
+                    [
+                        [
+                            'address_id' => $record->address_id,
+                            'message'    => $notice_mess
+                        ],
+                        [
+                            'user_id' => $record->user_id,
+                            'message' => $notice_mess
+                        ]
+                    ],
+                )->delay(now());
+
+                return response()->json(['ok' => 'Запись удалена']);
+
         }
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);

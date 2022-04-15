@@ -37,8 +37,6 @@ class CreateDatabase extends Command
                 ? $this->argument('connection')
                 : DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-            Log::debug('connection', [$connection, DB::connection($connection)]);
-
             $hasDb = DB::connection($connection)->select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = " . "'" . $dbname . "'");
 
             if (empty($hasDb)) {

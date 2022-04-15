@@ -190,7 +190,6 @@ class DatesHelper
                 $free[] = $times[$key];
             }
         }
-        Log::info('timeMap', $timeMap);
         return $free;
     }
 

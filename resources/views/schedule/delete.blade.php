@@ -4,12 +4,14 @@
 @endsection
 
 <div class="margin">
-    @foreach($window_records as $record)
+{{--    @foreach($window_records as $record)--}}
         <div class="m20px-0">
             <div class="delete text-align-center">
                 {{__('Вы действительно')}}<br>
-                {{__('хотите удалить клиента')}}<br>
+                {{__('хотите удалить запись клиента')}}<br>
                 <b>{{$record->telegramUser->getFio()}}</b><br>
+                {{__('на время')}}<br>
+                <b>{{$record->time}}</b><br>
                 {{__('из таблицы записей')}}?
             </div>
 
@@ -23,7 +25,7 @@
                 {{ __('Удалить') }}
             </button>
         </div>
-    @endforeach
+{{--    @endforeach--}}
 </div>
 
 <a href="{{route('schedule', ['business' => $slug, 'date' => $date, 'current_month' => $current_month, 'current_type' => $current_type, 'date' => $date])}}" id="refresh-modal"></a>

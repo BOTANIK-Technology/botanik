@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Facades\ConnectService;
+use Illuminate\Support\Facades\Log;
 
 class TelegramCheckReq
 {

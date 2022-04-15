@@ -18,10 +18,11 @@ class CashPay extends CallbackQuery
     public function __construct(Request $request)
     {
         parent::__construct($request);
+
         $record = $this->createRecord();
         if ($record) {
             parent::deleteMessage();
-            parent::getMenu(__('Спасибо! Активные записи доступны в <b>личном кабинете</b>.'));
+            return parent::getMenu(__('Спасибо! Активные записи доступны в <b>личном кабинете</b>.'));
         }
 
     }

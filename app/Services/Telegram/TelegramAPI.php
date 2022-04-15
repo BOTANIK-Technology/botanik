@@ -340,7 +340,7 @@ class TelegramAPI
      * @return Record|Model|bool
      * @throws YclientsException
      */
-    protected function createRecord($status = true, $online_pay = false, $bonus = 0)
+    protected function createRecord(bool $status = true, bool $online_pay = true, int $bonus = 0)
     {
         $service_id = $this->getServiceID();
         $master_id = $this->getMasterID();
@@ -373,7 +373,7 @@ class TelegramAPI
         ]);
 
         // Will upload this record to YClients CRM
-
+/*
         if (Yclients::isActive()) {
             $yclients = new Yclients();
             if ($status === false) {
@@ -396,7 +396,7 @@ class TelegramAPI
                 $beauty->api->addRecords([$record]);
             }
         }
-
+*/
         Payment::create([
             'online_pay' => $online_pay,
             'money'      => $price,
