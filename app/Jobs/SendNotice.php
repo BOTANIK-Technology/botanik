@@ -60,8 +60,9 @@ class SendNotice implements ShouldQueue
      */
     public function handle()
     {
-        if (!ConnectService::dbConnect($this->db))
+        if (!ConnectService::dbConnect($this->db)) {
             return;
+        }
         foreach ($this->notices as $notice) {
 
             if (isset($notice['role_slug'])) {
@@ -69,7 +70,7 @@ class SendNotice implements ShouldQueue
                 unset($notice['role_slug']);
             }
             /** @var Notice $res */
-            $res = Notice::create($notice);
+            Notice::create($notice);
         }
     }
 

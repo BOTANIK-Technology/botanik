@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Swift_Mailer;
@@ -76,7 +77,7 @@ class Business extends Model
     /**
      * @return BelongsTo
      */
-    public function package (): BelongsTo
+    public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);
     }
@@ -84,7 +85,7 @@ class Business extends Model
     /**
      * @return HasOne
      */
-    public function owner (): HasOne
+    public function owner(): HasOne
     {
         return $this->hasOne(Owner::class, 'id', 'owner_id');
     }
@@ -95,11 +96,10 @@ class Business extends Model
      * @param $id
      * @return array|Business
      */
-    public static function changeStatus ($id)
+    public static function changeStatus($id)
     {
-        if (!$obj = self::find($id))
-        {
-            return ['error' => 'Business with id="'.$id.'" not find in the table'];
+        if (!$obj = self::find($id)) {
+            return ['error' => 'Business with id="' . $id . '" not find in the table'];
         }
 
         $obj->status ? $obj->status = false : $obj->status = true;
@@ -116,10 +116,11 @@ class Business extends Model
     /**
      * @return array|bool
      */
-    public function getChart ()
+    public function getChart()
     {
-        if (!ConnectService::dbConnect($this->db_name))
+        if (!ConnectService::dbConnect($this->db_name)) {
             return false;
+        }
 
         $array = [
             'records'   => Record::count() ?? 0,
@@ -154,18 +155,18 @@ class Business extends Model
      */
     public function delete(): bool
     {
-        if ( ConnectService::isExist($this->db_name) ) {
+        if (ConnectService::isExist($this->db_name)) {
             try {
                 DB::statement("DROP DATABASE `{$this->db_name}`");
             }
             catch (Exception $e) {
-                Log::error($e->getMessage().' ** A level - delete database '.$this->db_name);
+                Log::error($e->getMessage() . ' ** A level - delete database ' . $this->db_name);
                 return false;
             }
         }
 
         $fs = Storage::disk('public');
-        $fs->delete('/'.$this->img);
+        $fs->delete('/' . $this->img);
 
         $this->owner()->delete();
 
@@ -177,7 +178,7 @@ class Business extends Model
             throw new Exception('No primary key defined on model.');
         }
 
-        if (! $this->exists) {
+        if (!$this->exists) {
             return false;
         }
 
@@ -195,10 +196,10 @@ class Business extends Model
     /**
      * @param string $path
      */
-    public function changeLogo (string $path)
+    public function changeLogo(string $path)
     {
         $fs = Storage::disk('public');
-        $fs->delete('/'.$this->img);
+        $fs->delete('/' . $this->img);
         $this->img = $path;
         $this->save();
     }
@@ -209,7 +210,7 @@ class Business extends Model
      * @return bool
      * @throws GuzzleException
      */
-    public function deploy (): bool
+    public function deploy(): bool
     {
         // Create a new database
         try {
@@ -217,7 +218,7 @@ class Business extends Model
             Log::debug('DB make', [$res]);
         }
         catch (Exception $e) {
-            Log::error($e->getMessage().' *** Cannot create "'.$this->db_name.'" database');
+            Log::error($e->getMessage() . ' *** Cannot create "' . $this->db_name . '" database');
             return false;
         }
 
@@ -229,8 +230,8 @@ class Business extends Model
         $business_name = $this->name;
 
         // Connect to created database
-        if ( ! ConnectService::dbConnect($db_name) )
-        {
+        if (!ConnectService::dbConnect($db_name)) {
+            Log::error(' *** Cannot connect to "' . $this->db_name . '" database');
             return false;
         }
 
@@ -239,15 +240,16 @@ class Business extends Model
             Artisan::call('migrate', ['--force' => true]);
         }
         catch (Exception $e) {
-            Log::error($e->getMessage().' *** Cannot migrate "'.$db_name.'" database');
+            Log::error($e->getMessage() . ' *** Cannot migrate "' . $db_name . '" database');
             return false;
         }
 
         // Do seed
         try {
             Artisan::call('db:seed');
-        } catch (Exception $e) {
-            Log::error($e->getMessage().' *** Cannot seed "'.$db_name.'" database');
+        }
+        catch (Exception $e) {
+            Log::error($e->getMessage() . ' *** Cannot seed "' . $db_name . '" database');
             return false;
         }
 
@@ -260,32 +262,36 @@ class Business extends Model
         ]);
 
         if (!$owner) {
-            Log::error(' *** Cannot create user in "'.$db_name.'" database');
+            Log::error(' *** Cannot create user in "' . $db_name . '" database');
             return false;
         }
 
         $owner->roles()->attach($role);
 
         try {
-            /*Mail::send('emails.user-create', ['login' => $email, 'password' => $password, 'slug' => $slug], function ($message) use ($name, $email, $business_name) {
-                $message->to($email, $name)->subject(__('Доступ к BOTANIK - '.$business_name));
-            });*/
-
+           /*
+            Mail::send('emails.user-create', ['login' => $email, 'password' => $password, 'slug' => $slug], function ($message) use ($name, $email, $business_name) {
+                $message->to($email, $name)->subject(__('Доступ к BOTANIK - ' . $business_name));
+            });
+*/
             $url = URL::to('/').'/'.$slug.'/login';
             $body = "Логин: <b>{$email}</b><br>Пароль: <b>{$password}</b><br>Ссылка на вход: {$url}";
             $transport = new Swift_SmtpTransport('localhost', 25);
             $mailer = new Swift_Mailer($transport);
             $message = (new Swift_Message('Доступ к BOTANIK' . $business_name))
-                ->setFrom([env('MAIL_FROM_ADDRESS') => 'Some One'])
-                ->setTo($email)
+                ->setFrom([env('MAIL_FROM_ADDRESS') => 'Office.botanik'])
+                ->setTo([$email => $name])
                 ->setBody($body, 'text/html');
 
-            $mailer->send($message);
-        } catch (Exception $e) {
-            Log::warning($e->getMessage().' *** Cannot send auth data to owner. "'.$db_name.'" database');
+            $res = $mailer->send($message);
+
+        }
+        catch (Exception $e) {
+            Log::warning($e->getMessage() . ' *** Cannot send auth data to owner. "' . $db_name . '" database');
         }
 
         ConnectService::setDefaultConnect();
+        return true;
         return $this->setWebhook();
     }
 
@@ -293,20 +299,20 @@ class Business extends Model
      * @return bool
      * @throws GuzzleException
      */
-    public function setWebhook (): bool
+    public function setWebhook(): bool
     {
         $base_url = URL::to('/');
         try {
             $client = new Client();
             $response = $client->request(
                 'POST',
-                $base_url.'/api/telegram/'.$this->slug.'/admin',
+                $base_url . '/api/telegram/' . $this->slug . '/admin',
                 [
                     'json' => [
                         'gess_key' => getenv('APP_KEY'),
-                        'call' => 'setWebhook',
-                        'params' => [
-                            'url' => $base_url.'/api/telegram/'.$this->slug
+                        'call'     => 'setWebhook',
+                        'params'   => [
+                            'url' => $base_url . '/api/telegram/' . $this->slug
                         ]
                     ]
                 ]
@@ -314,7 +320,8 @@ class Business extends Model
 
             return $response->getBody()->getContents();
 
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
 
             return $e->getMessage();
 
@@ -325,25 +332,26 @@ class Business extends Model
      * @return string
      * @throws GuzzleException
      */
-    public function deleteWebhook (): string
+    public function deleteWebhook(): string
     {
         $base_url = URL::to('/');
         try {
             $client = new Client();
             $response = $client->request(
                 'POST',
-                $base_url.'/api/telegram/'.$this->slug.'/admin',
+                $base_url . '/api/telegram/' . $this->slug . '/admin',
                 [
                     'json' => [
                         'gess_key' => getenv('APP_KEY'),
-                        'call' => 'deleteWebhook'
+                        'call'     => 'deleteWebhook'
                     ]
                 ]
             );
 
             return $response->getBody()->getContents();
 
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
 
             return $e->getMessage();
 
@@ -354,20 +362,20 @@ class Business extends Model
      * @return bool|string
      * @throws GuzzleException
      */
-    public function getWebhookInfo ()
+    public function getWebhookInfo()
     {
         $base_url = URL::to('/');
         try {
             $client = new Client();
             $response = $client->request(
                 'POST',
-                $base_url.'/api/telegram/'.$this->slug.'/admin',
+                $base_url . '/api/telegram/' . $this->slug . '/admin',
                 [
                     'json' => [
                         'gess_key' => getenv('APP_KEY'),
-                        'call' => 'getWebhookInfo',
-                        'params' => [
-                            'url' => $base_url.'/api/telegram/'.$this->slug
+                        'call'     => 'getWebhookInfo',
+                        'params'   => [
+                            'url' => $base_url . '/api/telegram/' . $this->slug
                         ]
                     ]
                 ]
@@ -375,7 +383,8 @@ class Business extends Model
 
             return $response->getBody()->getContents();
 
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
 
             return $e->getMessage();
 

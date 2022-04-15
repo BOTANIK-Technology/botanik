@@ -24,6 +24,7 @@ use App\Models\TypeService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use function PHPUnit\Framework\isNan;
@@ -70,10 +71,10 @@ class ScheduleController extends Controller
 
         if ($user->hasRole('admin', 'owner')) {
             $recordsQueue = Record::whereDate('date', Carbon::parse($this->params['date']));
-            if($request->current_type) {
+            if ($request->current_type) {
                 $recordsQueue->whereHas('service', function ($q) use ($request) {
-                        return $q->where('type_service_id', $request->current_type);
-                    });
+                    return $q->where('type_service_id', $request->current_type);
+                });
             }
             $records = $recordsQueue->get();
             $this->params['times'] = UserTimetable::getHours();
@@ -205,7 +206,7 @@ class ScheduleController extends Controller
                 'date'             => Carbon::parse($request->date)->format('Y-m-d')
             ]);
 
-            $service = Service::find($request->service_id);
+            $service = $record->service;
 
             $pay = new Payment();
             $pay->status = 1;
@@ -214,14 +215,26 @@ class ScheduleController extends Controller
             $pay->money = $service->price;
             $record->payment()->save($pay);
 
+            $client = $record->telegramUser;
+
+            TelegramNotice::dispatchSync(
+                $request->business_db,
+                $client->chat_id,
+                $record->id,
+                __('Внимание! Вас записали на услугу') . ' "' . $record->service->name . '" ' . $record->date . ' в ' . $record->time,
+                $request->date,
+                $request->time,
+                $request->token
+            );
+
+            return TelegramAPI::createRecordNotice($service->name, $record, $client, $request);
+
+
         }
         catch (Exception $e) {
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
 
-        $client = TelegramUser::find($request->client_id);
-
-        return TelegramAPI::createRecordNotice($service->name, $record, $client, $request);
 
     }
 
@@ -231,51 +244,48 @@ class ScheduleController extends Controller
      */
     public function deleteSchedule(Request $request): JsonResponse
     {
-        try {
-            $record = Record::find($request->id);
-            Record::find($request->id)->delete();
-        }
-        catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
-        }
 
-        $client = TelegramUser::find($record->telegram_user_id);
-        $service_name = TypeService::find($record->service->name);
+        $record = Record::findOrFail($request->id);
 
-        if (!ConnectService::prepareJob()) {
-            return response()->json(['errors' => ['server' => __('Запись изменена. Уведомления не будут отправлены.')]], 500);
-        }
+
+        $client = $record->telegramUser;
+        $service_name = $record->service->name;
+
+
         try {
 
-                TelegramNotice::dispatch(
-                    $request->business_db,
-                    $client->chat_id,
-                    $record->id,
-                    __('Внимание! Запись на услугу') . ' "' . $service_name . ' ' . $request->date . ' в ' . $request->time . 'удалена',
-                    $request->date,
-                    $request->time,
-                    $request->token
-                )->delay(now() );
+            $notice_mess = __('Удалена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $record->date . ' в ' . $record->time;
 
-                $notice_mess = __('Удалена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $request->date . ' в ' . $request->time;
-                SendNotice::dispatch(
-                    $request->business_db,
+            TelegramNotice::dispatchSync(
+                $request->business_db,
+                $client->chat_id,
+                $record->id,
+                __('Внимание! Запись на услугу') . ' "' . $service_name . ' ' . $record->date . ' в ' . $record->time . ' удалена',
+                $request->date,
+                $request->time,
+                $request->token
+            );
+
+
+            SendNotice::dispatchSync(
+                $request->business_db,
+                [
                     [
-                        [
-                            'address_id' => $record->address_id,
-                            'message'    => $notice_mess
-                        ],
-                        [
-                            'user_id' => $record->user_id,
-                            'message' => $notice_mess
-                        ]
+                        'address_id' => $record->address_id,
+                        'message'    => $notice_mess
                     ],
-                )->delay(now());
-
-                return response()->json(['ok' => 'Запись удалена']);
+                    [
+                        'user_id' => $record->user_id,
+                        'message' => $notice_mess
+                    ]
+                ],
+            );
+            $record->delete();
+            return response()->json(['ok' => 'Запись удалена']);
 
         }
         catch (Exception $e) {
+            Log::error('**** delete record error: ' . $e->getMessage());
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
@@ -297,15 +307,15 @@ class ScheduleController extends Controller
             return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
 
-        $client = TelegramUser::find($record->telegram_user_id);
-        $service_name = TypeService::find($record->service->name);
+        $client = $record->telegramUser;
+        $service_name = $record->service->name;
 
         if (!ConnectService::prepareJob()) {
             return response()->json(['errors' => ['server' => __('Запись изменена. Уведомления не будут отправлены.')]], 500);
         }
 
         try {
-            TelegramNotice::dispatch(
+            TelegramNotice::dispatchSync(
                 $request->business_db,
                 $client->chat_id,
                 $record->id,
@@ -313,10 +323,10 @@ class ScheduleController extends Controller
                 $request->date,
                 $request->time,
                 $request->token
-            )->delay(now()->addMinutes(2));
+            );
 
             $notice_mess = __('Перенесена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $request->date . ' в ' . $request->time;
-            SendNotice::dispatch(
+            SendNotice::dispatchSync(
                 $request->business_db,
                 [
                     [
@@ -328,7 +338,7 @@ class ScheduleController extends Controller
                         'message' => $notice_mess
                     ]
                 ],
-            )->delay(now()->addMinutes(2));
+            );
 
             return response()->json(['ok' => 'Запись изменена']);
         }
@@ -484,7 +494,7 @@ class ScheduleController extends Controller
 
         $dates = new Carbon();
         $dates->setYear($year);
-        $dates->setMonth(Carbon::createFromFormat('F', strtoupper($month) )->month );
+        $dates->setMonth(Carbon::createFromFormat('F', strtoupper($month))->month);
 
         $firstDate = $dates->firstOfMonth();
         if ($firstDate->lessThan(Carbon::now())) {

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Config;
 
 
 class TelegramNotice implements ShouldQueue
@@ -54,21 +55,25 @@ class TelegramNotice implements ShouldQueue
      */
     public function handle()
     {
-        if (!ConnectService::dbConnect($this->db))
+
+        if (!ConnectService::dbConnect($this->db)) {
             return;
+        }
 
         $record = Record::find($this->record_id);
-        if (!$record)
+        if (!$record) {
             return;
-        if (
-            Carbon::parse($this->date) == Carbon::parse($record->date) &&
-            Carbon::parse($this->time) == Carbon::parse($record->time)
-        ) {
-//            $bot = new \TelegramBot\Api\BotApi($this->token);
-//            $bot->sendMessage($this->chat_id, $this->message);
         }
+//        if (
+//            Carbon::parse($this->date) == Carbon::parse($record->date) &&
+//            Carbon::parse($this->time) == Carbon::parse($record->time)
+//        ) {
+////            $bot = new \TelegramBot\Api\BotApi($this->token);
+////            $bot->sendMessage($this->chat_id, $this->message);
+//        }
 
         $bot = new \TelegramBot\Api\BotApi($this->token);
         $bot->sendMessage($this->chat_id, $this->message);
+
     }
 }

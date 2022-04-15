@@ -64,7 +64,7 @@ class DataBaseConnect
      */
     public function isDefaultConnect () : bool
     {
-        if (DB::connection()->getConfig()['database'] == getenv('DB_DATABASE'))
+        if (DB::connection()->getConfig()['database'] == Config::get('database')['default_db'])
             return true;
         return false;
     }
@@ -90,7 +90,7 @@ class DataBaseConnect
      */
     public function setDefaultConnect () : bool
     {
-        return $this->dbConnect(getenv('DB_DATABASE'));
+        return $this->dbConnect(Config::get('database')['default_db']);
     }
 
 

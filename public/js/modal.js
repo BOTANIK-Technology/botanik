@@ -5,9 +5,10 @@ let app = document.getElementById('app');
 function closeError(id = 'error-modal') {
     document.getElementById(id).remove();
 }
+
 function closeModal(event, id = 'modal', href = false) {
     app.classList.remove('bg-blur');
-    let refresh = document.getElementById('refresh-'+id);
+    let refresh = document.getElementById('refresh-' + id);
     if (refresh) {
         if (href !== false)
             refresh.href = href;
@@ -17,6 +18,7 @@ function closeModal(event, id = 'modal', href = false) {
     }
 
 }
+
 if (close_modal.length > 0) {
     Object.keys(close_modal).forEach((k) => {
         close_modal[k].addEventListener('click', closeModal)
@@ -24,24 +26,17 @@ if (close_modal.length > 0) {
 }
 
 
-
 function inputActive(input) {
-    console.log(input);
-    if (input)
-        input.forEach((obj) => {
-            inputActive(obj);
-        });
-    else if (isObject(input) && input.length > 1) {
+
+    if (typeof (input) === 'object' ) {
         Object.keys(input).forEach((k) => {
             inputActive(input[k]);
         });
-    }
-    else {
+    } else {
         input.addEventListener('change', function () {
             if (this.value.length > 0) {
                 this.classList.add('active');
-            }
-            else this.classList.remove(this, 'active');
+            } else this.classList.remove(this, 'active');
         });
     }
 }
@@ -58,14 +53,13 @@ function selectActive() {
     });
 }
 
-if(modal.length){
+if (modal.length) {
     app.classList.add('bg-blur');
-}
-else {
+} else {
     app.classList.remove('bg-blur');
 }
 
-if(document.getElementById('modal-empty')){
+if (document.getElementById('modal-empty')) {
     app.classList.remove('bg-blur');
 }
 
@@ -81,7 +75,7 @@ if (loadMore !== null) {
             selectedPosY += theElement.offsetTop;
             theElement = theElement.offsetParent;
         }
-        window.scrollTo(selectedPosX,selectedPosY);
+        window.scrollTo(selectedPosX, selectedPosY);
     }
 
     document.addEventListener('DOMContentLoaded', function () {

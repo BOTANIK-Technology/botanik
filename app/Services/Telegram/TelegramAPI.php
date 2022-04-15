@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use \TelegramBot\Api\BotApi;
 use TelegramBot\Api\Exception;
@@ -487,12 +488,9 @@ class TelegramAPI
 
     /**
      */
-    public static function createRecordNotice($service_name, Record $record, TelegramUser $client, $request)
+    public static function createRecordNotice($service_name, Record $record, TelegramUser $client, Request $request): \Illuminate\Http\JsonResponse
     {
-        if (!ConnectService::prepareJob())
-        {
-            return response()->json(['error' => 'Ошибка создания задания'], 500);
-        }
+
 
 
         /**
@@ -501,7 +499,7 @@ class TelegramAPI
         $notice_mess = __('Новая запись на услугу') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $record->date . ' в ' . $record->time;
 
         try {
-            SendNotice::dispatch(
+            SendNotice::dispatchSync(
                 $request->business_db,
                 [
                     [
@@ -513,7 +511,7 @@ class TelegramAPI
                         'message' => $notice_mess,
                     ],
                 ],
-            )->delay(now()->addMinutes(0));
+            );
 
             $time = Carbon::createFromFormat('Y-m-d H:i', $record->date . " " . $record->time , 'Europe/Kiev');
 
@@ -535,6 +533,11 @@ class TelegramAPI
             /*
              * Client notice
              */
+            if (!ConnectService::prepareJob())
+            {
+                Log::error('Ошибка создания задания');
+                return response()->json(['error' => 'Ошибка создания задания'], 500);
+            }
             TelegramNotice::dispatch(
                 $request->business_db,
                 $client->chat_id,
@@ -570,6 +573,7 @@ class TelegramAPI
 
         }
         catch (Exception $e) {
+            Log::error('CreateNotice error', [$e->getMessage()]);
             return response()->json(['errors' => ['server' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]], 500);
         }
         ConnectService::dbConnect($request->business_db);
