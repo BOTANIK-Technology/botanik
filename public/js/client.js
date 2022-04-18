@@ -56,7 +56,7 @@ function unselect (userId = false) {
                         attr.setAttribute("disabled", "disabled");
                         attr.removeEventListener('change', change);
                     });
-                    removeClass(document.getElementById(id), 'active');
+                    document.getElementById(id).classList.remove('active');
                     element.remove();
                 }
             });
@@ -68,31 +68,32 @@ function unselect (userId = false) {
             attr.setAttribute("disabled", "disabled");
             attr.removeEventListener('change', change);
         });
-        removeClass(document.getElementById(userId), 'active');
+        document.getElementById('' + userId).classList.remove('active');
         document.getElementById('client-menu-'+userId).remove();
     }
     changed = false;
 }
 
+
 if (clients.length) {
     Object.keys(clients).forEach((k) => {
         clients[k].addEventListener('dblclick', function () {
             unselect();
-            if(current.indexOf(clients[k].id) === -1) {
+            if (current.indexOf(clients[k].id) === -1) {
                 current.push(clients[k].id);
                 inputNames.forEach((input) => {
-                    let attr = document.getElementById(input+clients[k].id);
+                    let attr = document.getElementById(input + clients[k].id);
                     attr.removeAttribute("disabled");
                 });
-                addClass(clients[k], 'active');
+                clients[k].classList.add('active');
                 clients[k].insertAdjacentHTML(
                     'beforeEnd',
-                    '<div id="client-menu-'+ clients[k].id +'" class="left-5px flex align-items-center justify-content-between">' +
-                        '<a class="icon-size chart-icon pointer" href="'+ url +'/statistic/'+ clients[k].id + urlParams +'"></a>' +
-                        '<a class="icon-size history-icon pointer" href="'+ url +'/history/'+ clients[k].id + urlParams +'"></a>' +
-                        '<a class="icon-size lock-icon pointer" href="'+ url +'/block/'+ clients[k].id + urlParams +'"></a>' +
-                        '<i class="icon-size check-icon pointer" id="update-'+clients[k].id+'" data-href="'+ url +'/edit/'+clients[k].id+'"></i>' +
-                        '<a class="icon-size trash-icon pointer" href="'+ url +'/delete/'+ clients[k].id + urlParams +'"></a>' +
+                    '<div id="client-menu-' + clients[k].id + '" class="left-5px flex align-items-center justify-content-between">' +
+                    '<a class="icon-size chart-icon pointer" href="' + url + '/statistic/' + clients[k].id + urlParams + '"></a>' +
+                    '<a class="icon-size history-icon pointer" href="' + url + '/history/' + clients[k].id + urlParams + '"></a>' +
+                    '<a class="icon-size lock-icon pointer" href="' + url + '/block/' + clients[k].id + urlParams + '"></a>' +
+                    '<i class="icon-size check-icon pointer" id="update-' + clients[k].id + '" data-href="' + url + '/edit/' + clients[k].id + '"></i>' +
+                    '<a class="icon-size trash-icon pointer" href="' + url + '/delete/' + clients[k].id + urlParams + '"></a>' +
                     '</div>'
                 );
                 sendUpdate(clients[k].id);

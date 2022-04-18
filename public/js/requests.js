@@ -10,6 +10,14 @@ function getMeta(metaName) {
     return false;
 }
 
+function addClass(item, classStr){
+    item.classList.add(classStr);
+}
+
+function removeClass(item, classStr){
+    item.classList.remove(classStr);
+}
+
 function putRequest(url, object = null, async = true) {
     return defaultRequest(url, 'PUT', object, async);
 }
