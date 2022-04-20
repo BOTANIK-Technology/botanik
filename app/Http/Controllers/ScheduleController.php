@@ -76,7 +76,7 @@ class ScheduleController extends Controller
                     return $q->where('type_service_id', $request->current_type);
                 });
             }
-            $records = $recordsQueue->get();
+            $records = $recordsQueue->orderBy('time', 'ASC')->get();
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
 
@@ -96,7 +96,7 @@ class ScheduleController extends Controller
 
             $types = Service::where('id', $s)->pluck('type_service_id')->toArray();
             $schedule = UserTimetable::userSchedule($user, Carbon::parse($this->params['date']));
-            $records = Record::where('user_id', $user->id)->whereDate('date', Carbon::parse($this->params['date']))->get();
+            $records = Record::where('user_id', $user->id)->whereDate('date', Carbon::parse($this->params['date']))->orderBy('time', 'ASC')->get();
             $this->params['types'] = $types;
             $this->params['current_type'] = $request->input('current_type') ?? $types[0];
             $this->params['schedule'] = $schedule['times'] ?? false;
@@ -116,7 +116,6 @@ class ScheduleController extends Controller
     public function getView(Request $request)
     {
         $this->setParams($request);
-//        dd($this->params);
         return view($this->view, $this->params);
     }
 
