@@ -143,7 +143,8 @@
                        href="{{route('window.service', [
                                 'business' => $slug,
                                   'service_id' => $view_service->id,
-                                   'modal' => 'timetable'
+                                   'modal' => 'timetable',
+                                   'mode' => 'edit'
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>

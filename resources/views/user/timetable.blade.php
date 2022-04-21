@@ -7,10 +7,11 @@
         let service_id = 0;
         let master_id = id;
         let timetableDB = @json($timetables ?? []);
+        let mode = '{{$mode}}'
     </script>
     <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/timetable.js')}}"></script>
-    <script src="{{asset('js/user/timetable.js')}}"></script>
+
 @endsection
 
 @section('modal')
@@ -23,11 +24,13 @@
         @include('layouts.timetable')
 
         @slot('buttons')
+            @if($mode == 'edit')
             <button type="button" id="time-confirm" data-id="{{$currentService}}" class="btn-primary">
                 {{ __('Подтвердить') }}
             </button>
+            @endif
             @if ($id)
-                <a href="{{route('addService', ['business' => $slug, 'modal' => 'edit', 'id' => $id, 'moreService' => $moreService])}}"
+                <a href="{{route('addService', ['business' => $slug, 'modal' => $mode, 'id' => $id, 'moreService' => ($mode == 'edit' ? $moreService : null)])}}"
                    id="refresh-modal"></a>
             @else
                 <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 0,'moreService' => $moreService])}}"

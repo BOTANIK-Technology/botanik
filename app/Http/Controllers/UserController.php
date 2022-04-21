@@ -90,6 +90,7 @@ class UserController extends Controller
         $this->params['services'] = Service::all();
         $this->params['types_select'] = TypeService::all();
         $this->params['addresses'] = Address::all();
+        $this->params['mode'] = $request->mode;
 
         switch ($modal) {
             case 'create':
@@ -100,10 +101,11 @@ class UserController extends Controller
                 break;
 
             case 'delete':
-            case 'view':
+//            case 'view':
                 $this->params['user'] = User::find($request->id);
                 break;
 
+            case 'view':
             case 'edit':
                 $this->params['id'] = $request->id ?? 0;
                 /** @var User $user */

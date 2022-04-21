@@ -91,6 +91,7 @@ class ServiceController extends Controller
 
         $serviceView = Service::find($id);
         $serviceRequest = Service::find($request->service_id);
+        $this->params['mode'] = $request->mode;
 
         switch ($modal) {
             case 'delete':
@@ -105,13 +106,13 @@ class ServiceController extends Controller
                 }
                 break;
             case 'view':
-                $this->params['view_service'] = $serviceView;
-                $this->params['service_id'] = $serviceView->id;
-                $this->setTimetableCookies($serviceView);
-                if ($serviceView) {
-                    $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
-                }
-                break;
+//                $this->params['view_service'] = $serviceView;
+//                $this->params['service_id'] = $serviceView->id;
+//                $this->setTimetableCookies($serviceView);
+//                if ($serviceView) {
+//                    $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
+//                }
+//                break;
             case 'create':
             case 'edit':
                 $this->params['types_select'] = TypeService::all();

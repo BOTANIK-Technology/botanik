@@ -16,6 +16,7 @@
                 @endforeach
             </select>
         </div>
+        @if($mode == 'edit')
         <div class="timetable_box-btns">
             <button id="save_month" class="timetable_box-btn btn btn-info">{{__('Сохранить')}}</button>
         </div>
@@ -25,6 +26,7 @@
             <button id="select-all" class="timetable_box-btn btn">{{__('Выбрать всё')}}</button>
             <button id="clear-all" class="timetable_box-btn btn btn-warning">{{__('Очистить всё')}}</button>
         </div>
+        @endif
     </div>
     <div class="timetable_box-wrap">
         <div class="timetable_box-table timetable grid">
@@ -117,6 +119,7 @@
             -webkit-box-pack: center;
             -ms-flex-pack: center;
             justify-content: center;
+            margin-left: 10px;
         }
 
         .timetable_box-btn {

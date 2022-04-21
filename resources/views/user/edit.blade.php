@@ -32,13 +32,13 @@
         <input type="hidden" id="token_id" name="_token" value="{{ csrf_token() }}">
 
         <div class="flex direction-column add-user">
-            <div><input type="text" value="{{$user->name}}" placeholder="{{__(' ФИО')}}" id="fio"></div>
-            <div><input type="text" value="{{$user->phone}}" placeholder="{{__('Телефон')}}" id="phone"></div>
-            <div><input type="email" value="{{$user->email}}" placeholder="Email" id="email"></div>
-            <div><input type="text" placeholder="Пароль" id="password"></div>
+            <div><input disabled type="text" value="{{$user->name}}" placeholder="{{__(' ФИО')}}" id="fio"></div>
+            <div><input disabled type="text" value="{{$user->phone}}" placeholder="{{__('Телефон')}}" id="phone"></div>
+            <div><input disabled type="email" value="{{$user->email}}" placeholder="Email" id="email"></div>
+            <div><input disabled type="text" placeholder="Пароль" id="password"></div>
 
             <div class="checkboxes flex justify-content-between">
-                <input id="master" type="radio" name="role"
+                <input disabled id="master" type="radio" name="role"
                        value="master" {{$user->hasRole('master') ? 'checked' : ''}}>
                 <label for="master">{{__('Специалист')}}</label>
                 <input id="admin" type="radio" name="role" value="admin" {{$user->hasRole('admin') ? 'checked' : ''}}>
@@ -107,7 +107,8 @@
                             'id' => $user->id,
                             'currentService' => $i,
 							 'moreService' => $moreService,
-                            'modal' => 'timetable'
+                            'modal' => 'timetable',
+                            'mode' => 'edit'
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>

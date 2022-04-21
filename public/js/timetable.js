@@ -11,13 +11,23 @@ let year = document.getElementById('year_picker');
 
 if (month.value) {
     month.addEventListener('change', () => {
-        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value + '&currentService=' + currentService);
+        window.location.replace(CURRENT_URL + '?service_id=' + id
+            + '&current_month=' + month.value
+            + '&current_year=' + year.value
+            + '&currentService=' + currentService
+            + '&mode=' + mode
+        );
     });
 }
 
 if (year) {
     year.addEventListener('change', () => {
-        window.location.replace(CURRENT_URL + '?service_id=' + id + '&current_month=' + month.value + '&current_year=' + year.value + '&currentService=' + currentService);
+        window.location.replace(CURRENT_URL + '?service_id=' + id
+            + '&current_month=' + month.value
+            + '&current_year=' + year.value
+            + '&currentService=' + currentService
+            + '&mode=' + mode
+        );
     });
 }
 
@@ -101,20 +111,24 @@ Object.keys(checkboxes).forEach((el) => {
 });
 
 let all = document.querySelector('#select-all');
-all.addEventListener('click', function () {
-    changeSavedButton(false);
-    Object.keys(checkboxes).forEach((el) => {
-        checkboxes[el].classList.add('checked')
-    });
-})
+if(all) {
+    all.addEventListener('click', function () {
+        changeSavedButton(false);
+        Object.keys(checkboxes).forEach((el) => {
+            checkboxes[el].classList.add('checked')
+        });
+    })
+}
 
 let clr = document.querySelector('#clear-all');
-clr.addEventListener('click', function () {
-    changeSavedButton(false);
-    Object.keys(checkboxes).forEach((el) => {
-        checkboxes[el].classList.remove('checked')
-    });
-})
+if(clr) {
+    clr.addEventListener('click', function () {
+        changeSavedButton(false);
+        Object.keys(checkboxes).forEach((el) => {
+            checkboxes[el].classList.remove('checked')
+        });
+    })
+}
 
 
 const saveMonthAction = (id) => {

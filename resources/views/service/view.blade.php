@@ -46,7 +46,17 @@
                         <span class="data"><b>{{$view_service->group->message}}</b></span>
                     @endif
                     <span class="label">{{__('Расписание')}}</span>
-                    @if (isset($view_service->timetable))
+
+                    @if ($usedMonths)
+                        <a id="calendar" class="background-none calendar-a"
+                           href="{{route('window.service', [
+                                'business' => $slug,
+                                  'service_id' => $view_service->id,
+                                   'modal' => 'timetable',
+                                   'mode' => 'view'
+                    ])}}">
+                            <div class="calendar-icon"></div>
+                        </a>
                         <div class="filled-months">
                             @foreach($usedMonths as $month)
                                 <p>{{$month}}</p>
