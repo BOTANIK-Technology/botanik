@@ -414,7 +414,7 @@ trait TimetableTrait
 
         $now = Carbon::now();
 
-        if ($date->month == $now->month){
+        if ($date->month == $now->month && $year == strtolower(date('Y') )){
             $start = Carbon::parse($now);
         }
         else {
