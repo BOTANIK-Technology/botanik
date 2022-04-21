@@ -33,7 +33,7 @@
                         {{$service->name}}
                     </div>
                     <div class="flex align-items-center text small ellipsis" >
-                        @if($service->timetable)
+                        @if($service->timetables->count())
                             Свой график
                         @else
                             Графики специалистов
