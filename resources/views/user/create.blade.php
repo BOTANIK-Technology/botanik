@@ -103,6 +103,7 @@
                             'id' => 0,
                             'currentService' => $i,
 							 'moreService' => $moreService,
+                            'mode' => 'edit',
                             'modal' => 'timetable'
                     ])}}">
                         <div class="calendar-icon"></div>

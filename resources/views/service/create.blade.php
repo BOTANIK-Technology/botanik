@@ -33,16 +33,20 @@
             <label class="row-1 col-1 align-self-start" for="service-type">{{__('Тип *')}}</label>
             <label class="row-2 col-1 align-self-start" for="service-name">{{__('Услуга *')}}</label>
             <label class="row-3 col-1 align-self-start" for="address">{{__('Адрес *')}}</label>
-            <label class="row-4 col-1 align-self-start" for="interval-hours-0">{{__('Длительность')}}<br>{{__('(часы) *')}}</label>
-            <label class="row-5 col-1 align-self-start" for="interval-minutes-0">{{__('Длительность')}}<br>{{__('(минуты) *')}}</label>
-            <label class="row-6 col-1 align-self-start" for="interval-hours-0">{{__('Интервал')}}<br>{{__('(часы) *')}}</label>
-            <label class="row-7 col-1 align-self-start" for="interval-minutes-0">{{__('Интервал')}}<br>{{__('(минуты) *')}}</label>
-{{--            <label class="row-8 col-1 align-self-start" for="range">{{__('Интервал *')}}</label>--}}
+            <label class="row-4 col-1 align-self-start" for="interval-hours-0">{{__('Длительность')}}
+                <br>{{__('(часы) *')}}</label>
+            <label class="row-5 col-1 align-self-start" for="interval-minutes-0">{{__('Длительность')}}
+                <br>{{__('(минуты) *')}}</label>
+            <label class="row-6 col-1 align-self-start" for="interval-hours-0">{{__('Интервал')}}<br>{{__('(часы) *')}}
+            </label>
+            <label class="row-7 col-1 align-self-start" for="interval-minutes-0">{{__('Интервал')}}
+                <br>{{__('(минуты) *')}}</label>
+            {{--            <label class="row-8 col-1 align-self-start" for="range">{{__('Интервал *')}}</label>--}}
             <label class="row-8 col-1 align-self-start" for="price">{{__('Стоимость *')}}</label>
             <label class="row-9 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
             <label class="row-10 col-1 align-self-start" for="calendar">{{__('Расписание')}}</label>
             <label class="row-12 col-1 align-self-center">{{__('Групповая услуга *')}}</label>
-            <label class="row-13 col-1 align-self-start" >{{__('Оплата *')}}</label>
+            <label class="row-13 col-1 align-self-start">{{__('Оплата *')}}</label>
 
             <div class="row-1 col-2">
                 @if ($types)
@@ -88,38 +92,38 @@
 
 
             {{-- Длительность --}}
-            <div class="checkboxes grid hours row-4 col-2"  >
+            <div class="checkboxes grid hours row-4 col-2">
                 @php($hours = 0)
                 @while($hours <= 24)
                     <input id="duration-hours-{{$hours}}" type="radio" name="durationHours" value="{{$hours}}">
-                    <label for="duration-hours-{{$hours}}" class="user-select-none" >{{$hours}}</label>
+                    <label for="duration-hours-{{$hours}}" class="user-select-none">{{$hours}}</label>
                     @php($hours ++)
                 @endwhile
             </div>
-            <div class="checkboxes grid minutes row-5 col-2"  >
+            <div class="checkboxes grid minutes row-5 col-2">
                 @php($minutes = 0)
                 @while($minutes <= 55)
                     <input id="duration-minutes-{{$minutes}}" type="radio" name="durationMinutes" value="{{$minutes}}">
-                    <label for="duration-minutes-{{$minutes}}" class="user-select-none" >{{$minutes}}</label>
+                    <label for="duration-minutes-{{$minutes}}" class="user-select-none">{{$minutes}}</label>
                     @php($minutes += 5)
                 @endwhile
             </div>
             {{-- / Длительность --}}
 
             {{-- Интервал --}}
-            <div class="checkboxes grid hours row-6 col-2"  >
+            <div class="checkboxes grid hours row-6 col-2">
                 @php($hours = 0)
                 @while($hours <= 24)
                     <input id="interval-hours-{{$hours}}" type="radio" name="intervalHours" value="{{$hours}}">
-                    <label for="interval-hours-{{$hours}}" class="user-select-none" >{{$hours}}</label>
+                    <label for="interval-hours-{{$hours}}" class="user-select-none">{{$hours}}</label>
                     @php($hours ++)
                 @endwhile
             </div>
-            <div class="checkboxes grid minutes row-7 col-2"  >
+            <div class="checkboxes grid minutes row-7 col-2">
                 @php($minutes = 0)
                 @while($minutes <= 55)
                     <input id="interval-minutes-{{$minutes}}" type="radio" name="intervalMinutes" value="{{$minutes}}">
-                    <label for="interval-minutes-{{$minutes}}" class="user-select-none" >{{$minutes}}</label>
+                    <label for="interval-minutes-{{$minutes}}" class="user-select-none">{{$minutes}}</label>
                     @php($minutes += 5)
                 @endwhile
             </div>
@@ -137,7 +141,13 @@
                 <button
                     id="calendar"
                     class="background-none calendar-a"
-                    data-href="{{route('window.service', ['business' => $slug, 'load' => $load, 'modal' => 'timetable', 'url' => url()->current()])}}" >
+                    data-href="{{route('window.service', [
+                                            'business' => $slug,
+                                            'load' => $load,
+                                            'modal' => 'timetable',
+											'mode' => 'edit',
+                                            'url' => url()->current()
+                                        ])}}">
                     <div class="calendar-icon"></div>
                 </button>
             </div>
