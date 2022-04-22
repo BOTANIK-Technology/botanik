@@ -9,6 +9,8 @@ document.body.addEventListener('mouseup', function () {
 let month = document.getElementById('month_picker');
 let year = document.getElementById('year_picker');
 
+
+
 if (month.value) {
     month.addEventListener('change', () => {
         window.location.replace(CURRENT_URL + '?service_id=' + id
@@ -97,18 +99,19 @@ if (saveMonth) {
 }
 
 let checkboxes = document.getElementsByClassName('checkbox');
+if(mode == 'edit') {
+    Object.keys(checkboxes).forEach((el) => {
 
-Object.keys(checkboxes).forEach((el) => {
+        checkboxes[el].addEventListener('mousedown', function () {
+            checkboxes[el].classList.toggle('checked');
+            changeSavedButton(false);
 
-    checkboxes[el].addEventListener('mousedown', function () {
-        checkboxes[el].classList.toggle('checked');
-        changeSavedButton(false);
-
+        });
+        checkboxes[el].addEventListener('mouseover', function () {
+            if (mouseDown) checkboxes[el].classList.toggle('checked');
+        });
     });
-    checkboxes[el].addEventListener('mouseover', function () {
-        if (mouseDown) checkboxes[el].classList.toggle('checked');
-    });
-});
+}
 
 let all = document.querySelector('#select-all');
 if(all) {
@@ -184,3 +187,4 @@ const saveMonthAction = (id) => {
 
 
 }
+

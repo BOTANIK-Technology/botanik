@@ -2,7 +2,7 @@
     <link href="{{ asset('css/timetable.css') }}" rel="stylesheet">
 @endsection
 
-<div class="timetable_box">
+<div class="timetable_box" id="timetable_body">
     <div class="timetable_box-head">
         <div class="timetable_box-fields">
             <select id="month_picker" class="timetable_box-select">
