@@ -8,6 +8,7 @@ use App\Models\TelegramSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use ConnectService;
+use Illuminate\Support\Facades\Log;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class CallbackQuery extends TelegramAPI

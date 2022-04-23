@@ -488,7 +488,7 @@ class TelegramAPI
 
     /**
      */
-    public static function createRecordNotice($service_name, Record $record, TelegramUser $client, Request $request): \Illuminate\Http\JsonResponse
+    public static function createRecordNotice($service_name, Record $record, TelegramUser $client, $request): \Illuminate\Http\JsonResponse
     {
 
 

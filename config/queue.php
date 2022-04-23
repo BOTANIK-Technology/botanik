@@ -39,6 +39,7 @@ return [
             'table' => 'jobs',
             'queue' => 'default',
             'retry_after' => 60,
+            'after_commit' => true,
         ],
 
         'beanstalkd' => [

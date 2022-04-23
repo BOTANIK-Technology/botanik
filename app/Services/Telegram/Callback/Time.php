@@ -28,22 +28,22 @@ class Time extends CallbackQuery
         return parent::editMessage("🕛 ".__('Выберете время'), $buttons);
     }
 
-    private function serviceTime (int $service_id, string $date)
+    private function serviceTime (int $service_id, string $date): array
     {
         $service = Service::find($service_id);
-        $times = $service->timetable->getFreeTimes($date);
+        $times = $service->getFreeTimes($date);
         return $this->getButtons($times);
     }
 
     private function masterTime(int $master_id, int $service_id, int $address_id, string $date)
     {
         $master = User::find($master_id);
-        Log::debug("masterTime", [
-            "master_id" => $master_id,
-            "service_id" => $service_id,
-            "address_id" => $address_id,
-            "date"      => $date
-        ]);
+//        Log::debug("masterTime", [
+//            "master_id" => $master_id,
+//            "service_id" => $service_id,
+//            "address_id" => $address_id,
+//            "date"      => $date
+//        ]);
 //        $times = UserTimetable::getFreeTimes($master, $address_id, $service_id, $date);
         $times = DatesHelper::getFreeMasterTimes($master,  $address_id,  $service_id,  $date);
         return $this->getButtons($times);

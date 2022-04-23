@@ -14,6 +14,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
@@ -302,7 +303,7 @@ class ServiceController extends Controller
 
             $service->rewriteAddresses($request->input('addresses'));
 
-            if ($request->has('timetables')) {
+            if ($request->has('timetables') && $request->input('timetables')) {
                 $service->updateTimetable($request->input('timetables'));
             }
 
@@ -330,7 +331,8 @@ class ServiceController extends Controller
             return response()->json(['ok' => true]);
         }
         catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage() . ' ' . $e->getLine()]], 500);
+            Log::error('Service Timetable Error', $e->getTrace());
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
         }
     }
 

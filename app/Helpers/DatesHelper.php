@@ -19,7 +19,7 @@ class DatesHelper
         return ['text' => Date::parse($date->toFormattedDateString())->format('F'), 'callback_data' => '-'];
     }
 
-    public static function masterDates($master_id, $service_id, $address_id, $monthButton)
+    public static function masterDates($master_id, $service_id, $address_id, $monthButton): array
     {
         switch ($monthButton) {
             case 'DateNext':
@@ -193,7 +193,7 @@ class DatesHelper
         return $free;
     }
 
-    public static function serviceDates($service_id, $address_id, $monthButton)
+    public static function serviceDates($service_id, $address_id, $monthButton): array
     {
 
         switch ($monthButton) {

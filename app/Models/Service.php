@@ -260,7 +260,7 @@ class Service extends Model
 
 
     /**
-     * @return HasOne
+     * @return HasMany
      */
     public function timetables(): HasMany
     {
