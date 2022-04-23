@@ -512,7 +512,7 @@ class ScheduleController extends Controller
         $errors = [];
         foreach ($records as $record) {
             if (!$times || !$times[$record->date] || !in_array($record->time, $times[$record->date])) {
-                $errors[] = $record->time . ' ' . $record->time . ' - ' . $record->telegramUser->getFio();
+                $errors[] = $record->date . ' ' . $record->time . ' - ' . $record->telegramUser->getFio();
             }
         }
 
