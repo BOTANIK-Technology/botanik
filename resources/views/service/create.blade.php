@@ -45,8 +45,8 @@
             <label class="row-8 col-1 align-self-start" for="price">{{__('Стоимость *')}}</label>
             <label class="row-9 col-1 align-self-start" for="bonus">{{__('Бонусы')}}</label>
             <label class="row-10 col-1 align-self-start" for="calendar">{{__('Расписание')}}</label>
-            <label class="row-12 col-1 align-self-center">{{__('Групповая услуга *')}}</label>
             <label class="row-13 col-1 align-self-start">{{__('Оплата *')}}</label>
+            <label class="row-12 col-1 align-self-center">{{__('Групповая услуга *')}}</label>
 
             <div class="row-1 col-2">
                 @if ($types)
