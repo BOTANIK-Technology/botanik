@@ -22,7 +22,8 @@
         <table class="schedule_table">
             <thead>
             <tr>
-                <th>{{__('Время записи')}}</th>
+                <th>{{__('Время записи от')}}</th>
+                <th>{{__('Время записи до')}}</th>
                 <th>{{__('Специалист')}}</th>
                 <th>{{__('Услуга')}}</th>
                 <th>{{__('Группа')}}</th>
@@ -34,6 +35,7 @@
             @foreach($records as $item)
                 <tr>
                     <td class="schedule_table-time">{{$item->time}}</td>
+                    <td class="schedule_table-time">{{$item->finishTime}}</td>
                     <td>{{$item->user ? $item->user->name : ''}}</td>
                     <td>{{$item->service->name}}</td>
                     <td>{{$item->service->group ? $item->service->group->quantity : ''}}</td>

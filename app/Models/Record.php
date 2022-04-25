@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\JsonFieldTrait;
 use Barryvdh\LaravelIdeHelper\Eloquent;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,6 +42,10 @@ class Record extends Model
         'status',
         'time',
         'date'
+    ];
+
+    protected $appends = [
+        'finishTime'
     ];
 
     /**
@@ -91,10 +96,18 @@ class Record extends Model
     public static function isTimeFree($request)
     {
         $date = \Carbon\Carbon::parse($request->date)->format('Y-m-d');
-        return Record::where('date', $date)
+        return self::where('date', $date)
             ->where('time', $request->time)
             ->where('service_id', $request->service_id)
             ->where('address_id', $request->address_id)
             ->count();
+    }
+
+    public function getFinishTimeAttribute()
+    {
+        $minutes = $this->service->interval->minutes * 60 ;
+
+        return Carbon::parse(strtotime($this->date . ' ' . $this->time) + $minutes)->setTimezone('Europe/Kiev')->format('H:i');
+
     }
 }

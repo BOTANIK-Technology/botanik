@@ -11,6 +11,7 @@
                 <div class="day border-bottom-main cnt" style="grid-column:2">{{$address}}</div>
                 @foreach($times as $time)
                     <div class="border-right-main {{$loop->index == 0 ? '' : 'border-top'}} col-1 time cnt" style="grid-row:{{$loop->iteration+1}}">{{$time}}</div>
+                    <div class="border-right-main {{$loop->index == 0 ? '' : 'border-top'}} col-1 time cnt" style="grid-row:{{$loop->iteration+1}}">{{$time}}</div>
                     <div class="checkbox col-2 {{$loop->index == 0 ? '' : 'border-top'}}" style="grid-row:{{$loop->iteration+1}}">
                         @if($records)
                             @foreach($records as $record)
