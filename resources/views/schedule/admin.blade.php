@@ -68,7 +68,7 @@
             }
 
             .schedule-main {
-                grid-template-columns: 15% 1fr 900px 10.5%;
+                grid-template-columns: 15% 1fr 90px 10.5%;
             }
 
             .timetable > .bg-service {
