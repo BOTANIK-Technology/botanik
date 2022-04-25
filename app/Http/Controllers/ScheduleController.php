@@ -163,7 +163,7 @@ class ScheduleController extends Controller
 
     /**
      * @param Request $request
-     * @return JsonResponse|false
+     * @return JsonResponse
      */
     public function createRecord(Request $request)
     {
@@ -229,7 +229,6 @@ class ScheduleController extends Controller
             );
 
             return TelegramAPI::createRecordNotice($service->name, $record, $client, $request);
-
 
         }
         catch (Exception $e) {

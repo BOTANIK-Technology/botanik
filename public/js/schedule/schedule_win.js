@@ -249,23 +249,23 @@ let ScheduleWindow = function () {
 
         if (this.paymentTypes.cash_pay) {
             hasPayment = true;
-            document.getElementById('block-cash_pay').classList.remove('hide');
+        //    document.getElementById('block-cash_pay').classList.remove('hide');
         }
         if (this.paymentTypes.bonus_pay) {
             hasPayment = true;
-            document.getElementById('block-bonus_pay').classList.remove('hide');
+        //    document.getElementById('block-bonus_pay').classList.remove('hide');
         }
         if (this.paymentTypes.online_pay) {
             hasPayment = true;
-            document.getElementById('block-online_pay').classList.remove('hide');
+        //    document.getElementById('block-online_pay').classList.remove('hide');
         }
         let createBtn = document.getElementById('action');
         createBtn.addEventListener('click', send);
         if (!hasPayment) {
-            createBtn.classList.remove('hide');
+        //    createBtn.classList.remove('hide');
         }
         document.getElementById('payments-block').addEventListener('click', () => {
-            createBtn.classList.remove('hide');
+          //  createBtn.classList.remove('hide');
         });
 
 
