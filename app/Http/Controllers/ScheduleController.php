@@ -194,7 +194,10 @@ class ScheduleController extends Controller
         if ($res !== true) {
             return response()->json(['errors' => ['text' => $res]], 405);
         }
-
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+        if(Record::isTimeFree($request) ) {
+            return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
+        }
 
         try {
 
@@ -205,7 +208,7 @@ class ScheduleController extends Controller
                 'pay_type'         => $request->pay_type,
                 'user_id'          => $request->has('user_id') ? $request->user_id : null,
                 'time'             => $request->time,
-                'date'             => Carbon::parse($request->date)->format('Y-m-d')
+                'date'             => $date
             ]);
 
             $service = $record->service;
@@ -297,6 +300,9 @@ class ScheduleController extends Controller
      */
     public function editSchedule(Request $request): JsonResponse
     {
+        if(Record::isTimeFree($request) ) {
+            return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
+        }
         try {
             $record = Record::find($request->id);
             $record->time = $request->time;

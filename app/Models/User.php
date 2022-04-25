@@ -261,6 +261,8 @@ class User extends Authenticatable
         }
     }
 
+
+
     /**
      * @param int $service_id
      * @param int $address_id

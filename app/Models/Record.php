@@ -87,4 +87,14 @@ class Record extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public static function isTimeFree($request)
+    {
+        $date = \Carbon\Carbon::parse($request->date)->format('Y-m-d');
+        return Record::where('date', $date)
+            ->where('time', $request->time)
+            ->where('service_id', $request->service_id)
+            ->where('address_id', $request->address_id)
+            ->count();
+    }
 }
