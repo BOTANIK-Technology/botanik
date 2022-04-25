@@ -13,23 +13,35 @@ let year = document.getElementById('year_picker');
 
 if (month.value) {
     month.addEventListener('change', () => {
-        window.location.replace(CURRENT_URL + '?service_id=' + id
-            + '&current_month=' + month.value
-            + '&current_year=' + year.value
-            + '&currentService=' + currentService
-            + '&mode=' + mode
-        );
+        let res = true;
+        if (! document.getElementById('save_month').classList.contains('saved')) {
+             res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
+        }
+        if(res) {
+            window.location.replace(CURRENT_URL + '?service_id=' + id
+                + '&current_month=' + month.value
+                + '&current_year=' + year.value
+                + '&currentService=' + currentService
+                + '&mode=' + mode
+            );
+        }
     });
 }
 
 if (year) {
     year.addEventListener('change', () => {
-        window.location.replace(CURRENT_URL + '?service_id=' + id
-            + '&current_month=' + month.value
-            + '&current_year=' + year.value
-            + '&currentService=' + currentService
-            + '&mode=' + mode
-        );
+        let res = true;
+        if (! document.getElementById('save_month').classList.contains('saved')) {
+            res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
+        }
+        if(res) {
+            window.location.replace(CURRENT_URL + '?service_id=' + id
+                + '&current_month=' + month.value
+                + '&current_year=' + year.value
+                + '&currentService=' + currentService
+                + '&mode=' + mode
+            );
+        }
     });
 }
 
@@ -78,16 +90,27 @@ changeSavedButton(true)
 if (close.length > 0) {
     Object.keys(close).forEach((k) => {
         close[k].removeEventListener('click', clearCloseModal);
-        close[k].addEventListener('click', closeModal);
+        close[k].addEventListener('click', function(){
+            let res = true;
+            if (! document.getElementById('save_month').classList.contains('saved')) {
+                res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
+            }
+            if(res) {
+                closeModal();
+            }
+        });
     });
 }
 
-
+/*
+* Confirm
+*/
 let timeBtn = document.getElementById('time-confirm');
+console.log(id, timeBtn);
 if (timeBtn) {
-    timeBtn.addEventListener('click', function () {
+    timeBtn.addEventListener('click', () => {
         saveMonthAction(id);
-        closeModal();
+        setTimeout(closeModal, 500)
     });
 }
 

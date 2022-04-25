@@ -118,6 +118,7 @@ b {
     box-shadow: 1px 2px 4px rgba(144, 0, 26, 0.9);
     width: 100px;
 }
+
 .btn-primary {
     background-image: url("../images/a-button-bg.png");
     background-color: white;
@@ -128,6 +129,7 @@ b {
     height: 40px;
     transition: all 200ms;
     cursor: pointer;
+    box-shadow: 1px 2px 4px rgba(144, 0, 26, 0.9);
 }
 .btn {
     max-width: 231px;
@@ -385,6 +387,7 @@ input[type=radio]:checked + label,input[type=checkbox]:checked + label {
     position: fixed;
     display: flex;
     overflow: auto;
+    z-index: 1000;
 }
 .modal.error {
     z-index: 999;
@@ -435,6 +438,7 @@ input[type=radio]:checked + label,input[type=checkbox]:checked + label {
     font-size: 18px;
     text-align: center;
     /*min-height: 78px;*/
+    padding: 10px;
 }
 .modal-footer {
     grid-row: 3;

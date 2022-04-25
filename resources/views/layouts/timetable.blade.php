@@ -231,10 +231,6 @@
             left: 0;
         }
 
-        .btn-info {
-            color: black;
-        }
-
         .saved {
             color: green;
         }

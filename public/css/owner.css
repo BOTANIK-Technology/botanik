@@ -17,6 +17,11 @@
     background: #F1F6EC;
     box-shadow: 0 2px 3px rgba(50, 100, 0, 0.2);
     border-radius: 5px 5px 0 0;
+    height: 50px;
+}
+
+.header-buttons {
+    margin: 5px;
 }
 .add {
     padding: 0;
@@ -154,4 +159,19 @@ select.border-color {
 }
 #img-label.active {
     background-image: url("../images/img-active-b.svg");
+}
+
+
+.btn-info {
+    color: black;
+}
+.btn-success {
+    color: black;
+    background: green;
+    margin: 5px;
+}
+
+.btn-label {
+    margin: 10px;
+    color: black;
 }

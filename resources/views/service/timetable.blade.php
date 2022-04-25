@@ -25,12 +25,19 @@
 {{--        @endslot--}}
 
         @include('layouts.timetable')
+@slot('header_buttons')
+    @if($mode == 'edit')
+        <button type="button" id="time-confirm" class="btn-primary">
+            {{ __('Подтвердить') }}
+        </button>
+    @endif
+@endslot
 
         @slot('buttons')
             @if($mode == 'edit')
-            <button type="button" id="time-confirm" class="btn-primary">
-                {{ __('Подтвердить') }}
-            </button>
+{{--            <button type="button" id="time-confirm" class="btn-primary">--}}
+{{--                {{ __('Подтвердить') }}--}}
+{{--            </button>--}}
             @endif
             @if (isset($type_id))
                 <a href="{{route('window.service', ['business' => $slug, 'modal' => $mode, 'id' => $service_id, 'load' => $load, 'no_cookie'=> 1])}}" id="refresh-modal"></a>
