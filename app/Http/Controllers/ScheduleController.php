@@ -172,6 +172,7 @@ class ScheduleController extends Controller
             'service_id' => 'required|integer',
             'address_id' => 'required|integer',
             'user_id'    => 'nullable|integer',
+            'pay_type'   => 'required|string',
             'date'       => 'required|date',
             'time'       => 'required|string|min:4|max:5',
         ]);
@@ -200,6 +201,7 @@ class ScheduleController extends Controller
                 'telegram_user_id' => $request->client_id,
                 'service_id'       => $request->service_id,
                 'address_id'       => $request->address_id,
+                'pay_type'         => $request->pay_type,
                 'user_id'          => $request->has('user_id') ? $request->user_id : null,
                 'time'             => explode(':', $request->time)[0] . ":00",
                 'date'             => Carbon::parse($request->date)->format('Y-m-d')

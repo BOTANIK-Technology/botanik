@@ -35,6 +35,7 @@ class Record extends Model
         'address_id',
         'user_id',
         'yclients_id',
+        'pay_type',
         'beauty_id',
         'transfer',
         'status',

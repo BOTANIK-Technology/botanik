@@ -7,6 +7,7 @@
         let month = '{{$month}}';
         let date = '{{$record->date}}';
         let time = '{{$record->time}}';
+        let pay_type = '{{$record->pay_type}}';
     </script>
     <script src="{{asset('js/schedule/schedule_win.js')}}"></script>
     <script src="{{asset('js/schedule/edit.js')}}"></script>

@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Log;
  */
 class Service extends Model
 {
+
     use HasFactory, RelationHelper;
 
     /** @var array $fillable */
