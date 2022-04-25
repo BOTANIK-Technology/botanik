@@ -68,20 +68,20 @@
 
 </div>
 
-<div class="flex justify-content-around create" id="payments-block">
-    <div class="pay-block hide" id="block-cash_pay">
-        <input class="pay-input" type="radio" name="pay_type">
-        <label for="cash_pay">{{__('Наличными')}}</label>
-    </div>
-    <div class="pay-block hide" id="block-bonus_pay">
-        <input class="pay-input" type="radio" name="pay_type">
-        <label for="bonus_pay">{{__('Бонусами')}}</label>
-    </div>
-    <div class="pay-block hide" id="block-online_pay">
-        <input class="pay-input" type="radio" name="pay_type">
-        <label for="online_pay">{{__('Бонусами')}}</label>
-    </div>
-</div>
+{{--<div class="flex justify-content-around create" id="payments-block">--}}
+{{--    <div class="pay-block hide" id="block-cash_pay">--}}
+{{--        <input class="pay-input" type="radio" name="pay_type">--}}
+{{--        <label for="cash_pay">{{__('Наличными')}}</label>--}}
+{{--    </div>--}}
+{{--    <div class="pay-block hide" id="block-bonus_pay">--}}
+{{--        <input class="pay-input" type="radio" name="pay_type">--}}
+{{--        <label for="bonus_pay">{{__('Бонусами')}}</label>--}}
+{{--    </div>--}}
+{{--    <div class="pay-block hide" id="block-online_pay">--}}
+{{--        <input class="pay-input" type="radio" name="pay_type">--}}
+{{--        <label for="online_pay">{{__('Бонусами')}}</label>--}}
+{{--    </div>--}}
+{{--</div>--}}
 
 @slot('buttons')
     <button type="button" id="action" data-href="{{route('schedule.create', ['business' => $slug])}}"

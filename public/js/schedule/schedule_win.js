@@ -264,8 +264,8 @@ let ScheduleWindow = function () {
         if (!hasPayment) {
         //    createBtn.classList.remove('hide');
         }
-        document.getElementById('payments-block').addEventListener('click', () => {
-          //  createBtn.classList.remove('hide');
+        document.getElementById('user_times').addEventListener('click', () => {
+           createBtn.classList.remove('hide');
         });
 
 
