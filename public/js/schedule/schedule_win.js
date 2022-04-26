@@ -31,9 +31,9 @@ let ScheduleWindow = function () {
         this.service.addEventListener('change', function () {
             _this.address.classList.add('hide');
             _this.master.classList.add('hide');
-           if(_this.calendar) {
-               _this.calendar.innerHTML = '';
-           }
+            if (_this.calendar) {
+                _this.calendar.innerHTML = '';
+            }
             _this.loadAddresses();
         });
     }
@@ -177,12 +177,13 @@ let ScheduleWindow = function () {
                     }
                     table.appendChild(row);
                 }
-
+                document.getElementById('user_times').innerHTML = '';
             }
         });
     }
 
     this.loadDayCreate = function (date) {
+
         if (this.mode === 'create') {
             let service_id = this.service.value;
             let master_id = this.master.value;
@@ -194,9 +195,11 @@ let ScheduleWindow = function () {
     }
 
     this.loadDay = function (date, service_id, master_id, address_id) {
+        if ((new Date(date + ' 23:59') - new Date()) < 0) {
+            return false;
+        }
         this.recordTime.date = date;
         let _this = this;
-        console.log(_this.recordTime.time, _this.mode);
 
         this.post({
                 url: '/api/times',
@@ -249,23 +252,23 @@ let ScheduleWindow = function () {
 
         if (this.paymentTypes.cash_pay) {
             hasPayment = true;
-        //    document.getElementById('block-cash_pay').classList.remove('hide');
+            //    document.getElementById('block-cash_pay').classList.remove('hide');
         }
         if (this.paymentTypes.bonus_pay) {
             hasPayment = true;
-        //    document.getElementById('block-bonus_pay').classList.remove('hide');
+            //    document.getElementById('block-bonus_pay').classList.remove('hide');
         }
         if (this.paymentTypes.online_pay) {
             hasPayment = true;
-        //    document.getElementById('block-online_pay').classList.remove('hide');
+            //    document.getElementById('block-online_pay').classList.remove('hide');
         }
         let createBtn = document.getElementById('action');
         createBtn.addEventListener('click', send);
         if (!hasPayment) {
-        //    createBtn.classList.remove('hide');
+            //    createBtn.classList.remove('hide');
         }
         document.getElementById('user_times').addEventListener('click', () => {
-           createBtn.classList.remove('hide');
+            createBtn.classList.remove('hide');
         });
 
 
