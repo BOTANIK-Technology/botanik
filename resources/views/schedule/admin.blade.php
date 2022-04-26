@@ -22,13 +22,16 @@
         <table class="schedule_table">
             <thead>
             <tr>
-                <th>{{__('Время записи от')}}</th>
-                <th>{{__('Время записи до')}}</th>
-                <th>{{__('Специалист')}}</th>
-                <th>{{__('Услуга')}}</th>
-                <th>{{__('Группа')}}</th>
-                <th>{{__('Клиент')}}</th>
-                <th>{{__('Действие')}}</th>
+                <th colspan="2" >{{__('Время записи')}}</th>
+                <th rowspan="2">{{__('Специалист')}}</th>
+                <th rowspan="2">{{__('Услуга')}}</th>
+                <th rowspan="2">{{__('Группа')}}</th>
+                <th rowspan="2">{{__('Клиент')}}</th>
+                <th rowspan="2">{{__('Действие')}}</th>
+            </tr>
+            <tr>
+                <th>{{__('от')}}</th>
+                <th>{{__('до')}}</th>
             </tr>
             </thead>
             <tbody>
@@ -134,7 +137,7 @@
                 font-weight: 600;
                 color: #9A13CA;
                 text-align: center;
-                border-right: 1px solid #CEB5CE;
+                border: 1px solid #CEB5CE;
                 padding: 8px 16px;
             }
 
