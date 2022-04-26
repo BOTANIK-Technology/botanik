@@ -6,7 +6,14 @@
         let currentService = {{$currentService}};
         let service_id = 0;
         let master_id = id;
-        let timetableDB = @json($timetables ?? []);
+        let timeCookie = getCookie('timetables');
+        let timetableDB
+        if ( timeCookie && <?= request()->get('only_render', 0 ) ?> ) {
+            timetableDB = timeCookie
+        }
+        else {
+            timetableDB = @json($timetables ?? []);
+        }
         let mode = '{{$mode}}'
     </script>
     <script src="{{asset('js/requests.js')}}"></script>

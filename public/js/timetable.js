@@ -10,19 +10,19 @@ let month = document.getElementById('month_picker');
 let year = document.getElementById('year_picker');
 
 
-
 if (month.value) {
     month.addEventListener('change', () => {
         let res = true;
-        if (! document.getElementById('save_month').classList.contains('saved')) {
-             res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
+        if (!document.getElementById('save_month').classList.contains('saved')) {
+            res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
         }
-        if(res) {
+        if (res) {
             window.location.replace(CURRENT_URL + '?service_id=' + id
                 + '&current_month=' + month.value
                 + '&current_year=' + year.value
                 + '&currentService=' + currentService
-                + '&mode=' + mode
+                + '&only_render=' + 1
+                +'&mode=' + mode
             );
         }
     });
@@ -31,14 +31,15 @@ if (month.value) {
 if (year) {
     year.addEventListener('change', () => {
         let res = true;
-        if (! document.getElementById('save_month').classList.contains('saved')) {
+        if (!document.getElementById('save_month').classList.contains('saved')) {
             res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
         }
-        if(res) {
+        if (res) {
             window.location.replace(CURRENT_URL + '?service_id=' + id
                 + '&current_month=' + month.value
                 + '&current_year=' + year.value
                 + '&currentService=' + currentService
+                + '&only_render=' + 1
                 + '&mode=' + mode
             );
         }
@@ -46,6 +47,17 @@ if (year) {
 }
 
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
+    console.log(yearVal, monthVal);
+    let checkedArray = getFromStorage(yearVal, monthVal, idVal);
+    for (let dateEl in checkedArray) {
+        for (let timeEl of checkedArray[dateEl]) {
+            let cell = document.getElementById(dateEl + '-' + timeEl);
+            if (cell) cell.classList.add('checked')
+        }
+    }
+}
+
+const getFromStorage = function (yearVal, monthVal, idVal = null) {
     let timetables = getCookie('timetables');
 
     if (timetables.length || Object.keys(timetables)) {
@@ -54,19 +66,12 @@ const showFromStorage = function (yearVal, monthVal, idVal = null) {
     }
     let timetable = timetables[currentService];
     if (timetable && (yearVal in timetable) && (monthVal in timetable[yearVal])) {
-        let checkedArray = timetable[yearVal][monthVal];
-        for (let dateEl in checkedArray) {
-            for (let timeEl of checkedArray[dateEl]) {
-                let cell = document.getElementById(dateEl + '-' + timeEl);
-                if (cell) cell.classList.add('checked')
-            }
-        }
+        return timetable[yearVal][monthVal];
     }
+    return [];
+}
 
-}
-if (month && year) {
-    showFromStorage(year.value, month.value, id);
-}
+
 
 
 const changeSavedButton = function (savedState) {
@@ -90,12 +95,12 @@ changeSavedButton(true)
 if (close.length > 0) {
     Object.keys(close).forEach((k) => {
         close[k].removeEventListener('click', clearCloseModal);
-        close[k].addEventListener('click', function(){
+        close[k].addEventListener('click', function () {
             let res = true;
-            if (! document.getElementById('save_month').classList.contains('saved')) {
+            if (!document.getElementById('save_month').classList.contains('saved')) {
                 res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
             }
-            if(res) {
+            if (res) {
                 closeModal();
             }
         });
@@ -122,7 +127,7 @@ if (saveMonth) {
 }
 
 let checkboxes = document.getElementsByClassName('checkbox');
-if(mode == 'edit') {
+if (mode == 'edit') {
     Object.keys(checkboxes).forEach((el) => {
 
         checkboxes[el].addEventListener('mousedown', function () {
@@ -137,7 +142,7 @@ if(mode == 'edit') {
 }
 
 let all = document.querySelector('#select-all');
-if(all) {
+if (all) {
     all.addEventListener('click', function () {
         changeSavedButton(false);
         Object.keys(checkboxes).forEach((el) => {
@@ -147,7 +152,7 @@ if(all) {
 }
 
 let clr = document.querySelector('#clear-all');
-if(clr) {
+if (clr) {
     clr.addEventListener('click', function () {
         changeSavedButton(false);
         Object.keys(checkboxes).forEach((el) => {
@@ -198,7 +203,7 @@ const saveMonthAction = (id) => {
     });
 
     Request.onload = function () {
-            let res = JSON.parse(Request.response);
+        let res = JSON.parse(Request.response);
         if (res && res.result === 'OK') {
             allCookies[currentService] = serviceTimetable;
             setCookie('timetables', allCookies);
@@ -211,3 +216,6 @@ const saveMonthAction = (id) => {
 
 }
 
+if (month && year) {
+    showFromStorage(year.value, month.value, id);
+}

@@ -1,17 +1,10 @@
-if (document.querySelector('.modal-edit') ) {
+if (document.querySelector('.modal-edit')) {
     setInitialData(id);
     //styles
     // inputActive(document.getElementsByClassName('inp'));
 
 
     let delBtns = document.getElementsByName('delete-service');
-
-
-
-
-
-
-
 
 
     /**
@@ -32,8 +25,6 @@ if (document.querySelector('.modal-edit') ) {
             };
         })
     });
-
-
 
 
     let btnType = document.getElementById('edit-type');
