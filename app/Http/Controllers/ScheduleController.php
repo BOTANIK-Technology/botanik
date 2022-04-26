@@ -237,7 +237,7 @@ class ScheduleController extends Controller
 
         }
         catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 200);
         }
 
 
@@ -291,7 +291,7 @@ class ScheduleController extends Controller
         }
         catch (Exception $e) {
             Log::error('**** delete record error: ' . $e->getMessage());
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 200);
         }
     }
 
@@ -351,7 +351,7 @@ class ScheduleController extends Controller
             return response()->json(['ok' => 'Запись изменена']);
         }
         catch (Exception $e) {
-            return response()->json(['errors' => ['server' => $e->getMessage()]], 500);
+            return response()->json(['errors' => ['server' => $e->getMessage()]], 200);
         }
     }
 
