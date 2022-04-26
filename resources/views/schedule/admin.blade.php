@@ -31,7 +31,7 @@
                 <th colspan="2" >{{__('Время записи')}}</th>
                 <th rowspan="2">{{__('Специалист')}}</th>
                 <th rowspan="2">{{__('Услуга')}}</th>
-                <th rowspan="2">{{__('Группа')}}</th>
+                <th rowspan="2">{{__('Тип')}}</th>
                 <th rowspan="2">{{__('Клиент')}}</th>
                 <th rowspan="2">{{__('Действие')}}</th>
             </tr>
@@ -47,7 +47,7 @@
                     <td class="schedule_table-time">{{$item->finishTime}}</td>
                     <td>{{$item->user ? $item->user->name : ''}}</td>
                     <td>{{$item->service->name}}</td>
-                    <td>{{$item->service->group ? $item->service->group->quantity : ''}}</td>
+                    <td>{{$item->service->typeServices->type }}</td>
                     <td>{{$item->telegramUser->getFio()}}</td>
                     <td>
                         <div class="schedule_table-btns">
