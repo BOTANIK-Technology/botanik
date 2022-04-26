@@ -1,6 +1,12 @@
 @slot('header')
     <header class="flex align-items-center">
-        <a href="{{route('window.schedule', ['business' => $slug, 'modal' => 'create', 'date' => $date])}}"
+        <a href="{{route('window.schedule', [
+	'business' => $slug,
+	'modal' => 'create',
+	'date' => $date,
+	'current_type' => $current_type,
+	'current_month' => $current_month
+	])}}"
            class="btn full-width text-decoration-none flex justify-content-around align-items-center">{!! file_get_contents(public_path('images/add-w.svg')) !!}
             записать клиента</a>
     </header>
