@@ -206,7 +206,7 @@ class ScheduleController extends Controller
                 'telegram_user_id' => $request->client_id,
                 'service_id'       => $request->service_id,
                 'address_id'       => $request->address_id,
-                'pay_type'         => $request->pay_type,
+//                'pay_type'         => $request->pay_type,
                 'user_id'          => $request->has('user_id') ? $request->user_id : null,
                 'time'             => $request->time,
                 'date'             => $date
