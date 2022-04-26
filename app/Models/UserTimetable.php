@@ -3,7 +3,6 @@
 namespace App\Models;
 
 
-
 use App\Traits\TimetableTrait;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -71,25 +70,29 @@ class UserTimetable extends Model
      */
     public static function userSchedule(User $user, Carbon $date = null)
     {
-        if (is_null($date))
-            $date = Carbon::now()->format('l');
-        else
-            $date = $date->format('l');
-        $date = mb_strtolower($date);
-        if ($user->timetables) {
-            $table = [];
-            foreach ($user->timetables as $tab)
-                if (isset($tab->$date)) {
-                    $table['times'][] = json_decode($tab->$date);
-                    $table['address'] = $tab->address->address;
-                    $table['service'] = $tab->service->name;
-                }
-            if (empty($table)) return false;
-            else return $table;
+        if (is_null($date)) {
+            $date = Carbon::now();
         }
-        return false;
-    }
+        $month = strtolower($date->format('F'));
+        $date = $date->format('Y-m-d');
 
+
+        $table = [];
+        if ($user->slots) {
+            foreach ($user->slots as $slot) {
+                $tab = $slot->timetables()->where('month', $month)->first();
+                $table['times'][] = $tab->schedule[$date] ?? [];
+                $table['address'] = $slot->address->address;
+                $table['service'] = $slot->service->name;
+            }
+        }
+        if (empty($table)) {
+            return false;
+        }
+        else {
+            return $table;
+        }
+    }
 
 
     /**
@@ -99,12 +102,13 @@ class UserTimetable extends Model
      * @param int $service_id
      * @return array|bool
      */
-    public static function getTimes(User $user, int $address_id, int $service_id, string $date)
+    public
+    static function getTimes(User $user, int $address_id, int $service_id, string $date)
     {
         $date = mb_strtolower(Carbon::parse($date)->format('Y-m-d'));
 
         $table = $user->getTimesForDate($date);
-        if(!$table){
+        if (!$table) {
             return [];
         }
 
@@ -124,7 +128,8 @@ class UserTimetable extends Model
      * @param null $ignore_time
      * @return array
      */
-    public static function getFreeTimes(User $user, int $address_id, int $service_id, string $date,$ignore_time = null): array
+    public
+    static function getFreeTimes(User $user, int $address_id, int $service_id, string $date, $ignore_time = null): array
     {
         $check_hours = Carbon::parse($date)->isToday();
         $now = Carbon::now();
@@ -158,7 +163,8 @@ class UserTimetable extends Model
             // если запись на сегодня - отбросим уже прошедшие слоты
             if ($check_hours && !Carbon::parse($times[$i])->greaterThanOrEqualTo($now)) {
                 $timeMap[$i] = 0;
-            } else {
+            }
+            else {
                 $timeMap[$i] = 1;
             }
         }
@@ -176,7 +182,7 @@ class UserTimetable extends Model
         foreach ($booked_array as $book => $bookDuration) {
 
             //Если прилетел слот для игнорирования (при правке даты уже созданной записи) - то мы его игнорируем
-            if($book == $ignore_time) {
+            if ($book == $ignore_time) {
                 continue;
             }
             // получим число слотов в текущей услуге

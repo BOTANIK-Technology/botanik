@@ -68,15 +68,16 @@ class ScheduleController extends Controller
         if (isset($request->modal)) {
             $this->params['modal'] = $request->modal;
         }
+        $recordsQueue = Record::whereDate('date', Carbon::parse($this->params['date']));
+        if ($request->current_type) {
+            $recordsQueue->whereHas('service', function ($q) use ($request) {
+                return $q->where('type_service_id', $request->current_type);
+            });
+        }
 
         if ($user->hasRole('admin', 'owner')) {
-            $recordsQueue = Record::whereDate('date', Carbon::parse($this->params['date']));
-            if ($request->current_type) {
-                $recordsQueue->whereHas('service', function ($q) use ($request) {
-                    return $q->where('type_service_id', $request->current_type);
-                });
-            }
-            $records = $recordsQueue->orderBy('time', 'ASC')->get();
+
+
             $this->params['times'] = UserTimetable::getHours();
             $this->params['types'] = TypeService::all();
 
@@ -89,14 +90,14 @@ class ScheduleController extends Controller
         else {
 
             $s = [];
-            $services = DB::table('users_services')->where('user_id', auth()->user()->id)->pluck('service_id')->toArray();
+            $services = DB::table('users_slots')->where('user_id', auth()->user()->id)->pluck('service_id')->toArray();
             foreach ($services as $service) {
                 $s[] = $service;
             }
 
             $types = Service::where('id', $s)->pluck('type_service_id')->toArray();
             $schedule = UserTimetable::userSchedule($user, Carbon::parse($this->params['date']));
-            $records = Record::where('user_id', $user->id)->whereDate('date', Carbon::parse($this->params['date']))->orderBy('time', 'ASC')->get();
+            $recordsQueue->where('user_id', $user->id);
             $this->params['types'] = $types;
             $this->params['current_type'] = $request->input('current_type') ?? $types[0];
             $this->params['schedule'] = $schedule['times'] ?? false;
@@ -104,7 +105,7 @@ class ScheduleController extends Controller
         }
 
 
-        $this->params['records'] = $records;
+        $this->params['records'] = $recordsQueue->orderBy('time', 'ASC')->get();
 
     }
 
