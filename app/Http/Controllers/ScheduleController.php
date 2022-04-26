@@ -196,13 +196,9 @@ class ScheduleController extends Controller
             return response()->json(['errors' => ['text' => $res]], 405);
         }
         $date = Carbon::parse($request->date)->format('Y-m-d');
-        if(Record::isTimeFree($request) ) {
-            return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
-        }
-
         try {
-
-            $record = Record::create([
+            $record = new Record();
+            $record->fill([
                 'telegram_user_id' => $request->client_id,
                 'service_id'       => $request->service_id,
                 'address_id'       => $request->address_id,
@@ -211,6 +207,10 @@ class ScheduleController extends Controller
                 'time'             => $request->time,
                 'date'             => $date
             ]);
+            if(Record::isTimeFree($request) ) {
+                return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
+            }
+            $record->save();
 
             $service = $record->service;
 
@@ -301,14 +301,16 @@ class ScheduleController extends Controller
      */
     public function editSchedule(Request $request): JsonResponse
     {
-        if(Record::isTimeFree($request) ) {
-            return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
-        }
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+
         try {
             $record = Record::find($request->id);
             $record->time = $request->time;
-            $record->transfer = Carbon::parse($record->date)->format('Y-m-d');
-            $record->date = Carbon::parse($request->date)->format('Y-m-d');
+            $record->transfer = $record->date . ' ' . $record->time;
+            $record->date = $date;
+            if(Record::isTimeFree($record) ) {
+                return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
+            }
             $record->save();
         }
         catch (Exception $e) {

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Log;
 
 /**
  * App\Models\Record
@@ -93,13 +94,12 @@ class Record extends Model
         return $this->hasOne(Payment::class);
     }
 
-    public static function isTimeFree($request)
+    public static function isTimeFree($record)
     {
-        $date = \Carbon\Carbon::parse($request->date)->format('Y-m-d');
-        return self::where('date', $date)
-            ->where('time', $request->time)
-            ->where('service_id', $request->service_id)
-            ->where('address_id', $request->address_id)
+        return self::where('date', $record->date)
+            ->where('time', $record->time)
+            ->where('service_id', $record->service_id)
+            ->where('address_id', $record->address_id)
             ->count();
     }
 
