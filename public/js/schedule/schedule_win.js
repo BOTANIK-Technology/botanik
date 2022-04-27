@@ -214,25 +214,29 @@ let ScheduleWindow = function () {
                 success: function (response) {
                     let table = document.getElementById('user_times');
                     table.innerHTML = '';
-                    for (let cellTime of response) {
-                        let cell = document.createElement('div');
-                        cell.setAttribute('onclick', 'scheduleWin.loadPayment("' + cellTime + '")');
-                        let radioInput = document.createElement('input');
-                        radioInput.setAttribute('type', 'radio');
-                        radioInput.setAttribute('id', cellTime);
-                        radioInput.setAttribute('name', 'calendar_cellTime');
-                        radioInput.setAttribute('value', cellTime);
-                        let radioLabel = document.createElement('label');
-                        radioLabel.innerHTML = cellTime;
+                    if (response.length) {
+                        for (let cellTime of response) {
+                            let cell = document.createElement('div');
+                            cell.setAttribute('onclick', 'scheduleWin.loadPayment("' + cellTime + '")');
+                            let radioInput = document.createElement('input');
+                            radioInput.setAttribute('type', 'radio');
+                            radioInput.setAttribute('id', cellTime);
+                            radioInput.setAttribute('name', 'calendar_cellTime');
+                            radioInput.setAttribute('value', cellTime);
+                            let radioLabel = document.createElement('label');
+                            radioLabel.innerHTML = cellTime;
 
-                        cell.appendChild(radioInput);
-                        cell.appendChild(radioLabel);
-                        cell.classList.add('time_cell');
+                            cell.appendChild(radioInput);
+                            cell.appendChild(radioLabel);
+                            cell.classList.add('time_cell');
 
-                        table.appendChild(cell);
-                        if (time && time == cellTime) {
-                            radioInput.checked = true
+                            table.appendChild(cell);
+                            if (time && time == cellTime) {
+                                radioInput.checked = true
+                            }
                         }
+                    } else {
+                        table.innerHTML = 'Нет свободных слотов';
                     }
                 }
 

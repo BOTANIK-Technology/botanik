@@ -237,6 +237,7 @@ class ScheduleController extends Controller
 
         }
         catch (Exception $e) {
+            Log::error('**** create record error: ' . $e->getMessage());
             return response()->json(['errors' => ['server' => $e->getMessage()]], 200);
         }
 
@@ -249,18 +250,12 @@ class ScheduleController extends Controller
      */
     public function deleteSchedule(Request $request): JsonResponse
     {
-
         $record = Record::findOrFail($request->id);
-
-
         $client = $record->telegramUser;
         $service_name = $record->service->name;
-
-
         try {
-
+            $record->delete();
             $notice_mess = __('Удалена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $record->date . ' в ' . $record->time;
-
             TelegramNotice::dispatchSync(
                 $request->business_db,
                 $client->chat_id,
@@ -270,8 +265,6 @@ class ScheduleController extends Controller
                 $request->time,
                 $request->token
             );
-
-
             SendNotice::dispatchSync(
                 $request->business_db,
                 [
@@ -285,7 +278,7 @@ class ScheduleController extends Controller
                     ]
                 ],
             );
-            $record->delete();
+
             return response()->json(['ok' => 'Запись удалена']);
 
         }
