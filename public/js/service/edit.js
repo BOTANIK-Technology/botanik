@@ -1,5 +1,5 @@
 if (document.querySelector('.modal-edit')) {
-    setInitialData(id);
+   // setInitialData(id);
     //styles
     // inputActive(document.getElementsByClassName('inp'));
 
