@@ -109,9 +109,10 @@
                             'business' => $slug,
                             'id' => $user->id,
                             'currentService' => $i,
-							 'moreService' => $moreService,
+							'moreService' => $moreService,
                             'modal' => 'timetable',
-                            'mode' => 'edit'
+                            'mode' => 'edit',
+                            'only_render' => 1
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>

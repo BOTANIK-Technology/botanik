@@ -100,9 +100,6 @@ let timeBtn = document.getElementById('time-confirm');
 if (timeBtn) {
     timeBtn.addEventListener('click', () => {
         saveMonthAction(id);
-        if (isOK) {
-            setTimeout(closeModal, 500)
-        }
     });
 }
 
@@ -198,6 +195,7 @@ const saveMonthAction = (id) => {
             allCookies[currentService] = serviceTimetable;
             setCookie('timetables', allCookies);
             changeSavedButton(true);
+            closeModal();
             isOK = true;
         } else {
             showErrors(Request.response, 'Невозможно сохранить расписание. <br>Имеются записи клиентов на следующие даты:');

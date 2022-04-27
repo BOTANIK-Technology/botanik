@@ -10,6 +10,7 @@
 
         let services = @json([]);
         let addresses = @json([]);
+        console.log(getCookie('timetables'));
         if (!getCookie('timetables').length) {
             setCookie('timetables', @json([]));
         }
@@ -106,33 +107,34 @@
                             'business' => $slug,
                             'id' => 0,
                             'currentService' => $i,
-							 'moreService' => $moreService,
+							'moreService' => $moreService,
+                            'modal' => 'timetable',
                             'mode' => 'edit',
-                            'modal' => 'timetable'
+                            'only_render' => 1
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>
                     <div class="filled-months" data-slot="{{$i}}">
 
                     </div>
-                    </div>
-                    @endfor
                 </div>
+            @endfor
+        </div>
 
-                <div class="line"></div>
+        <div class="line"></div>
 
-                @slot('buttons')
-                    <div id="type-block" class="row-1 col-3 flex align-items-center justify-content-center">
-                        <div class="add-b-icon"></div>
-                        <a id="add-type" class="color text-decoration-none"
-                           data-href="{{route('addService', ['business' => $slug, 'id' => $id ?? 'new', 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load])}}">{{__('Добавить услугу к специалисту')}}</a>
-                    </div><br>
-                    <button type="button" id="edit-user"
-                            data-ref="{{route('editUser', ['business' => $slug, 'id' => 0])}}"
-                            class="btn-primary">
-                        {{ __('Создать') }}
-                    </button>
-                    <a href="{{route('user', ['business' => $slug, 'sort' => $sort])}}" id="refresh-modal"></a>
+        @slot('buttons')
+            <div id="type-block" class="row-1 col-3 flex align-items-center justify-content-center">
+                <div class="add-b-icon"></div>
+                <a id="add-type" class="color text-decoration-none"
+                   data-href="{{route('addService', ['business' => $slug, 'id' => $id ?? 'new', 'modal' => $modal, 'moreService' => $moreService+1, 'sort' => $sort, 'load' => $load])}}">{{__('Добавить услугу к специалисту')}}</a>
+            </div><br>
+            <button type="button" id="edit-user"
+                    data-ref="{{route('editUser', ['business' => $slug, 'id' => 0])}}"
+                    class="btn-primary">
+                {{ __('Создать') }}
+            </button>
+            <a href="{{route('user', ['business' => $slug, 'sort' => $sort])}}" id="refresh-modal"></a>
         @endslot
 
     @endcomponent
