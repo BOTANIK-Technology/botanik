@@ -21,7 +21,7 @@ const dropdownChanged = function () {
             + '&current_year=' + year.value
             + '&currentService=' + currentService
             + '&only_render=' + 1
-            + '&moreService=' + moreServices
+            + '&moreService=' + countService
             + '&mode=' + mode
         );
     }

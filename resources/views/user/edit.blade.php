@@ -18,6 +18,9 @@
         if (!getCookie('timetables').length) {
             setCookie('timetables', @json($timetables));
         }
+        let usedMonths = getCookie('timetables');
+
+
 
     </script>
     <script src="{{asset('js/requests.js')}}"></script>
@@ -112,12 +115,8 @@
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>
-                    <div class="filled-months">
-                        @if(isset($usedMonths[$i]))
-                            @foreach($usedMonths[$i] as $month)
-                                <p>{{$month}}</p>
-                            @endforeach
-                        @endif
+                    <div class="filled-months" data-slot="{{$i}}">
+
                     </div>
 
                 </div>

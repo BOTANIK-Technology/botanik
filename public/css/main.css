@@ -259,7 +259,7 @@ b {
     margin: 66px auto 0 auto;
 }
 .table>div {
-    max-height: 70px;
+    /*max-height: 70px;*/
     min-height: 50px;
     border: 1px solid #E9EAEC;
 }

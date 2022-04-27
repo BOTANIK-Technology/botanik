@@ -2,6 +2,21 @@ let CreateUserWindow = function () {
     let isInit = true;
     this.token = null;
 
+    let monthsEnRu = {
+        'january' : 'Январь',
+        'february' : 'Февраль',
+        'march' : 'Март',
+        'april' : 'Апрель',
+        'may' : 'Май',
+        'june' : 'Июнь',
+        'july' : 'Июль',
+        'august' : 'Август',
+        'september' : 'Сентябрь',
+        'october' : 'Октябрь',
+        'november' : 'Ноябрь',
+        'december' : 'Декабрь'
+    }
+
 
     let allServiceList = {};
     let allAddressList = {};
@@ -11,14 +26,26 @@ let CreateUserWindow = function () {
     this.address = null;
 
     this.master = null;
+    let monthSlots = document.getElementsByClassName('filled-months');
 
     this.init = function () {
         this.token = document.querySelector('#token_id');
         this.slug = document.querySelector('#url_slug');
 
         this.loadAllServices();
-        // this.initAllServices();
-        // document.querySelector('input[name="role"]);
+        for (let slot of monthSlots){
+            let slotId = slot.getAttribute('data-slot');
+            let slotTimes = usedMonths[slotId];
+            for (let year of Object.keys(slotTimes) ){
+                for (let month of Object.keys(slotTimes[year])){
+                console.log(year, month);
+                    let child = document.createElement('div');
+                    child.innerText = year + '/' + monthsEnRu[month];
+                        slot.appendChild(child);
+                }
+            }
+
+        }
     }
 
     this.initAllServices = function () {

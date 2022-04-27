@@ -6,7 +6,6 @@
         let currentService = {{$currentService}};
         let service_id = 0;
         let master_id = id;
-        let moreServices = {{$moreService ?? 1}};
         let timeCookie = getCookie('timetables');
         let timetableDB
         if ( timeCookie && <?= request()->get('only_render', 0 ) ?> ) {
