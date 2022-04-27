@@ -3,10 +3,16 @@
     <script src="{{asset('js/cookie.js')}}"></script>
     <script src="{{asset('js/requests.js')}}"></script>
     <script>
+        let countService = false;
         let currentYear = '{{$current_year}}';
         let currentMonth = '{{$current_month}}';
         let id = 0;
         let timetableDB = @json([]);
+
+        if (!getCookie('timetables').length) {
+            setCookie('timetables', @json([]));
+        }
+        let usedMonths = getCookie('timetables');
     </script>
     <script src="{{asset('js/service/common.js')}}"></script>
     <script src="{{asset('js/service/create.js')}}"></script>
@@ -146,10 +152,12 @@
                                             'load' => $load,
                                             'modal' => 'timetable',
 											'mode' => 'edit',
+											'only_render' => 1,
                                             'url' => url()->current()
                                         ])}}">
                     <div class="calendar-icon"></div>
                 </button>
+                <div id="filled-months" ></div>
             </div>
 
             <div class="row-11 col-2 grid intervals ">

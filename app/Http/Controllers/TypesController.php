@@ -21,6 +21,7 @@ class TypesController extends Controller
     public function edit(string $business, int $id, Request $request): View
     {
         $params = [
+            'id' => $id,
             'view' => 'types',
             'types' => TypeService::all(),
             'slug' => $business,

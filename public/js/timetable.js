@@ -17,14 +17,16 @@ const dropdownChanged = function () {
         res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
     }
     if (res) {
-        window.location.replace(CURRENT_URL + '?service_id=' + id
+        let query ='?service_id=' + id
             + '&current_month=' + month.value
             + '&current_year=' + year.value
             + '&currentService=' + currentService
             + '&only_render=' + 1
-            + '&moreService=' + countService
-            + '&mode=' + mode
-        );
+            + '&mode=' + mode;
+        if(countService){
+            query += '&moreService=' + countService;
+        }
+        window.location.replace(CURRENT_URL + query);
     }
 }
 if (month.value) {
@@ -99,7 +101,7 @@ if (close.length > 0) {
 let timeBtn = document.getElementById('time-confirm');
 if (timeBtn) {
     timeBtn.addEventListener('click', () => {
-        saveMonthAction(id);
+        saveMonthAction(id, true);
     });
 }
 
@@ -146,7 +148,7 @@ if (clr) {
 }
 
 
-const saveMonthAction = (id) => {
+const saveMonthAction = (id, close = false) => {
     let allCookies = getCookie('timetables');
     currentService = parseInt(currentService);
     let serviceTimetable = allCookies[currentService];
@@ -192,15 +194,20 @@ const saveMonthAction = (id) => {
             if ( (!Object.keys(serviceTimetable[indexYear][indexMonth]).length) && (!serviceTimetable[indexYear][indexMonth].length) ){
                 delete serviceTimetable[indexYear][indexMonth];
             }
+
+            if ( (!Object.keys(serviceTimetable[indexYear]).length) && (!serviceTimetable[indexYear].length) ){
+                delete serviceTimetable[indexYear];
+            }
+
             allCookies[currentService] = serviceTimetable;
             setCookie('timetables', allCookies);
             changeSavedButton(true);
-            closeModal();
-            isOK = true;
+            if (close) {
+                closeModal();
+            }
         } else {
             showErrors(Request.response, 'Невозможно сохранить расписание. <br>Имеются записи клиентов на следующие даты:');
             showFromStorage(year.value, month.value, id);
-            isOK = false;
         }
     }
 

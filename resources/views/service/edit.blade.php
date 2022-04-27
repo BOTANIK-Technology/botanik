@@ -1,13 +1,17 @@
 @section('scripts')
     <script src="{{asset('js/service/page.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
+    <script src="{{asset('js/requests.js')}}"></script>
     <script>
+        let countService = false;
         let currentYear = '{{$current_year}}';
         let currentMonth = '{{$current_month}}';
         let id = {{$service_id}};
+        if (!getCookie('timetables').length) {
+            setCookie('timetables', @json($timetables));
+        }
+        let usedMonths = getCookie('timetables');
     </script>
-
-    <script src="{{asset('js/requests.js')}}"></script>
     <script src="{{asset('js/service/common.js')}}"></script>
     <script src="{{asset('js/service/edit.js')}}"></script>
 
@@ -144,15 +148,12 @@
                                 'business' => $slug,
                                   'service_id' => $view_service->id,
                                    'modal' => 'timetable',
-                                   'mode' => 'edit'
+                                   'mode' => 'edit',
+                                   'only_render' => 1
                     ])}}">
                         <div class="calendar-icon"></div>
                     </a>
-                    <div class="filled-months">
-                        @foreach($usedMonths as $month)
-                            <p>{{$month}}</p>
-                        @endforeach
-                    </div>
+                    <div id="filled-months" ></div>
                 </div>
 
 

@@ -1,3 +1,18 @@
+let monthsEnRu = {
+    'january' : 'Январь',
+    'february' : 'Февраль',
+    'march' : 'Март',
+    'april' : 'Апрель',
+    'may' : 'Май',
+    'june' : 'Июнь',
+    'july' : 'Июль',
+    'august' : 'Август',
+    'september' : 'Сентябрь',
+    'october' : 'Октябрь',
+    'november' : 'Ноябрь',
+    'december' : 'Декабрь'
+}
+
 function addressSelectors(idVal = null) {
     return document.getElementsByName('addresses[]');
 }
@@ -11,7 +26,7 @@ function addAddressSelector(idVal = null) {
 }
 
 const clearCloseModal = () => {
-    unsetCookies(id);
+    unsetCookies();
     closeModal();
 }
 
@@ -27,9 +42,9 @@ if (close.length > 0) {
 }
 
 
-function unsetCookies(idVal) {
+function unsetCookies() {
     deleteCookie('inputs');
-    deleteCookie('timetable');
+    deleteCookie('timetables');
 }
 
 
@@ -44,8 +59,8 @@ if (saveBtn) {
         let Request = postRequest(CURRENT_URL + '/confirm', data);
         Request.onload = function () {
             if (Request.status >= 200 && Request.status < 400) {
-                unsetCookies(id);
-               closeModal();
+                unsetCookies();
+                closeModal();
             } else {
                 showErrors(Request.response)
             }
@@ -115,7 +130,6 @@ function groupVal(idVal = null) {
 }
 
 
-
 function setValues(objects, values) {
     Object.keys(objects).forEach((k) => {
         if (values[k])
@@ -163,6 +177,16 @@ const setInitialData = (idVal) => {
         setChecked(document.getElementsByName('intervalMinutes'), inputs.intervalMinutes);
     }
 
+    let slot = document.getElementById('filled-months');
+    let slotTimes = usedMonths[0];
+    for (let year of Object.keys(slotTimes)) {
+        for (let month of Object.keys(slotTimes[year])) {
+            let child = document.createElement('div');
+            child.innerText = year + '/' + monthsEnRu[month];
+            slot.appendChild(child);
+        }
+    }
+
     /**
      * Group
      */
@@ -201,6 +225,7 @@ const setInitialData = (idVal) => {
         });
     }
 }
+
 function groupOff(groupBlock, id) {
     groupBlock.classList.add('hide');
     document.getElementById('quantity').value = '';
@@ -216,7 +241,8 @@ function prepayOff(prepayBlock, id) {
 function intervalVal(id) {
     return getCheckedVal(document.getElementsByName('interval'))
 }
-function checkedByNameVal (name) {
+
+function checkedByNameVal(name) {
     return getCheckedVal(document.getElementsByName(name));
 }
 

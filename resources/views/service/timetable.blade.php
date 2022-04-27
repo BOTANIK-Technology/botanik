@@ -2,6 +2,7 @@
     <script src="{{asset('js/service/page.js')}}"></script>
     <script src="{{asset('js/cookie.js')}}"></script>
     <script>
+        let countService = false;
         let id = {{$service_id ?? 0}};
         let service_id = id;
         let master_id = null;
