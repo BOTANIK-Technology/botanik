@@ -10,40 +10,28 @@ let month = document.getElementById('month_picker');
 let year = document.getElementById('year_picker');
 
 
+const dropdownChanged = function () {
+    let res = true;
+    if (!document.getElementById('save_month').classList.contains('saved')) {
+        res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
+    }
+    if (res) {
+        window.location.replace(CURRENT_URL + '?service_id=' + id
+            + '&current_month=' + month.value
+            + '&current_year=' + year.value
+            + '&currentService=' + currentService
+            + '&only_render=' + 1
+            + '&moreService=' + moreServices
+            + '&mode=' + mode
+        );
+    }
+}
 if (month.value) {
-    month.addEventListener('change', () => {
-        let res = true;
-        if (!document.getElementById('save_month').classList.contains('saved')) {
-            res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
-        }
-        if (res) {
-            window.location.replace(CURRENT_URL + '?service_id=' + id
-                + '&current_month=' + month.value
-                + '&current_year=' + year.value
-                + '&currentService=' + currentService
-                + '&only_render=' + 1
-                +'&mode=' + mode
-            );
-        }
-    });
+    month.addEventListener('change', dropdownChanged);
 }
 
 if (year) {
-    year.addEventListener('change', () => {
-        let res = true;
-        if (!document.getElementById('save_month').classList.contains('saved')) {
-            res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
-        }
-        if (res) {
-            window.location.replace(CURRENT_URL + '?service_id=' + id
-                + '&current_month=' + month.value
-                + '&current_year=' + year.value
-                + '&currentService=' + currentService
-                + '&only_render=' + 1
-                + '&mode=' + mode
-            );
-        }
-    });
+    year.addEventListener('change', dropdownChanged);
 }
 
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
@@ -70,8 +58,6 @@ const getFromStorage = function (yearVal, monthVal, idVal = null) {
     }
     return [];
 }
-
-
 
 
 const changeSavedButton = function (savedState) {
@@ -111,7 +97,6 @@ if (close.length > 0) {
 * Confirm
 */
 let timeBtn = document.getElementById('time-confirm');
-console.log(id, timeBtn);
 if (timeBtn) {
     timeBtn.addEventListener('click', () => {
         saveMonthAction(id);

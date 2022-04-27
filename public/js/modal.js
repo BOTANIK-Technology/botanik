@@ -10,8 +10,9 @@ function closeModal(event, id = 'modal', href = false) {
     app.classList.remove('bg-blur');
     let refresh = document.getElementById('refresh-' + id);
     if (refresh) {
-        if (href !== false)
+        if (href !== false) {
             refresh.href = href;
+        }
         refresh.click();
     } else {
         document.getElementById(id).remove();
@@ -28,7 +29,7 @@ if (close_modal.length > 0) {
 
 function inputActive(input) {
 
-    if (typeof (input) === 'object' ) {
+    if (typeof (input) === 'object') {
         Object.keys(input).forEach((k) => {
             inputActive(input[k]);
         });

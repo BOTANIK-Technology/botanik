@@ -6,6 +6,7 @@
         let currentService = {{$currentService}};
         let service_id = 0;
         let master_id = id;
+        let moreServices = {{$moreService ?? 1}};
         let timeCookie = getCookie('timetables');
         let timetableDB
         if ( timeCookie && <?= request()->get('only_render', 0 ) ?> ) {
@@ -47,7 +48,7 @@
                 <a href="{{route('addService', ['business' => $slug, 'modal' => $mode, 'id' => $id, 'moreService' => ($mode == 'edit' ? $moreService : null)])}}"
                    id="refresh-modal"></a>
             @else
-                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 0,'moreService' => $moreService])}}"
+                <a href="{{route('addService', ['business' => $slug, 'modal' => 'create', 'id' => 0,'moreService' => $moreService ?? 1])}}"
                    id="refresh-modal"></a>
             @endif
         @endslot
