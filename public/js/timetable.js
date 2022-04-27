@@ -36,7 +36,6 @@ if (year) {
 }
 
 const showFromStorage = function (yearVal, monthVal, idVal = null) {
-    console.log(yearVal, monthVal);
     let checkedArray = getFromStorage(yearVal, monthVal, idVal);
     for (let dateEl in checkedArray) {
         for (let timeEl of checkedArray[dateEl]) {
