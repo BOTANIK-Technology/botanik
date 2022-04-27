@@ -236,7 +236,7 @@ let ScheduleWindow = function () {
                             }
                         }
                     } else {
-                        table.innerHTML = 'Нет свободных слотов';
+                        table.innerHTML = 'На этот день свободных мест нет';
                     }
                 }
 
