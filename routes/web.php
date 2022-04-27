@@ -43,7 +43,7 @@ Route::group(
          * Redirect from index to login route
          */
         Route::get('/', function () {
-            
+
             return redirect()->route('login', ['a-level']);
         });
 
@@ -164,6 +164,7 @@ Route::group(
                  */
                 Route::get('/schedule', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedule');
                 Route::get('/schedule/{modal}/{id?}', [App\Http\Controllers\ScheduleController::class, 'window'])->name('window.schedule');
+                Route::get('/schedule/{modal}', [App\Http\Controllers\ScheduleController::class, 'window'])->name('window.schedule');
                 Route::post('/schedule/delete/{id}', [App\Http\Controllers\ScheduleController::class, 'deleteSchedule'])->name('schedule.delete');
                 Route::post('/schedule/update/{id}', [App\Http\Controllers\ScheduleController::class, 'editSchedule'])->name('schedule.update');
                 Route::post('/schedule/create', [App\Http\Controllers\ScheduleController::class, 'createRecord'])->name('schedule.create');

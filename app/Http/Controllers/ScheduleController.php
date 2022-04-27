@@ -102,10 +102,11 @@ class ScheduleController extends Controller
             $this->params['current_type'] = $request->input('current_type') ?? $types[0];
             $this->params['schedule'] = $schedule['times'] ?? false;
             $this->params['address'] = $schedule['address'] ?? false;
+            $this->params['service'] = $schedule['service'] ?? false;
         }
 
-
         $this->params['records'] = $recordsQueue->orderBy('time', 'ASC')->get();
+      //  dd($this->params['records']);
 
     }
 
@@ -138,7 +139,7 @@ class ScheduleController extends Controller
      */
     public function window(Request $request)
     {
-
+        $id = $request->id;
         switch ($request->modal) {
             case 'create':
                 $this->params['create_clients'] = TelegramUser::all();
@@ -150,11 +151,16 @@ class ScheduleController extends Controller
             case 'view':
             case 'delete':
 
-                $this->params['record'] =
-                    Record::whereDate('date', Carbon::parse($request->input('date')))
-                        ->where('service_id', $request->id)
-                        ->where('time', $request->time)
-                        ->first();
+                if($id) {
+                    $this->params['record'] =
+                        Record::whereDate('date', $request->input('date'))
+                            ->where('service_id', $id)
+                            ->where('time', $request->time)
+                            ->first();
+                }
+                else {
+                    $this->params['record'] = Record::query()->findOrFail($request->input('record_id'));
+                }
                 $this->params['month'] = strtolower(Carbon::parse($this->params['record']->date)->format('F'));
                 break;
 
@@ -174,7 +180,7 @@ class ScheduleController extends Controller
             'service_id' => 'required|integer',
             'address_id' => 'required|integer',
             'user_id'    => 'nullable|integer',
-//            'pay_type'   => 'required|string',
+            //            'pay_type'   => 'required|string',
             'date'       => 'required|date',
             'time'       => 'required|string|min:4|max:5',
         ]);
@@ -202,12 +208,12 @@ class ScheduleController extends Controller
                 'telegram_user_id' => $request->client_id,
                 'service_id'       => $request->service_id,
                 'address_id'       => $request->address_id,
-//                'pay_type'         => $request->pay_type,
+                //                'pay_type'         => $request->pay_type,
                 'user_id'          => $request->has('user_id') ? $request->user_id : null,
                 'time'             => $request->time,
                 'date'             => $date
             ]);
-            if(Record::isTimeFree($request) ) {
+            if (Record::isTimeFree($request)) {
                 return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
             }
             $record->save();
@@ -301,7 +307,7 @@ class ScheduleController extends Controller
             $record->time = $request->time;
             $record->transfer = $record->date . ' ' . $record->time;
             $record->date = $date;
-            if(Record::isTimeFree($record) ) {
+            if (Record::isTimeFree($record)) {
                 return response()->json(['errors' => ['text' => 'Запись на ' . $date . ' ' . $request->time . ' уже кем-то создана']], 400);
             }
             $record->save();

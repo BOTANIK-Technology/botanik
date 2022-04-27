@@ -74,18 +74,20 @@ class UserTimetable extends Model
             $date = Carbon::now();
         }
         $month = strtolower($date->format('F'));
+        $year = strtolower($date->format('Y'));
         $date = $date->format('Y-m-d');
 
 
         $table = [];
         if ($user->slots) {
             foreach ($user->slots as $slot) {
-                $tab = $slot->timetables()->where('month', $month)->first();
+                $tab = $slot->timetables()->where('month', $month)->where('year', $year)->first();
                 $table['times'][] = $tab->schedule[$date] ?? [];
-                $table['address'] = $slot->address->address;
-                $table['service'] = $slot->service->name;
+                $table['address'][] = ['id' => $slot->address->id, 'name' => $slot->address->address];
+                $table['service'][] = ['id' => $slot->service->id, 'name' => $slot->service->name];
             }
         }
+
         if (empty($table)) {
             return false;
         }
