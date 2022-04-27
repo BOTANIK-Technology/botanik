@@ -84,7 +84,7 @@ function showErrors(response, message = '') {
             '</ul>' +
             '</div>' +
             '<div class="modal-footer text-align-center">' +
-            '<button class="btn error" type="button" onclick="closeError()">ОК</button>' +
+            '<button class="btn error" type="button" onclick="isOK=true; closeError()">ОК</button>' +
             '</div>' +
             '</div>' +
             '</div>'

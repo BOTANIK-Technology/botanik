@@ -9,6 +9,7 @@ document.body.addEventListener('mouseup', function () {
 let month = document.getElementById('month_picker');
 let year = document.getElementById('year_picker');
 
+let isOK = false;
 
 const dropdownChanged = function () {
     let res = true;
@@ -100,7 +101,9 @@ let timeBtn = document.getElementById('time-confirm');
 if (timeBtn) {
     timeBtn.addEventListener('click', () => {
         saveMonthAction(id);
-        setTimeout(closeModal, 500)
+        if (isOK) {
+            setTimeout(closeModal, 500)
+        }
     });
 }
 
@@ -172,12 +175,12 @@ const saveMonthAction = (id) => {
     if (!(indexYear in serviceTimetable)) {
         serviceTimetable[indexYear] = {};
     }
-
     serviceTimetable[indexYear][indexMonth] = cookies;
     let userData = getCookie('userData');
     if (userData && userData[currentService]) {
         service_id = userData[currentService].service_id;
     }
+
 
     let Request = postRequest(CURRENT_URL + '/check-records', {
         'service_id': service_id,
@@ -190,11 +193,17 @@ const saveMonthAction = (id) => {
     Request.onload = function () {
         let res = JSON.parse(Request.response);
         if (res && res.result === 'OK') {
+            if ( (!Object.keys(serviceTimetable[indexYear][indexMonth]).length) && (!serviceTimetable[indexYear][indexMonth].length) ){
+                delete serviceTimetable[indexYear][indexMonth];
+            }
             allCookies[currentService] = serviceTimetable;
             setCookie('timetables', allCookies);
             changeSavedButton(true);
+            isOK = true;
         } else {
             showErrors(Request.response, 'Невозможно сохранить расписание. <br>Имеются записи клиентов на следующие даты:');
+            showFromStorage(year.value, month.value, id);
+            isOK = false;
         }
     }
 

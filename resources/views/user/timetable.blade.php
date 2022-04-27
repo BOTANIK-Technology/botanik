@@ -4,6 +4,7 @@
     <script>
         let id = {{$id ?? 0}};
         let currentService = {{$currentService}};
+        let countService = '{{$moreService}}';
         let service_id = 0;
         let master_id = id;
         let timeCookie = getCookie('timetables');
