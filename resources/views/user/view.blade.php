@@ -69,11 +69,10 @@
                             @endforeach
                         @endif
                     </div>
-
-                </div>
+                <div class="line full-width"></div>
             @endfor
         </div>
-        <div class="line"></div>
+{{--        <div class="line"></div>--}}
         @slot('buttons')
             @if ($user->hasRole('master'))
                 <div class="flex direction-column view-user">

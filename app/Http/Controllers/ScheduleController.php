@@ -259,14 +259,19 @@ class ScheduleController extends Controller
         $record = Record::findOrFail($request->id);
         $client = $record->telegramUser;
         $service_name = $record->service->name;
+        $address_id = $record->address_id;
+        $user_id = $record->user_id;
+
+        $notice_mess = __('Удалена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $record->date . ' в ' . $record->time;
+        $bot_mess = __('Внимание! Запись на услугу') . ' "' . $service_name . ' ' . $record->date . ' в ' . $record->time . ' удалена';
         try {
-            $record->delete();
-            $notice_mess = __('Удалена запись на услугу ') . ' <b>' . $service_name . '</b> от ' . $client->getFio() . ' на ' . $record->date . ' в ' . $record->time;
+            Record::destroy($request->id);
+
             TelegramNotice::dispatchSync(
                 $request->business_db,
                 $client->chat_id,
-                $record->id,
-                __('Внимание! Запись на услугу') . ' "' . $service_name . ' ' . $record->date . ' в ' . $record->time . ' удалена',
+                $request->id,
+                $bot_mess,
                 $request->date,
                 $request->time,
                 $request->token
@@ -275,11 +280,11 @@ class ScheduleController extends Controller
                 $request->business_db,
                 [
                     [
-                        'address_id' => $record->address_id,
+                        'address_id' => $address_id,
                         'message'    => $notice_mess
                     ],
                     [
-                        'user_id' => $record->user_id,
+                        'user_id' => $user_id,
                         'message' => $notice_mess
                     ]
                 ],

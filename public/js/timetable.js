@@ -13,17 +13,18 @@ let isOK = false;
 
 const dropdownChanged = function () {
     let res = true;
-    if (!document.getElementById('save_month').classList.contains('saved')) {
+    let saveBtn = document.getElementById('save_month');
+    if (saveBtn && !saveBtn.classList.contains('saved')) {
         res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
     }
     if (res) {
-        let query ='?service_id=' + id
+        let query = '?service_id=' + id
             + '&current_month=' + month.value
             + '&current_year=' + year.value
             + '&currentService=' + currentService
             + '&only_render=' + 1
             + '&mode=' + mode;
-        if(countService){
+        if (countService) {
             query += '&moreService=' + countService;
         }
         window.location.replace(CURRENT_URL + query);
@@ -41,8 +42,12 @@ const showFromStorage = function (yearVal, monthVal, idVal = null) {
     let checkedArray = getFromStorage(yearVal, monthVal, idVal);
     for (let dateEl in checkedArray) {
         for (let timeEl of checkedArray[dateEl]) {
+            console.log(dateEl, timeEl);
             let cell = document.getElementById(dateEl + '-' + timeEl);
-            if (cell) cell.classList.add('checked')
+            console.log(cell);
+            if (cell) {
+                cell.classList.add('checked');
+            }
         }
     }
 }
@@ -50,7 +55,7 @@ const showFromStorage = function (yearVal, monthVal, idVal = null) {
 const getFromStorage = function (yearVal, monthVal, idVal = null) {
     let timetables = getCookie('timetables');
 
-    if (timetables.length || Object.keys(timetables)) {
+    if (!timetables.length && !Object.keys(timetables)) {
         timetables = timetableDB;
         setCookie('timetables', timetables);
     }
@@ -85,7 +90,8 @@ if (close.length > 0) {
         close[k].removeEventListener('click', clearCloseModal);
         close[k].addEventListener('click', function () {
             let res = true;
-            if (!document.getElementById('save_month').classList.contains('saved')) {
+            let saveBtn = document.getElementById('save_month');
+            if (saveBtn && !saveBtn.classList.contains('saved')) {
                 res = window.confirm('Вы не сохранили текущий месяц. Вы точно хотите продолжить без сохранения?');
             }
             if (res) {
@@ -191,11 +197,11 @@ const saveMonthAction = (id, close = false) => {
     Request.onload = function () {
         let res = JSON.parse(Request.response);
         if (res && res.result === 'OK') {
-            if ( (!Object.keys(serviceTimetable[indexYear][indexMonth]).length) && (!serviceTimetable[indexYear][indexMonth].length) ){
+            if ((!Object.keys(serviceTimetable[indexYear][indexMonth]).length) && (!serviceTimetable[indexYear][indexMonth].length)) {
                 delete serviceTimetable[indexYear][indexMonth];
             }
 
-            if ( (!Object.keys(serviceTimetable[indexYear]).length) && (!serviceTimetable[indexYear].length) ){
+            if ((!Object.keys(serviceTimetable[indexYear]).length) && (!serviceTimetable[indexYear].length)) {
                 delete serviceTimetable[indexYear];
             }
 

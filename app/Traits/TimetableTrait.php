@@ -9,6 +9,7 @@ use DatePeriod;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
 
 trait TimetableTrait
 {
@@ -343,8 +344,7 @@ trait TimetableTrait
     {
         $mondays = self::getMondays($start, $end);
         $arr = [];
-        foreach ($mondays as $monday)
-        {
+        foreach ($mondays as $monday) {
             $arr[] = $monday;
         }
         return Date::parse($arr[count($arr) - 1]);
@@ -408,18 +408,11 @@ trait TimetableTrait
      */
     public static function getFullDaysOfMonth(string $month = null, $year = null): array
     {
-        $date = new Carbon();
-        $date->setYear($year ?? strtolower(date('Y') ));
-        $date->setMonth(Carbon::createFromFormat('F', $month ?? date('F'))->month );
+        $month = $month ?? strtolower(date('F') );
+        $monthNumber = array_search($month, array_keys(self::$months) ) + 1;
+        $date = Carbon::create(($year ?? date('Y') ), $monthNumber, 1, 0,0,0);
 
-        $now = Carbon::now();
-
-        if ($date->month == $now->month && $year == strtolower(date('Y') )){
-            $start = Carbon::parse($now);
-        }
-        else {
-            $start = Carbon::parse($date)->firstOfMonth();
-        }
+        $start = Carbon::parse($date)->firstOfMonth();
         $end = Carbon::parse($date)->endOfMonth();
 
         return self::generateFullDateRange($start, $end);

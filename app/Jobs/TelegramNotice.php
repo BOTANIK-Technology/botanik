@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 
@@ -62,17 +63,6 @@ class TelegramNotice implements ShouldQueue
             return;
         }
 
-        $record = Record::find($this->record_id);
-        if (!$record) {
-            return;
-        }
-//        if (
-//            Carbon::parse($this->date) == Carbon::parse($record->date) &&
-//            Carbon::parse($this->time) == Carbon::parse($record->time)
-//        ) {
-////            $bot = new \TelegramBot\Api\BotApi($this->token);
-////            $bot->sendMessage($this->chat_id, $this->message);
-//        }
 
         $bot = new \TelegramBot\Api\BotApi($this->token);
         $bot->sendMessage($this->chat_id, $this->message);

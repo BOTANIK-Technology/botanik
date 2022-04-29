@@ -10,6 +10,7 @@ let ScheduleWindow = function () {
     this.address = null;
     this.master = null;
     this.calendar = null;
+    this.times = null;
 
     this.init = function () {
         let _this = this;
@@ -21,6 +22,8 @@ let ScheduleWindow = function () {
         this.service = this.service || document.getElementById('service');
         this.address = this.address || document.getElementById('address');
         this.master = this.master || document.getElementById('master');
+        this.calendar = document.getElementById('user_calendar');
+        this.times = document.getElementById('user_times');
 
 
         if (this.service.value) {
@@ -33,6 +36,9 @@ let ScheduleWindow = function () {
             _this.master.classList.add('hide');
             if (_this.calendar) {
                 _this.calendar.innerHTML = '';
+            }
+            if (_this.times) {
+                _this.times.innerHTML = '';
             }
             _this.loadAddresses();
         });

@@ -30,7 +30,7 @@
                 <a href="{{ route('client', $slug) }}">{{__('Клиенты')}}</a>
             </li>
             <li class="{{ Route::currentRouteNamed('schedule') ? 'active': '' }}">
-                <a href="{{ route('schedule', ['business' => $slug, 'date' => date('Y-m-d'), 'current_type' => 2, 'current_month' => strtolower(date('F') )] ) }}">{{__('Расписание')}}</a>
+                <a href="{{ route('schedule', ['business' => $slug, 'date' => date('Y-m-d'), 'current_month' => strtolower(date('F') )] ) }}">{{__('Расписание')}}</a>
             </li>
             @if ($package == 'pro' || $package == 'base')
                 <li class="{{ Route::currentRouteNamed('feedback') || Route::currentRouteNamed('review') ? 'active': '' }}">
