@@ -209,6 +209,7 @@ Route::group(
 
                     Route::post('/services/window/edit/{id}/confirm', [App\Http\Controllers\ServiceController::class, 'editService']);
                     Route::post('/services/window/create/confirm', [App\Http\Controllers\ServiceController::class, 'editService']);
+                    Route::post('/services/window/create/0/confirm', [App\Http\Controllers\ServiceController::class, 'editService']);
 
                     Route::post('/services/window/edit/{id}/remove-service', [App\Http\Controllers\ServiceController::class, 'removeService']);
                     Route::post('/services/window/edit/{id}/remove-address', [App\Http\Controllers\ServiceController::class, 'removeAddress']);

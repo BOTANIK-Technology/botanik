@@ -53,7 +53,7 @@ function unselect (userId = false) {
                 if (element) {
                     inputNames.forEach((input) => {
                         let attr = document.getElementById(input+id);
-                        attr.setAttribute("disabled", "disabled");
+                        attr.setAttribute("readonly", "readonly");
                         attr.removeEventListener('change', change);
                     });
                     document.getElementById(id).classList.remove('active');
@@ -65,7 +65,7 @@ function unselect (userId = false) {
     } else {
         inputNames.forEach((input) => {
             let attr = document.getElementById(input+userId);
-            attr.setAttribute("disabled", "disabled");
+            attr.setAttribute("readonly", "readonly");
             attr.removeEventListener('change', change);
         });
         document.getElementById('' + userId).classList.remove('active');
@@ -83,7 +83,7 @@ if (clients.length) {
                 current.push(clients[k].id);
                 inputNames.forEach((input) => {
                     let attr = document.getElementById(input + clients[k].id);
-                    attr.removeAttribute("disabled");
+                    attr.removeAttribute("readonly");
                 });
                 clients[k].classList.add('active');
                 clients[k].insertAdjacentHTML(
@@ -98,7 +98,7 @@ if (clients.length) {
                 );
                 sendUpdate(clients[k].id);
             }
-        })
+        });
     });
 }
 

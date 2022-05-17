@@ -36,15 +36,16 @@ let CreateUserWindow = function () {
         for (let slot of monthSlots){
             let slotId = slot.getAttribute('data-slot');
             let slotTimes = usedMonths[slotId];
-            for (let year of Object.keys(slotTimes) ){
-                for (let month of Object.keys(slotTimes[year])){
-                console.log(year, month);
-                    let child = document.createElement('div');
-                    child.innerText = year + '/' + monthsEnRu[month];
+            if(typeof slotTimes != 'undefined'){
+                for (let year of Object.keys(slotTimes) ){
+                    for (let month of Object.keys(slotTimes[year])){
+                        console.log(year, month);
+                        let child = document.createElement('div');
+                        child.innerText = year + '/' + monthsEnRu[month];
                         slot.appendChild(child);
+                    }
                 }
             }
-
         }
     }
 

@@ -69,7 +69,8 @@ class TypesController extends Controller
             'type' => TypeService::find($id),
             'load' => $request->load ?? 5,
             'modal' => $request->modal,
-            'countService' => Service::where('type_service_id', $id)->count()
+            'countService' => Service::where('type_service_id', $id)->count(),
+            'id'=>$id
         ];
 
         return view('service.page', $params);

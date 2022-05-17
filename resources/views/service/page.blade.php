@@ -67,10 +67,16 @@
                 }
                 if(!isset($countTypes)) {
                     $countTypes = 0;
+                    $_type = false;
                 }
             @endphp
             <div class="table grid" style="grid-template-columns: 10% 60% 15% 15%;">
                 @foreach ($types as $type)
+                    @if (isset($id) && $type->id == $id)
+                        @php
+                            $_type = $type;
+                        @endphp
+                    @endif
                     @if ($ti > $load_types) @break @endif
                     <div class="flex align-items-center justify-content-center num">
                         {{$loop->iteration}}
@@ -100,10 +106,16 @@
                 }
                 if(!isset($countAddresses)) {
                     $countAddresses = 0;
+                    $_address = false;
                 }
             @endphp
             <div class="table grid" style="grid-template-columns: 10% 60% 15% 15%;">
                 @foreach ($addresses as $address)
+                    @if (isset($id) && $address->id == $id)
+                        @php
+                            $_address = $address;
+                        @endphp
+                    @endif
                     @if ($ai > $load_addresses) @break @endif
                     <div class="flex align-items-center justify-content-center num">
                         {{$loop->iteration}}
@@ -135,9 +147,15 @@
 @endif
 
 @if ($view == 'types' && isset($modal))
+    <?php
+    $type = $_type;
+    ?>
     @include('type.' . $modal)
 @endif
 
 @if ($view == 'addresses' && isset($modal))
+    <?php
+    $address = $_address;
+    ?>
     @include('address.' . $modal)
 @endif

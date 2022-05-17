@@ -18,6 +18,10 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
 use Illuminate\View\View;
+use Swift_Mailer;
+use Swift_Message;
+use Swift_SmtpTransport;
+use Illuminate\Support\Facades\URL;
 
 class UserController extends Controller
 {
@@ -199,6 +203,7 @@ class UserController extends Controller
      */
     public function addUser(Request $request): JsonResponse
     {
+
         $validator = $this->validateUser($request);
 
         if ($validator->fails()) {
@@ -260,7 +265,7 @@ class UserController extends Controller
             $user->attachTimetables($request->timetables, $request->addresses, $services);
             $user->attachCustom('addresses', $request->addresses);
 
-            if (!isset($array['status']) && \ConnectService::prepareJob()) {
+            /*if (!isset($array['status']) && \ConnectService::prepareJob()) {
                 SendMail::dispatch(
                     $request->business,
                     $request->email,
@@ -268,6 +273,18 @@ class UserController extends Controller
                     $request->name,
                     $request->business_name
                 )->delay(now()->addMinutes(2));
+            }*/
+            if(!isset($array['status'])){
+                $url = URL::to('/').'/'.$request->business.'/login';
+                $body = "Логин: <b>{$request->email}</b><br>Пароль: <b>{ $request->password}</b><br>Ссылка на вход: {$url}";
+                $transport = new Swift_SmtpTransport('localhost', 25);
+                $mailer = new Swift_Mailer($transport);
+                $message = (new Swift_Message('Доступ к BOTANIK' . $request->business_name))
+                    ->setFrom([env('MAIL_FROM_ADDRESS') => 'Office.botanik'])
+                    ->setTo([$request->email => $request->name])
+                    ->setBody($body, 'text/html');
+
+                $res = $mailer->send($message);
             }
 
             return response()->json(['ok' => true], 200);
@@ -313,6 +330,7 @@ class UserController extends Controller
             ];
 
             if (!empty($request->password)) {
+                $pwd = $request->password;
                 $array['password'] = bcrypt($request->password);
             }
 
@@ -333,6 +351,20 @@ class UserController extends Controller
 //            $user->attachTimetables($request->timetables, $request->addresses, $services);
 //
 //            $user->attachCustom('addresses', $request->addresses, true);
+
+            if($request->id == 0){
+                $url = URL::to('/').'/'.$request->route()->parameter('business').'/login';
+                $body = "Логин: <b>{$array['email']}</b><br>Пароль: <b>{$pwd}</b><br>Ссылка на вход: {$url}";
+                $transport = new Swift_SmtpTransport('localhost', 25);
+                $mailer = new Swift_Mailer($transport);
+                $message = (new Swift_Message('Доступ к BOTANIK'))
+                    ->setFrom([env('MAIL_FROM_ADDRESS') => 'Office.botanik'])
+                    ->setTo([$array['email'] => $array['name']])
+                    ->setBody($body, 'text/html');
+
+                $res = $mailer->send($message);
+            }
+
 
             return response()->json(['ok' => true], 200);
 
@@ -504,7 +536,7 @@ class UserController extends Controller
             'name'       => 'required|string|min:1',
             'phone'      => 'nullable|string|max:20',
             'email'      => 'required|email',
-            'password'   => 'nullable|string|min:6|max:25',
+            'password'   => 'nullable|string|min:6|max:100',
             'role'       => 'required|string',
             'addresses'  => 'required|array',
             'services'   => 'nullable|array',

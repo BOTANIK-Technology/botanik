@@ -56,15 +56,15 @@
                 @foreach($clients as $client)
                     <div id="{{$client->id}}" class="client-item client {{$loop->index == 0 ? '' : 'border-top'}}">
                         <div class="text-align-center client-data border-right-main pointer">{{$client->id}}</div>
-                        <input id="last-name-{{$client->id}}" class="border-right" type="text" value="{{$client->last_name ?? ''}}" disabled>
-                        <input id="first-name-{{$client->id}}" class="border-right" type="text" value="{{$client->first_name ?? ''}}" disabled>
-                        <input id="middle-name-{{$client->id}}" class="border-right" type="text" value="{{$client->middle_name ?? ''}}" disabled>
-                        <input id="username-{{$client->id}}" class="border-right" type="text" value="{{$client->username ?? ''}}" disabled>
-                        <input id="phone-{{$client->id}}" class="border-right" type="text" value="{{$client->phone ?? ''}}" disabled>
-                        <input id="email-{{$client->id}}" class="border-right email" type="text" value="{{$client->email ?? ''}}" disabled>
-                        <input id="age-{{$client->id}}" class="border-right" type="text" value="{{$client->age ?? ''}}" disabled>
-                        <input id="sex-{{$client->id}}" class="border-right" type="text" value="@if (isset($client->sex)){{$client->sex == 1 ? 'мужской' : 'женский'}} @endif" disabled>
-                        <input id="bonus-{{$client->id}}" class="border-right-none" type="text" value="{{$client->bonus ?? 0}}" disabled>
+                        <input id="last-name-{{$client->id}}" class="border-right" type="text" value="{{$client->last_name ?? ''}}" readonly>
+                        <input id="first-name-{{$client->id}}" class="border-right" type="text" value="{{$client->first_name ?? ''}}" readonly>
+                        <input id="middle-name-{{$client->id}}" class="border-right" type="text" value="{{$client->middle_name ?? ''}}" readonly>
+                        <input id="username-{{$client->id}}" class="border-right" type="text" value="{{$client->username ?? ''}}" readonly>
+                        <input id="phone-{{$client->id}}" class="border-right" type="text" value="{{$client->phone ?? ''}}" readonly>
+                        <input id="email-{{$client->id}}" class="border-right email" type="text" value="{{$client->email ?? ''}}" readonly>
+                        <input id="age-{{$client->id}}" class="border-right" type="text" value="{{$client->age ?? ''}}" readonly>
+                        <input id="sex-{{$client->id}}" class="border-right" type="text" value="@if (isset($client->sex)){{$client->sex == 1 ? 'мужской' : 'женский'}} @endif" readonly>
+                        <input id="bonus-{{$client->id}}" class="border-right-none" type="text" value="{{$client->bonus ?? 0}}" readonly>
                     </div>
                 @endforeach
             @endif
@@ -160,3 +160,7 @@
 @endcomponent
 @endsection
 @endif
+
+<style>
+    .client-item input:read-only{outline:none;}
+</style>

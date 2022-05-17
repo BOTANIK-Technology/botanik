@@ -179,20 +179,24 @@ const setInitialData = (idVal) => {
 
     let slot = document.getElementById('filled-months');
     let slotTimes = usedMonths[0];
-    for (let year of Object.keys(slotTimes)) {
-        for (let month of Object.keys(slotTimes[year])) {
-            let child = document.createElement('div');
-            child.innerText = year + '/' + monthsEnRu[month];
-            slot.appendChild(child);
+    if(typeof slotTimes != 'undefined'){
+        for (let year of Object.keys(slotTimes)) {
+            for (let month of Object.keys(slotTimes[year])) {
+                let child = document.createElement('div');
+                child.innerText = year + '/' + monthsEnRu[month];
+                slot.appendChild(child);
+            }
         }
     }
+
 
     /**
      * Group
      */
-    let groupBlock = document.getElementById('group-service');
+    /*let groupBlock = document.getElementById('group-service');
     let groupBtns = document.getElementsByName('group');
     if (groupBlock) {
+        console.log(groupVal(idVal));
         if (groupVal(idVal)) {
             groupOff(groupBlock, idVal);
         } else {
@@ -223,7 +227,7 @@ const setInitialData = (idVal) => {
             else
                 prepayOff(prepayBlock, idVal)
         });
-    }
+    }*/
 }
 
 function groupOff(groupBlock, id) {

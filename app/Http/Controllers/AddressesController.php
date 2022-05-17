@@ -68,7 +68,8 @@ class AddressesController extends Controller
             'address' => Address::find($id),
             'load' => $request->load ?? 5,
             'modal' => $request->modal,
-            'countService' => ServiceAddress::where('address_id', $id)->count()
+            'countService' => ServiceAddress::where('address_id', $id)->count(),
+            'id' => $id
         ];
 
         return view('service.page', $params);

@@ -70,10 +70,10 @@ function getData() {
     let serviceSelects = [];
     let addressSelects = [];
 
-
     serviceTypeSelects.push(document.getElementsByClassName('master-service-type'));
     serviceSelects.push(document.getElementsByClassName('master-service'));
     addressSelects.push(document.getElementsByClassName('master-address'));
+
 
     let data = {
         'name': fio.value,
@@ -173,6 +173,10 @@ document.getElementById('edit-user').addEventListener('click', function () {
         'password': data.password,
         'timetables': getCookie('timetables')
     };
+    
+    let adminAddressSelects = [];
+    adminAddressSelects.push(document.getElementsByClassName('admin-address'));
+    console.log(adminAddressSelects);
 
     if (master.checked) {
         send.role = master.value;

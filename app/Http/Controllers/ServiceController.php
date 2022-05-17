@@ -81,6 +81,7 @@ class ServiceController extends Controller
      */
     public function window(Request $request)
     {
+
         $id = $request->id ?? $request->service_id;
         $business = $request->business;
         $modal = $request->modal;
@@ -124,7 +125,6 @@ class ServiceController extends Controller
                 if ($serviceView) {
                     $this->params['view_service_type'] = TypeService::find($serviceView->type_service_id);
                 }
-
                 break;
         }
 

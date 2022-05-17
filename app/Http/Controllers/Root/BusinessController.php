@@ -86,7 +86,7 @@ class BusinessController extends Controller
             'last_name' => 'required|string|min:1|max:30',
             'first_name' => 'required|string|min:1|max:30',
             'middle_name' => 'required|string|min:1|max:30',
-            'password' => 'required|string|min:6|max:25|confirmed',
+            'password' => 'required|string|min:6|max:100|confirmed',
             'email' => 'required|email|unique:owners,email',
             'business_name' => 'required|string|min:1|max:255',
             'bot_name' => 'required|string|min:3|max:32',
