@@ -25,3 +25,4 @@ data/dev
 /composer.lock
 /vendor/
 /storage/
+/node_modules/
